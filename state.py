@@ -5,4 +5,4 @@ from food import Food
 class State:
     game_over: bool
     in_end_screen: bool
-    food: Food
+    food: list[Food]

@@ -48,15 +48,29 @@ default_player_controls = {
 }
 
 player_1_controls = {
-    pygame.K_LEFT: Controls.LEFT,
-    pygame.K_RIGHT: Controls.RIGHT,
     pygame.K_UP: Controls.UP,
+    pygame.K_LEFT: Controls.LEFT,
     pygame.K_DOWN: Controls.DOWN,
+    pygame.K_RIGHT: Controls.RIGHT,
 }
 
 player_2_controls = {
-    pygame.K_a: Controls.LEFT,
-    pygame.K_d: Controls.RIGHT,
     pygame.K_w: Controls.UP,
+    pygame.K_a: Controls.LEFT,
     pygame.K_s: Controls.DOWN,
+    pygame.K_d: Controls.RIGHT,
+}
+
+player_3_controls = {
+    pygame.K_t: Controls.UP,
+    pygame.K_f: Controls.LEFT,
+    pygame.K_g: Controls.DOWN,
+    pygame.K_h: Controls.RIGHT,
+}
+
+player_4_controls = {
+    pygame.K_i: Controls.UP,
+    pygame.K_j: Controls.LEFT,
+    pygame.K_k: Controls.DOWN,
+    pygame.K_l: Controls.RIGHT,
 }
