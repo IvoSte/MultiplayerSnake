@@ -3,7 +3,7 @@ from viewer import Viewer
 from state import State
 from colors import Color
 from food import Food
-from input_controls import inputHandler, Controls
+from input_controls import inputHandler, Controls, player_1_controls, player_2_controls, general_controls
 import pygame
 import time
 import random
@@ -21,13 +21,15 @@ class Game():
 
         # Keep a clock
         self.clock = pygame.time.Clock()
+        self.time_elapsed = 0
         
         # Initialize display
         self.viewer = Viewer(snake_size=self.snake_size, display_size=display_size)
 
         # Keep a list of all the players
         self.players = []
-        self.players.append(Player(display_size[0] / 2, display_size[1] / 2, speed=15))
+        self.players.append(Player(display_size[0] / 2, display_size[1] / 2, speed=2, name = "p1", controls= player_1_controls))
+        #self.players.append(Player(display_size[0] / 3, display_size[1] / 2, speed=15, name = "p2",  controls= player_2_controls))
         
         # Set state
         self.state = State(game_over = False, in_end_screen = False, food = None)
@@ -38,6 +40,35 @@ class Game():
         self.state.food = Food((foodx, foody), self)
         self.viewer.draw_food(self.state.food)
 
+    def end_screen(self):
+        # This function should be somewhere else and probably not a function, but for now its fine #TODO
+        self.viewer.clear_screen()
+        self.viewer.render_message("You Lost! Press any key to quit", Color.RED.value)
+        self.viewer.display_player_score(self.players[0])
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                print("Quitting game from end screen")
+                self.state.game_over = True
+                self.state.in_end_screen = False
+
+    def parse_general_command(self, command):
+        # Quit key
+        if command == Controls.QUIT:
+            self.state.game_over = True
+        if command == Controls.PAUSE:
+            self.pause_menu()
+
+    def pause_menu(self):
+        print("pause menu")
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key in general_controls:
+                    return   
+        return
+                
+
     def run(self):
         # Pre game setup
         self.spawn_food()
@@ -47,39 +78,37 @@ class Game():
 
             ###  End Screen
             while self.state.in_end_screen == True:
-                self.viewer.clear_screen()
-                self.viewer.render_message("You Lost! Press any key to quit", Color.RED.value)
-                self.viewer.display_player_score(self.players[0])
-                pygame.display.update()
-    
-                for event in pygame.event.get():
-                    if event.type == pygame.KEYDOWN:
-                        print("Quitting game from end screen")
-                        self.state.game_over = True
-                        self.state.in_end_screen = False
-    
+                self.end_screen()
+
             ###  Main game
             # Clear screen function
             self.viewer.clear_screen()
 
             # Draw food
             self.viewer.draw_food(self.state.food)
-            
-            for player in self.players:
-                # Move the player
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.state.game_over = True
 
-                    if event.type == pygame.KEYDOWN:
-                        command = inputHandler(event)
-                        # Quit key
-                        if command == Controls.QUIT:
-                            self.state.game_over = True
-                            break
-                        # Move
-                        player.set_command(command)
-                #if pygame.time.get_ticks() % player.speed == 0:
+            # Read each input
+            for event in pygame.event.get():
+                # If the game is closed
+                if event.type == pygame.QUIT:
+                    self.state.game_over = True
+
+                # If the event is a keypress
+                if event.type == pygame.KEYDOWN:
+
+                    # Parse the keypress to a command
+                    if event.key in general_controls:
+                        self.parse_general_command(general_controls[event.key])
+                        break
+                    
+                    # Receive player command
+                    for player in self.players:
+                        if event.key in player.controls:
+                            player.set_command(player.controls[event.key])
+
+            #if pygame.time.get_ticks() % player.speed == 0:
+            # Move players snake
+            for player in self.players:
                 player.move()
 
                 # TODO: This means it is game over for everyone if any one snake dies
@@ -91,7 +120,8 @@ class Game():
                 player.eat_food(food = self.state.food)
                 player.update_body()
     
-            self.viewer.draw_snake(self.players[0])
+            for player in self.players:
+                self.viewer.draw_snake(player)
             
             # Update score
             self.viewer.display_player_score(self.players[0])
@@ -100,7 +130,7 @@ class Game():
             self.viewer.update()
     
             # Move time forward
-            self.clock.tick(15)
+            self.elapsed = self.clock.tick(30)
     
         # Quit the game if the main game loop breaks
         pygame.quit()

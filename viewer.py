@@ -32,7 +32,7 @@ class Viewer():
 
     def draw_snake(self, player):
         for pos in player.body:
-            pygame.draw.rect(self.dis, Color.BLACK.value, [pos[0], pos[1], self.snake_size[0], self.snake_size[1]])
+            pygame.draw.rect(self.dis, player.color, [pos[0], pos[1], self.snake_size[0], self.snake_size[1]])
     
     def draw_food(self, food):
         pygame.draw.rect(self.dis, Color.GREEN.value, [food.pos[0], food.pos[1], self.snake_size[0], self.snake_size[1]])
