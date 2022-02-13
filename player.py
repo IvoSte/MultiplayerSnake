@@ -2,12 +2,16 @@ from colors import Color, colormaps
 from input_controls import Controls, default_player_controls
 import pygame
 import random
+from env_variables import DEATH_PUNISHMENT, SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, MAX_COLOR_SCALE
 
 class Player:
-    def __init__(self, x_pos, y_pos, speed=15, width=10, length=1, color=random.randint(0, 255), colormap = random.choice(colormaps), colorscale=random.randint(0, 3), score=0, name="Player", controls=default_player_controls):
+    def __init__(self, x_pos, y_pos, speed=SNAKE_SPEED, width = SNAKE_SIZE, length=INITIAL_SNAKE_LENGTH, color=random.randint(0, 255), colormap = random.choice(list(colormaps.values())), colorscale=random.randint(1, MAX_COLOR_SCALE), score=0, lives = 0, name="Player", controls=default_player_controls):
         self.name = name
         self.controls = controls
-        
+
+        self.spawn_pos_x = x_pos
+        self.spawn_pos_y = y_pos
+
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.speed = speed
@@ -20,6 +24,7 @@ class Player:
 
         self.score = score
         self.alive = True
+        self.lives_left = lives
         self.command = None
         self.move_dir_buffer = None
         self.move_dist_buffer = 0
@@ -32,7 +37,7 @@ class Player:
     def update_body(self):
         # Update total body positions
         self.body.append((self.x_pos, self.y_pos))
-        if len(self.body) > self.length:
+        while len(self.body) > self.length:
             self.body.pop(0)
 
     def is_dead(self, display_size, snakes = None):
@@ -52,7 +57,13 @@ class Player:
     def collision(self, other) -> bool:
         # Collision if my head is in your body, we collided. You can be me
         # TODO head collisions are acceptable
-        return self.body[len(self.body) - 1] in other.body[0:len(other.body) - 2]
+
+        # If my head and neck are at the same position, don't check collisions 
+        # because it means I just spawned
+        # TODO possibly index out of bounds issue here where it checks the neck if there is none. 
+        if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
+            return False
+        return self.body[len(self.body) - 1] in other.body[0:len(other.body) - 1]
 
     def move(self):
         # The move command is issued each tick. This function translates that check to the move speed
@@ -105,4 +116,30 @@ class Player:
         if command == Controls.RIGHT and self.move_dir_buffer == Controls.LEFT:
             return False
         return True
+
+
+    def respawn(self, x_pos = None, y_pos = None, punishment = DEATH_PUNISHMENT):
+        # Default spawn or given arguments
+        x_pos = self.spawn_pos_x if x_pos == None else x_pos
+        y_pos = self.spawn_pos_y if y_pos == None else y_pos
+
+        print(f"{self.name} respawning. {self.lives_left} lives left.")
+        
+        # Set alive
+        self.alive = True
+
+        # Cut off some of the tail
+        self.length = self.length-punishment if self.length-punishment > 1 else 1
+        
+        self.command = None
+        self.move_dir_buffer = None
+        self.spawn(x_pos, y_pos)
+
+    def spawn(self, x_pos, y_pos):
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+        
+        # Remove body at spawn. It will grow to length when starting to move.
+        # Having only a head avoids collision with body at respawn
+        self.body = [(x_pos, y_pos)]
         

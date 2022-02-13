@@ -9,10 +9,17 @@ class Color(Enum):
     GREEN = (0, 255, 0)
     BLUE = (50, 153, 213)
 
-colormaps = [turbo_colormap, viridis_colormap, magma_colormap, inferno_colormap, plasma_colormap]
+colormaps = {"Turbo" : turbo_colormap, 
+            "Viridis" : viridis_colormap,
+            "Magma" : magma_colormap, 
+            "Inferno" : inferno_colormap, 
+            "Plasma" : plasma_colormap}
 
 def color(colormap, i):
     return to_rgb(colormap[i % len(colormap)])
+
+def rgb_color(r,g,b,a = 255):
+    return ()
 
 def to_rgb(color_floats):
     return tuple(x * 255.0 for x in color_floats)

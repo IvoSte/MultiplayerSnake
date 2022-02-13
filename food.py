@@ -1,11 +1,12 @@
-class Food:
-    
-    def __init__(self, pos, gameManager):
-        self.pos = pos
-        self.gameManager = gameManager
+from item import Item
 
-    def attach(self, observer):
-        self._gameManager.append(observer)
+class Food(Item):
+    
+    def __init__(self, gameManager, pos, color):
+        super().__init__(gameManager)
+        self.pos = pos
+        self.color = color
+
         
     def notify(self):
         self.gameManager.spawn_food()
@@ -14,3 +15,5 @@ class Food:
         self.notify()
         del self
     
+    def spawn(self):
+        pass
