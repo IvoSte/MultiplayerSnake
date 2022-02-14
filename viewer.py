@@ -69,7 +69,7 @@ class Viewer():
         pygame.draw.rect(self.dis, food.color, [food.pos[0], food.pos[1], self.snake_size[0], self.snake_size[1]])
 
     def draw_environment(self, environment):
-        for idx, agent in enumerate(environment.agents):
-            print(f"drawing agent {idx}/{len(environment.agents)}", end = '\r')
-            pygame.draw.rect(self.dis, pygame.Color(0, 0, 0), [agent.x_pos, agent.y_pos, agent.size[0], agent.size[1]]) 
+        for idx, agent in enumerate(environment.active_agents):
+            print(f"drawing agent {idx}/{len(environment.active_agents)}", end = '\r')
+            pygame.draw.rect(self.dis, agent.color, [agent.x_pos * agent.size[0], agent.y_pos * agent.size[1], agent.size[0], agent.size[1]]) 
             

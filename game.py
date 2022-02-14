@@ -41,7 +41,8 @@ class Game():
         # Set state
         self.state = State(game_over = False, in_end_screen = False, food = [])
     
-    def init(self):
+    #### Game init -- Could be split to own file
+    def init_game(self):
         # Pre game setup
         
         # Setup environment
@@ -65,12 +66,22 @@ class Game():
                     colormap = colormaps[[*colormaps][i]], name=f"{i+1} - {[*colormaps][i]}", controls=self.control_sets[i]))
 
     def init_environment(self):
-        self.environment = Environment(self.display_size[0], self.display_size[1], self.snake_size, Color.BLUE.value)
+        self.environment = Environment(self.display_size[0], self.display_size[1], self.snake_size, pygame.Color(0,0,255,255))
 
     def init_food(self):
         self.food = []
         for _ in range(INITIAL_FOOD):
             self.spawn_food()
+
+    #### End game init
+
+    def restart_game(self):
+        self.init_game()
+        self.run()
+
+    def quit_game(self):
+        pygame.quit()
+        quit()
 
     def spawn_food(self):
         food_size = float(SNAKE_SIZE) 
@@ -94,19 +105,7 @@ class Game():
                         self.restart_game()
                     else : 
                         print("Quitting game from end screen")
-                        pygame.quit()
-                        quit()
-
-    def parse_general_command(self, command):
-        # Quit key
-        if command == Controls.QUIT:
-            self.state.game_over = True
-        if command == Controls.PAUSE:
-            self.pause_menu()
-
-    def restart_game(self):
-        self.init()
-        self.run()
+                        self.quit_game()
 
     def pause_menu(self):
         set_pause_screen(self)
@@ -122,6 +121,13 @@ class Game():
                         self.end_screen()
                     if general_controls[event.key] == Controls.RESTART:
                         self.restart_game()
+
+    def parse_general_command(self, command):
+        # Quit key
+        if command == Controls.QUIT:
+            self.state.game_over = True
+        if command == Controls.PAUSE:
+            self.pause_menu()
 
     def players_alive(self) -> int:
         return sum(1 for player in self.players if player.alive)
@@ -141,7 +147,7 @@ class Game():
         self.viewer.clear_screen()
 
         # Draw background / environment
-        #self.viewer.draw_environment(self.environment)
+        self.viewer.draw_environment(self.environment)
 
         # Draw food TODO draw items / draw entities
         for food in self.food:
@@ -197,6 +203,7 @@ class Game():
             for food in self.food:
                 if player.eat_food(food = food):
                     eaten_food.append(food)
+                    self.environment.activate_agents(food.pos)
             for food in eaten_food:
                 self.food.remove(food)
 
@@ -205,6 +212,7 @@ class Game():
     def update(self):
         self.parse_input()
         self.update_players()
+        self.environment.update_environment()
 
     def run(self):
 
@@ -224,5 +232,4 @@ class Game():
     
         self.end_screen()
         # Quit the game if the main game loop breaks
-        pygame.quit()
-        quit()
+        self.quit_game()
