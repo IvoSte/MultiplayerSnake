@@ -7,7 +7,7 @@ from colors import Color, colormaps
 from food import Food
 from input_controls import inputHandler, Controls, player_1_controls, player_2_controls, general_controls, player_3_controls, player_4_controls
 from env_variables import INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
-    SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED
+    SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, TICKS_PER_SECOND
 from screens import set_end_screen, set_pause_screen
 import pygame
 import time
@@ -90,9 +90,12 @@ class Game():
         while in_end_screen:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-                    print("Quitting game from end screen")
-                    pygame.quit()
-                    quit()
+                    if general_controls[event.key] == Controls.RESTART:
+                        self.restart_game()
+                    else : 
+                        print("Quitting game from end screen")
+                        pygame.quit()
+                        quit()
 
     def parse_general_command(self, command):
         # Quit key
@@ -132,7 +135,6 @@ class Game():
         if len(self.players) == 1 and self.players_lives_left() == 0 or\
             len(self.players) > 1 and self.players_lives_left() == 1:
             self.state.game_over = True
-            self.state.in_end_screen = True
 
 
     def draw(self):
@@ -218,8 +220,9 @@ class Game():
             self.draw()
             
             # Move time forward
-            self.time_elapsed = self.clock.tick(30)
+            self.time_elapsed = self.clock.tick(TICKS_PER_SECOND)
     
+        self.end_screen()
         # Quit the game if the main game loop breaks
         pygame.quit()
         quit()

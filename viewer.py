@@ -29,8 +29,8 @@ class Viewer():
 
     def display_players_information(self, players):
         self.display_player_information(players, self.display_player_score, 0, 0)
-        self.display_player_information(players, self.display_snake_length, 250, 0)
-        self.display_player_information(players, self.display_player_lives_left, 450, 0)
+        self.display_player_information(players, self.display_snake_length, 500, 0)
+        self.display_player_information(players, self.display_player_lives_left, 1000, 0)
 
     def display_player_information(self, players, display_function, x_offset, y_offset):
         positions = [[0 + x_offset, 0 + (20 * n) + y_offset] for n in range(len(players))]

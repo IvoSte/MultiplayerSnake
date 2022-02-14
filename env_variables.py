@@ -1,6 +1,7 @@
 # Environment / Visual
 SCREEN_SIZE_X = 1200
 SCREEN_SIZE_Y = 800
+TICKS_PER_SECOND = 60
 SNAKE_SIZE = 20
 
 # Player
