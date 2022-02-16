@@ -101,7 +101,7 @@ class Game():
         in_end_screen = True
         while in_end_screen:
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN and event.key in general_controls:
                     if general_controls[event.key] == Controls.RESTART:
                         self.restart_game()
                     else : 
@@ -139,10 +139,9 @@ class Game():
         return active_lives + reserve_lives
 
     def is_game_over(self):
-        if len(self.players) == 1 and self.players_lives_left() == 0 or\
-            len(self.players) > 1 and self.players_lives_left() == 1:
+        if NUMBER_OF_PLAYERS == 1 and self.players_alive() == 0 or\
+            NUMBER_OF_PLAYERS > 1 and self.players_alive() == 1:
             self.state.game_over = True
-
 
     def draw(self):
         self.viewer.clear_screen()

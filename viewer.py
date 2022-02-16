@@ -80,9 +80,15 @@ class Viewer():
         self.dis.blit(msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y])
 
     def draw_snake(self, player):
+        # Draw body
         for idx, pos in enumerate(player.body):
             pygame.draw.rect(self.dis, color(player.colormap, player.color + ((len(player.body) - idx) * player.colorscale)), [
                              pos[0], pos[1], self.snake_size[0], self.snake_size[1]])
+        # Draw decaying body
+        for idx, pos in enumerate(player.decaying_body):
+            pygame.draw.rect(self.dis, player.decay_body_color[idx], [
+                             pos[0], pos[1], self.snake_size[0], self.snake_size[1]])
+            
     
     def draw_food(self, food):
         pygame.draw.rect(self.dis, food.color, [food.pos[0], food.pos[1], self.snake_size[0], self.snake_size[1]])

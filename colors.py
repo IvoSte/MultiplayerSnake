@@ -23,12 +23,12 @@ def make_continuous(colormap):
     return colormap + tail
 
 colormaps = {
+    "Turbo" : turbo_colormap, 
     "Green" : green_colormap,
     "Red" : red_colormap,
     "Blue" : blue_colormap,
     "Inferno" : inferno_colormap, 
     "Magma" : magma_colormap, 
-    "Turbo" : turbo_colormap, 
     "Viridis" : viridis_colormap,
     "Plasma" : plasma_colormap,
     }

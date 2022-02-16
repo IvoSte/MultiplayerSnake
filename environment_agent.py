@@ -1,4 +1,6 @@
 from agent import Agent
+from colormaps import generate_colormap
+from colors import color
 from pygame import Color
 from env_variables import AGENT_EFFECT_STEP_SIZE
 
@@ -11,6 +13,7 @@ class Env_agent(Agent):
         self.size = size
         self.base_color = color
         self.color = color
+        self.colormap = generate_colormap(0, color.r, 255, color.g, 255, color.b)
         self.intensity = 255
 
         self.active = False
@@ -29,7 +32,7 @@ class Env_agent(Agent):
     def update(self):
         self.decrease_intensity()
         self.color = [x + ((y-x)/(255/AGENT_EFFECT_STEP_SIZE)) * ((255 - self.intensity)/AGENT_EFFECT_STEP_SIZE) for x, y in zip(Color(0, 255, 255), self.base_color)]
-
+        #self.color = color(self.colormap, 255 - self.intensity)
         if self.intensity == 250:
             self.infectious = True
         else : 
