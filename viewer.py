@@ -1,7 +1,7 @@
 import random
 import pygame
-from colors import Color, turbo_color, color
-from env_variables import SCREEN_SIZE_X, SCREEN_SIZE_Y, SNAKE_SIZE
+from colors import Color, turbo_color, color, extend_colormaps
+from env_variables import PLAYER_SCORE_BOXES, SCREEN_SIZE_X, SCREEN_SIZE_Y, SNAKE_SIZE
 
 class Viewer():
     def __init__(self, snake_size=(SNAKE_SIZE,SNAKE_SIZE), display_size=(SCREEN_SIZE_X,SCREEN_SIZE_Y), game_title="Multiplayer Snake Game - Extraordinaire"):
@@ -28,25 +28,44 @@ class Viewer():
     # have the same information at all times.
 
     def display_players_information(self, players):
-        self.display_player_information(players, self.display_player_score, 0, 0)
-        self.display_player_information(players, self.display_snake_length, 500, 0)
-        self.display_player_information(players, self.display_player_lives_left, 1000, 0)
+        if PLAYER_SCORE_BOXES :
+            self.display_players_information_boxes(players)
+        else :
+            self.display_player_information(players, self.display_player_score, 0, 0)
+            self.display_player_information(players, self.display_snake_length, 500, 0)
+            self.display_player_information(players, self.display_player_lives_left, 1000, 0)
 
     def display_player_information(self, players, display_function, x_offset, y_offset):
         positions = [[0 + x_offset, 0 + (20 * n) + y_offset] for n in range(len(players))]
         for idx, player in enumerate(players):
             display_function(player, positions[idx])
 
-    def display_player_score(self, player, position):
-        value = self.score_font.render(f"{player.name} - points: {player.score}", True, Color.WHITE.value)
+    def display_players_information_boxes(self, players):
+        positions = [[0,0], [SCREEN_SIZE_X - 180, 0], [0, SCREEN_SIZE_Y - 90], [SCREEN_SIZE_X - 180, SCREEN_SIZE_Y - 90]]
+        for idx, player in enumerate(players):
+            text_color = color(player.colormap, player.color)
+            self.display_player_information_box(player, positions[idx], text_color)
+
+    def display_player_information_box(self, player, pos, color):
+        length = pygame.font.SysFont("futura", 90).render(f"{player.length}", True, color)
+        score =  pygame.font.SysFont("futura", 45).render(f"S {player.score}", True, color)
+        eaten = pygame.font.SysFont("futura", 45).render(f"B {player.tails_eaten}", True, color)
+        lives =  pygame.font.SysFont("garamond", 45).render(f" {'♥'*player.lives_left}", True, color)
+        self.dis.blit(length, pos)
+        self.dis.blit(score, [pos[0] + 105, pos[1]])
+        self.dis.blit(eaten, [pos[0] + 105, pos[1] + 25])
+        self.dis.blit(lives, [pos[0], pos[1] + 45])
+
+    def display_player_score(self, player, position, color = Color.WHITE.value):
+        value = self.score_font.render(f"{player.name} - points: {player.score}", True, color)
         self.dis.blit(value, position)
 
-    def display_snake_length(self, player, position):
-        value = self.score_font.render(f"tail length: {player.length}", True, Color.WHITE.value)
+    def display_snake_length(self, player, position, color = Color.WHITE.value):
+        value = self.score_font.render(f"tail length: {player.length}", True, color)
         self.dis.blit(value, position)
 
-    def display_player_lives_left(self, player, position):
-        value = self.score_font.render(f"lives: {player.lives_left}", True, Color.WHITE.value)
+    def display_player_lives_left(self, player, position, color = Color.WHITE.value):
+        value = self.score_font.render(f"lives: {player.lives_left}", True, color)
         self.dis.blit(value, position)
 
 
@@ -62,7 +81,7 @@ class Viewer():
 
     def draw_snake(self, player):
         for idx, pos in enumerate(player.body):
-            pygame.draw.rect(self.dis, color(player.colormap, player.color + (idx * player.colorscale)), [
+            pygame.draw.rect(self.dis, color(player.colormap, player.color + ((len(player.body) - idx) * player.colorscale)), [
                              pos[0], pos[1], self.snake_size[0], self.snake_size[1]])
     
     def draw_food(self, food):

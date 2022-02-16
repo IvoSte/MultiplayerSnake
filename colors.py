@@ -1,5 +1,6 @@
 from enum import Enum
-from colormaps import turbo_colormap, viridis_colormap, magma_colormap, inferno_colormap, plasma_colormap
+from colormaps import turbo_colormap, viridis_colormap, magma_colormap, inferno_colormap, plasma_colormap, green_colormap, red_colormap, blue_colormap
+from copy import deepcopy
 
 class Color(Enum):
     WHITE = (255, 255, 255)
@@ -9,13 +10,30 @@ class Color(Enum):
     GREEN = (0, 255, 0)
     BLUE = (50, 153, 213)
 
+# I made this function because I didn't want to surround the colormaps in the colormaps dict with the make_continuous function. Maybe that is the better option though
+# Is there a third way?
+
+def extend_colormaps(colormaps):
+    for name, colormap in colormaps.items():
+        colormaps[name] = make_continuous(colormap)
+
+def make_continuous(colormap):
+    tail = deepcopy(colormap)
+    tail.reverse()
+    return colormap + tail
+
 colormaps = {
+    "Green" : green_colormap,
+    "Red" : red_colormap,
+    "Blue" : blue_colormap,
     "Inferno" : inferno_colormap, 
     "Magma" : magma_colormap, 
     "Turbo" : turbo_colormap, 
     "Viridis" : viridis_colormap,
-    "Plasma" : plasma_colormap
+    "Plasma" : plasma_colormap,
     }
+
+extend_colormaps(colormaps)
 
 def color(colormap, i):
     return to_rgb(colormap[i % len(colormap)])

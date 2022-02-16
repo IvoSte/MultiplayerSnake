@@ -2,7 +2,7 @@ from colors import Color, colormaps
 from input_controls import Controls, default_player_controls
 import pygame
 import random
-from env_variables import DEATH_PUNISHMENT, SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, MAX_COLOR_SCALE
+from env_variables import DEATH_PUNISHMENT, FREEZE_FRAMES_ON_EAT, SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, MAX_COLOR_SCALE, TAIL_BITING, TAIL_STEALING
 
 class Player:
     def __init__(self, x_pos, y_pos, speed=SNAKE_SPEED, width = SNAKE_SIZE, length=INITIAL_SNAKE_LENGTH, color=random.randint(0, 255), colormap = random.choice(list(colormaps.values())), colorscale=random.randint(1, MAX_COLOR_SCALE), score=0, lives = 0, name="Player", controls=default_player_controls):
@@ -31,6 +31,9 @@ class Player:
         self.move_freeze_timer = 0
 
         self.ghost = False
+        self.tails_lost = 0
+        self.tails_eaten = 0
+
 
     def set_command(self, command):
         if self.check_legal_move(command):
@@ -52,9 +55,12 @@ class Player:
 
         # Snake dies because it hits itself
         for other in snakes:
-            if self.collision(other):
-                print(f"{self.name} booped a snake with its snoot, perishing in the process.")
-                self.alive = False
+            if TAIL_BITING:
+                self.bite_collision(other)
+            else :
+                if self.collision(other):
+                    print(f"{self.name} booped a snake with its snoot, perishing in the process.")
+                    self.alive = False
 
     def collision(self, other) -> bool:
         # Collision if my head is in your body, we collided. You can be me
@@ -65,7 +71,33 @@ class Player:
         # TODO possibly index out of bounds issue here where it checks the neck if there is none. 
         if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
             return False
-        return self.body[len(self.body) - 1] in other.body[0:len(other.body) - 1]
+
+        # Collision with myself
+        if other.name == self.name:        
+            return self.body[len(self.body) - 1] in other.body[0:len(other.body) - 1]
+        else :
+            return self.body[len(self.body) - 1] in other.body
+
+    def bite_collision(self, other):
+        # Hatchling snek is friendly
+        if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
+            return
+        if self.body[len(self.body) - 1] in other.body[0:len(other.body) - 1]:
+            self.move_freeze_timer = FREEZE_FRAMES_ON_EAT
+            # I bite you where my head is at
+            tails_bitten = other.get_bitten(self.body[len(self.body) - 1])
+            self.tails_eaten += tails_bitten
+            if TAIL_STEALING: 
+                if other.name != self.name:
+                    self.length += tails_bitten
+
+    def get_bitten(self, pos):
+        bite_position = self.body.index(pos)
+        tails_lost = self.length - (self.length - bite_position)
+        self.body = self.body[bite_position: len(self.body)]
+        self.length = self.length - tails_lost
+        self.tails_lost += tails_lost
+        return tails_lost
 
     def move(self):
         # The move command is issued each tick. This function translates that check to the move speed
@@ -148,3 +180,6 @@ class Player:
         # Having only a head avoids collision with body at respawn
         self.body = [(x_pos, y_pos)]
         
+    def report(self):
+        print(f"Player report: {self.name}")
+        print(f"    {self.score = }\n   {self.length = }\n  {self.tails_lost = }\n  {self.tails_eaten = }")

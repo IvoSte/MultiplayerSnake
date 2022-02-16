@@ -3,7 +3,7 @@ from player import Player
 from screens import set_end_screen
 from viewer import Viewer
 from state import State
-from colors import Color, colormaps
+from colors import Color, colormaps, extend_colormaps
 from food import Food
 from input_controls import inputHandler, Controls, player_1_controls, player_2_controls, general_controls, player_3_controls, player_4_controls
 from env_variables import BACKGROUND_VISUALS, FREEZE_FRAMES_ON_EAT, INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
@@ -44,7 +44,7 @@ class Game():
     #### Game init -- Could be split to own file
     def init_game(self):
         # Pre game setup
-        
+
         # Setup environment
         self.init_environment()
 
