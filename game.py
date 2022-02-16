@@ -6,7 +6,7 @@ from state import State
 from colors import Color, colormaps
 from food import Food
 from input_controls import inputHandler, Controls, player_1_controls, player_2_controls, general_controls, player_3_controls, player_4_controls
-from env_variables import INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
+from env_variables import BACKGROUND_VISUALS, FREEZE_FRAMES_ON_EAT, INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
     SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, TICKS_PER_SECOND
 from screens import set_end_screen, set_pause_screen
 import pygame
@@ -66,7 +66,8 @@ class Game():
                     colormap = colormaps[[*colormaps][i]], name=f"{i+1} - {[*colormaps][i]}", controls=self.control_sets[i]))
 
     def init_environment(self):
-        self.environment = Environment(self.display_size[0], self.display_size[1], self.snake_size, pygame.Color(0,0,255,255))
+        self.environment = Environment(self.display_size[0], self.display_size[1], self.snake_size, pygame.Color(50, 153, 213))
+        self.environment.init_environment()
 
     def init_food(self):
         self.food = []
@@ -147,7 +148,8 @@ class Game():
         self.viewer.clear_screen()
 
         # Draw background / environment
-        self.viewer.draw_environment(self.environment)
+        if BACKGROUND_VISUALS:
+            self.viewer.draw_environment(self.environment)
 
         # Draw food TODO draw items / draw entities
         for food in self.food:
@@ -202,8 +204,9 @@ class Game():
             eaten_food = []
             for food in self.food:
                 if player.eat_food(food = food):
+                    player.move_freeze_timer = FREEZE_FRAMES_ON_EAT
                     eaten_food.append(food)
-                    self.environment.activate_agents(food.pos)
+                    self.environment.activate_agent_on_position(food.pos)
             for food in eaten_food:
                 self.food.remove(food)
 

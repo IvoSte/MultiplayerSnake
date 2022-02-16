@@ -1,5 +1,7 @@
 from agent import Agent
 from pygame import Color
+from env_variables import AGENT_EFFECT_STEP_SIZE
+
 
 class Env_agent(Agent):
 
@@ -26,19 +28,21 @@ class Env_agent(Agent):
 
     def update(self):
         self.decrease_intensity()
-        self.color = Color(255, 255, 255, self.intensity)
+        self.color = [x + ((y-x)/(255/AGENT_EFFECT_STEP_SIZE)) * ((255 - self.intensity)/AGENT_EFFECT_STEP_SIZE) for x, y in zip(Color(0, 255, 255), self.base_color)]
 
-        if self.intensity == 100:
-            print("I am infectious")
+        if self.intensity == 250:
             self.infectious = True
         else : 
             self.infectious = False
 
     def decrease_intensity(self):
-        self.intensity -= 1
+        self.intensity -= AGENT_EFFECT_STEP_SIZE
         if self.intensity < 0:
             self.reset()
 
     def reset(self):
         self.active = False
         self.intensity = 255
+
+    def report(self):
+        print(f"{self.x_pos = } {self.y_pos = }")

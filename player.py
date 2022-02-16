@@ -28,7 +28,9 @@ class Player:
         self.command = None
         self.move_dir_buffer = None
         self.move_dist_buffer = 0
+        self.move_freeze_timer = 0
 
+        self.ghost = False
 
     def set_command(self, command):
         if self.check_legal_move(command):
@@ -70,7 +72,10 @@ class Player:
         # Updating the direction at required points
         if self.x_pos % self.width == 0 and self.y_pos % self.width == 0:
             self.move_dir_buffer = self.command
-        self.move_step(self.width / self.speed)
+        if self.move_freeze_timer > 0:
+            self.move_freeze_timer -= 1
+        else :
+            self.move_step(self.width / self.speed)
 
     def move_step(self, step_size):
         # Determine move direction

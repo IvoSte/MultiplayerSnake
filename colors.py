@@ -9,11 +9,13 @@ class Color(Enum):
     GREEN = (0, 255, 0)
     BLUE = (50, 153, 213)
 
-colormaps = {"Turbo" : turbo_colormap, 
-            "Viridis" : viridis_colormap,
-            "Magma" : magma_colormap, 
-            "Inferno" : inferno_colormap, 
-            "Plasma" : plasma_colormap}
+colormaps = {
+    "Inferno" : inferno_colormap, 
+    "Magma" : magma_colormap, 
+    "Turbo" : turbo_colormap, 
+    "Viridis" : viridis_colormap,
+    "Plasma" : plasma_colormap
+    }
 
 def color(colormap, i):
     return to_rgb(colormap[i % len(colormap)])

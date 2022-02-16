@@ -70,6 +70,6 @@ class Viewer():
 
     def draw_environment(self, environment):
         for idx, agent in enumerate(environment.active_agents):
-            print(f"drawing agent {idx}/{len(environment.active_agents)}", end = '\r')
-            pygame.draw.rect(self.dis, agent.color, [agent.x_pos * agent.size[0], agent.y_pos * agent.size[1], agent.size[0], agent.size[1]]) 
+            #print(f"drawing agent {idx + 1}/{len(environment.active_agents)} at {agent.x_pos} {agent.y_pos}") #, end = '\r'
+            pygame.draw.rect(self.dis, agent.color, [agent.x_pos, agent.y_pos, agent.size[0], agent.size[1]]) 
             
