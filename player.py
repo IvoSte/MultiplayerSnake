@@ -43,7 +43,8 @@ class Player:
 
     def update_body(self):
         # Update total body positions
-        self.body.append((self.x_pos, self.y_pos))
+        if self.alive:
+            self.body.append((self.x_pos, self.y_pos))
         while len(self.body) > self.length:
             self.body.pop(0)
         if len(self.decaying_body) > 0:
@@ -64,7 +65,8 @@ class Player:
             snakes = [self]
         # hit edges/boundaries
         if self.x_pos >= display_size[0] or self.x_pos < 0 or self.y_pos >= display_size[1] or self.y_pos < 0:
-            print(f"{self.name} hit the edge and died")
+            #print(f"{self.name} hit the edge and died")
+            self.init_decaying_body(self.body[0:len(self.body)])
             self.alive = False
 
         # Snake dies because it hits itself
@@ -73,7 +75,8 @@ class Player:
                 self.bite_collision(other)
             else :
                 if self.collision(other):
-                    print(f"{self.name} booped a snake with its snoot, perishing in the process.")
+                    #print(f"{self.name} booped a snake with its snoot, perishing in the process.")
+                    self.init_decaying_body(self.body[0:len(self.body)])
                     self.alive = False
 
     def collision(self, other) -> bool:
@@ -117,7 +120,7 @@ class Player:
 
     def init_decaying_body(self, decaying_body):
         self.decaying_body = decaying_body
-        self.decay_body_color = [pygame.Color(255,255,255) for t in decaying_body]
+        self.decay_body_color = [pygame.Color(255,255,255) for tail in decaying_body]
 
     def move(self):
         # The move command is issued each tick. This function translates that check to the move speed
@@ -180,7 +183,7 @@ class Player:
         x_pos = self.spawn_pos_x if x_pos == None else x_pos
         y_pos = self.spawn_pos_y if y_pos == None else y_pos
 
-        print(f"{self.name} respawning. {self.lives_left} lives left.")
+        #print(f"{self.name} respawning. {self.lives_left} lives left.")
         
         # Set alive
         self.alive = True

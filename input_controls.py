@@ -1,4 +1,5 @@
 from enum import Enum
+from env_variables import CONTROLLER_DEADZONE
 import pygame
 
 class Controls(Enum):
@@ -31,6 +32,39 @@ def inputHandler(command):
         return Controls.RESTART
     else :
         return None
+
+def controllerInputHandler(event):
+    deadzone = CONTROLLER_DEADZONE
+    if event.type == pygame.JOYAXISMOTION:
+        value = event.value
+        if event.axis == 0:
+            if abs(value) >= deadzone:
+                if value < 0:
+                    return Controls.LEFT
+                else:
+                    return Controls.RIGHT
+
+        elif event.axis == 1:
+            if abs(value) >= deadzone:
+                if value < 0:
+                    return Controls.UP
+                else:
+                    return Controls.DOWN
+
+    if event.type == pygame.JOYHATMOTION:
+        x,y = event.value
+        if x == -1:
+            return Controls.LEFT
+        if x == 1:
+            return Controls.RIGHT
+        if y == 1:
+            return Controls.UP
+        if y == -1:
+            return Controls.DOWN
+
+
+
+
 
 # Crude implementation, make better later
 general_controls = {

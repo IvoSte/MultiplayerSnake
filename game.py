@@ -5,7 +5,7 @@ from viewer import Viewer
 from state import State
 from colors import Color, colormaps, extend_colormaps
 from food import Food
-from input_controls import inputHandler, Controls, player_1_controls, player_2_controls, general_controls, player_3_controls, player_4_controls
+from input_controls import controllerInputHandler, inputHandler, Controls, player_1_controls, player_2_controls, general_controls, player_3_controls, player_4_controls
 from env_variables import BACKGROUND_VISUALS, FREEZE_FRAMES_ON_EAT, INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
     SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, TICKS_PER_SECOND
 from screens import set_end_screen, set_pause_screen
@@ -33,6 +33,7 @@ class Game():
 
         # Keep a list of all the players
         self.control_sets = [player_1_controls, player_2_controls, player_3_controls, player_4_controls]
+        self.controllers = {}
         self.players = []
         # food can be moved to the environment. For now the environment is intended to experiment with the background
         self.food = []
@@ -44,6 +45,8 @@ class Game():
     #### Game init -- Could be split to own file
     def init_game(self):
         # Pre game setup
+
+        self.init_controllers()
 
         # Setup environment
         self.init_environment()
@@ -57,6 +60,13 @@ class Game():
         self.state = State(game_over = False, in_end_screen = False, food = [])
         
         # Spawn food
+
+    def init_controllers(self):
+        pygame.joystick.init()
+        joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+        for joystick in joysticks:
+            joystick.init()
+            #self.controllers[joystick.get_instance_id()] = joystick
 
     def init_players(self):
         self.players = []
@@ -138,9 +148,15 @@ class Game():
         reserve_lives = sum(player.lives_left for player in self.players)
         return active_lives + reserve_lives
 
+    def dead_players_lives_left(self) -> int:
+        return sum(player.lives_left for player in self.players if not player.alive)
+
     def is_game_over(self):
-        if NUMBER_OF_PLAYERS == 1 and self.players_alive() == 0 or\
-            NUMBER_OF_PLAYERS > 1 and self.players_alive() == 1:
+        # In single player the player should be dead and have no lives left.
+        # In multiplayer all players but on should be dead and without lives left.
+        if NUMBER_OF_PLAYERS == 1 and self.players_lives_left() == 0 or\
+            (NUMBER_OF_PLAYERS > 1 and self.players_alive() == 1 and \
+            self.dead_players_lives_left() == 0):
             self.state.game_over = True
 
     def draw(self):
@@ -167,6 +183,7 @@ class Game():
 
     def parse_input(self):
         # Read each input
+
         for event in pygame.event.get():
             # If the game is closed
             if event.type == pygame.QUIT:
@@ -185,6 +202,14 @@ class Game():
                 for player in self.players:
                     if event.key in player.controls:
                         player.set_command(player.controls[event.key])
+            
+            # TODO: This is needed to make the joystick work, but it makes no sense
+            # This needs to be removed at some point (ideally)
+            joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+            if event.type == pygame.JOYAXISMOTION or event.type == pygame.JOYHATMOTION:
+                command = controllerInputHandler(event)
+                if command != None and len(self.players) -1 >= event.instance_id:
+                    self.players[event.instance_id].set_command(command)
 
     def update_players(self):
         # Move players snake
