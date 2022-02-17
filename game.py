@@ -1,13 +1,14 @@
 from environment import Environment
 from player import Player
-from screens import set_end_screen
+from screens import set_end_screen, set_options_screen
+from sounds import Sounds
 from viewer import Viewer
 from state import State
 from colors import Color, colormaps, extend_colormaps
 from food import Food
 from input_controls import controllerInputHandler, inputHandler, Controls, player_1_controls, player_2_controls, general_controls, player_3_controls, player_4_controls
-from env_variables import BACKGROUND_VISUALS, FREEZE_FRAMES_ON_EAT, INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
-    SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, TICKS_PER_SECOND
+from env_variables import BACKGROUND_VISUALS, DISABLE_MUSIC, FREEZE_FRAMES_ON_EAT, INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
+    SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, TICKS_PER_SECOND, WAVE_RATE
 from screens import set_end_screen, set_pause_screen
 import pygame
 import time
@@ -23,7 +24,7 @@ class Game():
 
         # Call relevant init functions
         pygame.init()
-
+        self.sounds = Sounds()
         # Keep a clock
         self.clock = pygame.time.Clock()
         self.time_elapsed = 0
@@ -40,12 +41,16 @@ class Game():
         self.environment = None
 
         # Set state
-        self.state = State(game_over = False, in_end_screen = False, food = [])
+        self.state = State(game_over = False, in_end_screen = False, in_pause_menu = True, in_options_menu = False, food = [])
     
     #### Game init -- Could be split to own file
     def init_game(self):
         # Pre game setup
+        
+        # initialize sound module
+        self.init_sounds()
 
+        # initialize controllers
         self.init_controllers()
 
         # Setup environment
@@ -57,9 +62,15 @@ class Game():
         # Grow food
         self.init_food()
         # Set state
-        self.state = State(game_over = False, in_end_screen = False, food = [])
+        self.state = State(game_over = False, in_end_screen = False, in_pause_menu = False, in_options_menu = False, food = [])
         
         # Spawn food
+
+    def init_sounds(self):
+        self.sounds.init()
+        if not DISABLE_MUSIC:
+            self.sounds.play_music()
+            self.sounds.set_music_volume(self.sounds.music_volume)
 
     def init_controllers(self):
         pygame.joystick.init()
@@ -119,19 +130,55 @@ class Game():
                         self.quit_game()
 
     def pause_menu(self):
+        self.state.in_pause_menu = True
+        self.draw()
         set_pause_screen(self)
         pygame.display.update()
-
-        while True:
+        while self.state.in_pause_menu:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key in general_controls:
-                    if general_controls[event.key] == Controls.PAUSE:
-                        return
-                    if general_controls[event.key] == Controls.QUIT:
-                        print("to end screen from pause screen")
-                        self.end_screen()
-                    if general_controls[event.key] == Controls.RESTART:
-                        self.restart_game()
+                    self.pause_menu_options(event)
+
+    def pause_menu_options(self, event):
+        if general_controls[event.key] == Controls.PAUSE:
+            self.state.in_pause_menu = False
+            return
+        if general_controls[event.key] == Controls.QUIT:
+            self.end_screen()
+        if general_controls[event.key] == Controls.RESTART:
+            self.restart_game()
+        if general_controls[event.key] == Controls.OPTIONS:
+            if self.state.in_options_menu:
+                self.state.in_options_menu = False
+                self.pause_menu()
+            else : 
+                self.options_menu()
+        
+    def options_menu(self):
+        self.state.in_options_menu = True
+        self.draw()
+        set_pause_screen(self)
+        set_options_screen(self)
+        pygame.display.update()
+
+        while self.state.in_options_menu:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key in general_controls:
+                    self.options_menu_options(event)
+                    self.pause_menu_options(event)
+
+    def options_menu_options(self, event):
+        if general_controls[event.key] == Controls.MUSIC:
+            if not self.sounds.music_paused:
+                self.sounds.pause_music()
+            else :
+                self.sounds.unpause_music()
+        if general_controls[event.key] == Controls.EFFECTS:
+            if not self.sounds.effects_muted:
+                self.sounds.mute_effects()
+            else :
+                self.sounds.unmute_effects()
+
 
     def parse_general_command(self, command):
         # Quit key
@@ -177,6 +224,8 @@ class Game():
         # Update score
         self.viewer.display_players_information(self.players)
 
+        self.viewer.draw_player_counters(self.players)
+
         # Update screen
         self.viewer.update()
 
@@ -205,7 +254,7 @@ class Game():
             
             # TODO: This is needed to make the joystick work, but it makes no sense
             # This needs to be removed at some point (ideally)
-            joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+            joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]            
             if event.type == pygame.JOYAXISMOTION or event.type == pygame.JOYHATMOTION:
                 command = controllerInputHandler(event)
                 if command != None and len(self.players) -1 >= event.instance_id:
@@ -213,7 +262,7 @@ class Game():
 
     def update_players(self):
         # Move players snake
-        for player in self.players:
+        for idx, player in enumerate(self.players):
 
             # If the player is dead, 
             if not player.alive:
@@ -230,7 +279,9 @@ class Game():
                 if player.eat_food(food = food):
                     player.move_freeze_timer = FREEZE_FRAMES_ON_EAT
                     eaten_food.append(food)
-                    self.environment.activate_agent_on_position(food.pos)
+                    if random.random() < WAVE_RATE:
+                        self.environment.activate_agent_on_position(food.pos)
+                    self.sounds.play_player_effect(idx)
             for food in eaten_food:
                 self.food.remove(food)
 

@@ -1,3 +1,5 @@
+import random
+from colors import Color
 from environment_agent import Env_agent
 from env_variables import NEIGHBOURHOOD_SHAPE
 
@@ -22,6 +24,7 @@ class Environment:
 
         self.agents = []
         self.active_agents = set()
+
 
         self.neighbourhood_shape = NEIGHBOURHOOD_SHAPE
 
@@ -88,6 +91,13 @@ class Environment:
 
     def activate_agent_on_position(self, pos):
         agent = self.agents[self.pos_loc_transform[pos]]
+        #agent.set_top_color(random.choice([Color.BLUE.value, Color.WHITE.value, Color.YELLOW.value, Color.RED.value, Color.GREEN.value]))
+        self.activate_agent(agent)
+
+    def activate_agent_on_position_with_colormap(self, pos, colormap):
+        agent = self.agents[self.pos_loc_transform[pos]]
+        agent.colormap = colormap
+        #agent.set_top_color(random.choice([Color.BLUE.value, Color.WHITE.value, Color.YELLOW.value, Color.RED.value, Color.GREEN.value]))
         self.activate_agent(agent)
 
     def activate_agent(self, agent):
@@ -103,6 +113,7 @@ class Environment:
             agent.update()
             if agent.infectious :
                 for other in agent.neighbours:
+                    #other.set_top_color(agent.top_color)
                     #if not other.active:
                     agents_to_activate.append(other)
         self.activate_agents(agents_to_activate)

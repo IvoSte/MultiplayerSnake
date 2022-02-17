@@ -2,7 +2,7 @@ from colors import Color, colormaps
 from input_controls import Controls, default_player_controls
 import pygame
 import random
-from env_variables import BODY_DECAY_RATE, DEATH_PUNISHMENT, FREEZE_FRAMES_ON_EAT, SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, MAX_COLOR_SCALE, TAIL_BITING, TAIL_STEALING
+from env_variables import BODY_DECAY_RATE, DEATH_PUNISHMENT, FREEZE_FRAMES_ON_BITTEN, FREEZE_FRAMES_ON_EAT, SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, MAX_COLOR_SCALE, TAIL_BITING, TAIL_STEALING, TICKS_PER_SECOND, VERZET
 
 class Player:
     def __init__(self, x_pos, y_pos, speed=SNAKE_SPEED, width = SNAKE_SIZE, length=INITIAL_SNAKE_LENGTH, color=random.randint(0, 255), colormap = random.choice(list(colormaps.values())), colorscale=random.randint(1, MAX_COLOR_SCALE), score=0, lives = 0, name="Player", controls=default_player_controls):
@@ -17,12 +17,12 @@ class Player:
         self.speed = speed
         self.body = [(x_pos, y_pos)]
         self.decaying_body = []
-        self.decay_body_color = []
         self.width = width
         self.length = length
         self.color = color
         self.colormap = colormap
         self.colorscale = colorscale
+        self.decay_body_color = []
 
         self.score = score
         self.alive = True
@@ -31,6 +31,7 @@ class Player:
         self.move_dir_buffer = None
         self.move_dist_buffer = 0
         self.move_freeze_timer = 0
+        self.body_buffer = 0
 
         self.ghost = False
         self.tails_lost = 0
@@ -45,10 +46,13 @@ class Player:
         # Update total body positions
         if self.alive:
             self.body.append((self.x_pos, self.y_pos))
-        while len(self.body) > self.length:
+        while len(self.body) > self.body_length():
             self.body.pop(0)
         if len(self.decaying_body) > 0:
             self.update_decaying_body()
+
+    def body_length(self):
+        return self.length * self.speed
 
     def update_decaying_body(self):
         ## TODO Here stuff can go wrong if the decay rate is set different. I dislike working with these colours.
@@ -111,7 +115,9 @@ class Player:
 
     def get_bitten(self, pos):
         bite_position = self.body.index(pos)
-        tails_lost = self.length - (len(self.body) - bite_position)
+        tails_lost = 1 + (self.body_length() - ((len(self.body) - bite_position))) // self.speed
+        if VERZET:
+            self.move_freeze_timer = FREEZE_FRAMES_ON_BITTEN + (TICKS_PER_SECOND * tails_lost)
         self.init_decaying_body(self.body[0 : bite_position])
         self.body = self.body[bite_position: len(self.body)]
         self.length = self.length - tails_lost

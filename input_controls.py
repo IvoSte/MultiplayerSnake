@@ -11,6 +11,9 @@ class Controls(Enum):
     PAUSE = 5
     CONFIRM = 6
     RESTART = 7
+    OPTIONS = 8
+    MUSIC = 9
+    EFFECTS = 10
 
 def inputHandler(command):
     assert command.type == pygame.KEYDOWN, "Command issued to inputHandler when event type is not a keypress."
@@ -72,6 +75,9 @@ general_controls = {
     pygame.K_c: Controls.CONFIRM,
     pygame.K_p: Controls.PAUSE,
     pygame.K_r: Controls.RESTART,
+    pygame.K_o: Controls.OPTIONS,
+    pygame.K_m: Controls.MUSIC,
+    pygame.K_e: Controls.EFFECTS,
 }
 
 default_player_controls = {

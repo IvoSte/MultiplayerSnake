@@ -2,6 +2,7 @@ from enum import Enum
 from colormaps import turbo_colormap, viridis_colormap, magma_colormap, inferno_colormap, plasma_colormap, green_colormap, red_colormap, blue_colormap
 from copy import deepcopy
 
+
 class Color(Enum):
     WHITE = (255, 255, 255)
     YELLOW = (255, 255, 102)
@@ -60,6 +61,9 @@ def turbo_color(i):
 # If you have a floating point value in the range [0,1], you can use interpolate() to linearly interpolate between the entries.
 # If you have 16-bit or 32-bit integer values, convert them to floating point values on the [0,1] range and then use interpolate(). Doing the interpolation in floating point will reduce banding.
 # If some of your values may lie outside the [0,1] range, use interpolate_or_clip() to highlight them.
+
+def fade_colors(from_color, to_color, steps, current_step):
+    return [x + ((y - x)/steps) * current_step for x, y in zip(from_color, to_color)]
 
 def interpolate(colormap, x):
   x = max(0.0, min(1.0, x))

@@ -1,7 +1,7 @@
 import random
 import pygame
 from colors import Color, turbo_color, color, extend_colormaps
-from env_variables import PLAYER_SCORE_BOXES, SCREEN_SIZE_X, SCREEN_SIZE_Y, SNAKE_SIZE
+from env_variables import PLAYER_SCORE_BOXES, SCREEN_SIZE_X, SCREEN_SIZE_Y, SNAKE_SIZE, TICKS_PER_SECOND, VERZET
 
 class Viewer():
     def __init__(self, snake_size=(SNAKE_SIZE,SNAKE_SIZE), display_size=(SCREEN_SIZE_X,SCREEN_SIZE_Y), game_title="Multiplayer Snake Game - Extraordinaire"):
@@ -18,6 +18,13 @@ class Viewer():
         # Snake Display variables
         self.snake_size = snake_size
         
+        self.background_color = Color.BLUE.value
+        self.background_colors = [Color.WHITE.value, Color.BLUE.value, Color.WHITE.value, Color.YELLOW.value, Color.RED.value, Color.GREEN.value]
+
+        self.background_switch_timer = None
+
+        self.verzet_logo = pygame.image.load("images\\Verzet.tif")
+
     def update(self):
         pygame.display.update()
 
@@ -50,30 +57,42 @@ class Viewer():
         length = pygame.font.SysFont("futura", 90).render(f"{player.length}", True, color)
         score =  pygame.font.SysFont("futura", 45).render(f"S {player.score}", True, color)
         eaten = pygame.font.SysFont("futura", 45).render(f"B {player.tails_eaten}", True, color)
-        lives =  pygame.font.SysFont("garamond", 45).render(f" {'♥'*player.lives_left}", True, color)
+        lives =  pygame.font.SysFont("garamond", 45).render(f" {'♥'*(player.lives_left + 1)}", True, color)
         self.dis.blit(length, pos)
         self.dis.blit(score, [pos[0] + 105, pos[1]])
         self.dis.blit(eaten, [pos[0] + 105, pos[1] + 25])
         self.dis.blit(lives, [pos[0], pos[1] + 45])
 
-    def display_player_score(self, player, position, color = Color.WHITE.value):
-        value = self.score_font.render(f"{player.name} - points: {player.score}", True, color)
-        self.dis.blit(value, position)
+    # def display_player_score(self, player, position, color = Color.WHITE.value):
+    #     value = self.score_font.render(f"{player.name} - points: {player.score}", True, color)
+    #     self.dis.blit(value, position)
 
-    def display_snake_length(self, player, position, color = Color.WHITE.value):
-        value = self.score_font.render(f"tail length: {player.length}", True, color)
-        self.dis.blit(value, position)
+    # def display_snake_length(self, player, position, color = Color.WHITE.value):
+    #     value = self.score_font.render(f"tail length: {player.length}", True, color)
+    #     self.dis.blit(value, position)
 
-    def display_player_lives_left(self, player, position, color = Color.WHITE.value):
-        value = self.score_font.render(f"lives: {player.lives_left}", True, color)
-        self.dis.blit(value, position)
+    # def display_player_lives_left(self, player, position, color = Color.WHITE.value):
+    #     value = self.score_font.render(f"lives: {player.lives_left}", True, color)
+    #     self.dis.blit(value, position)
 
+    def draw_player_counters(self, players):
+        for player in players:
+            if player.move_freeze_timer >= 10:
+                self.draw_player_counter((player.move_freeze_timer // TICKS_PER_SECOND) + 1, [player.x_pos, player.y_pos], color(player.colormap, player.color))
+
+    def draw_player_counter(self, value, pos, color):
+        counter = pygame.font.SysFont("futura", 120).render(f"{value}", True, Color.WHITE.value)
+        self.dis.blit(counter, [pos[0] - 12, pos[1] - 25])
+        self.dis.blit(counter, [pos[0] - 8, pos[1] - 25])
+        self.dis.blit(counter, [pos[0] - 10, pos[1] - 27])
+        self.dis.blit(counter, [pos[0] - 10, pos[1] - 23])
+        counter = pygame.font.SysFont("futura", 120).render(f"{value}", True, color)
+        self.dis.blit(counter, [pos[0] - 10, pos[1] - 25])
 
     def clear_screen(self):
-        self.dis.fill(Color.BLUE.value)
-
-    def render_sprite(self, sprite):
-        pass
+        self.dis.fill(self.background_color)
+        #if VERZET:
+        #    self.dis.blit(self.verzet_logo, (0,0))
 
     def render_message(self, msg, color, relative_x, relative_y):
         msg = self.font_style.render(msg, True, color)
@@ -88,7 +107,6 @@ class Viewer():
         for idx, pos in enumerate(player.decaying_body):
             pygame.draw.rect(self.dis, player.decay_body_color[idx], [
                              pos[0], pos[1], self.snake_size[0], self.snake_size[1]])
-            
     
     def draw_food(self, food):
         pygame.draw.rect(self.dis, food.color, [food.pos[0], food.pos[1], self.snake_size[0], self.snake_size[1]])
