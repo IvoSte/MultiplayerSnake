@@ -18,11 +18,11 @@ TAIL_STEALING = False
 
 # Gameplay
 VERZET = True
-FREEZE_FRAMES_ON_BITTEN = 0#120 # Only active if VERZET is True
+FREEZE_FRAMES_ON_BITTEN = 120 # Only active if VERZET is True
 
 # Cosmetic
 BACKGROUND_VISUALS = True
-WAVE_RATE = 0.2
+WAVE_RATE = 1.0
 MAX_COLOR_SCALE = 1 # higher value (potentially) compresses the colourmap so the hue shift is shorter
 NEIGHBOURHOOD_SHAPE = 0 # 0 for Von Neumann, 1 for Moore
 AGENT_EFFECT_STEP_SIZE = 5
@@ -36,12 +36,12 @@ CONTROLLER_DEADZONE = 0.45
 
 # Music
 MUSIC_PATH = "sounds\\track_1_loop.wav"
-DISABLE_MUSIC = True
+DISABLE_MUSIC = False
 MUSIC_VOLUME = 1.0    # float in the range [0,1] where 0 is off, 1 is loudest
 
 # Sounds
 DISABLE_EFFECT_SOUNDS = False
-EFFECT_VOLUME = 1.0
+EFFECT_VOLUME = 0.5
 
 TEST_SOUND = "sounds\\release_snare.wav"
 PLAYER_1_EAT_FRUIT_SOUNDS = ["sounds\\1_pickupsound_1_C.wav", "sounds\\1_pickupsound_2_D.wav","sounds\\1_pickupsound_3_E.wav","sounds\\1_pickupsound_4_G.wav","sounds\\1_pickupsound_5_A.wav","sounds\\1_pickupsound_6_C.wav"]

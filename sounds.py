@@ -80,6 +80,7 @@ class Sounds:
             self.player_effects[player] = []
             for effect in effect_files:
                 self.player_effects[player].append(self.load_effect(effect))
+        self.set_effect_volume(self.effect_volume)
 
     def load_effect(self, path):
         return pygame.mixer.Sound(path)
@@ -93,6 +94,12 @@ class Sounds:
     def set_effect_volume(self, volume):
         for effect in self.effects:
             self.effects[effect].set_volume(volume)
+        self.set_player_effect_volume(volume)
+
+    def set_player_effect_volume(self, volume):
+        for player in self.player_effects:
+            for effect in self.player_effects[player]:
+                effect.set_volume(volume)
 
     def mute_effects(self):
         self.set_effect_volume(0.0)
