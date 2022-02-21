@@ -1,5 +1,11 @@
 from colors import Color
 
+def set_final_score(game, final_scores):
+    for idx, (category, player) in enumerate(final_scores.items()):
+        game.viewer.render_message(category, Color.WHITE.value, 0.3, 0.1 * (idx + 1))    
+        game.viewer.render_message_bold(player.name, player.head_color, 0.5, 0.1 *  (idx + 1))    
+
+
 def set_end_screen(game):
     game.viewer.clear_screen()
     game.viewer.render_message("Match over!", Color.WHITE.value, 0.5, 0.4)    

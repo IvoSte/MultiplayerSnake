@@ -10,6 +10,7 @@ class Color(Enum):
     RED = (213, 50, 80)
     GREEN = (0, 255, 0)
     BLUE = (50, 153, 213)
+    GREY = (128, 128, 128)
 
 # I made this function because I didn't want to surround the colormaps in the colormaps dict with the make_continuous function. Maybe that is the better option though
 # Is there a third way?
@@ -25,18 +26,22 @@ def make_continuous(colormap):
 
 colormaps = {
     "Turbo" : turbo_colormap, 
+    "Magma" : magma_colormap, 
+    "Viridis" : viridis_colormap,
+    "Inferno" : inferno_colormap, 
+    "Plasma" : plasma_colormap,
     "Green" : green_colormap,
     "Red" : red_colormap,
     "Blue" : blue_colormap,
-    "Inferno" : inferno_colormap, 
-    "Magma" : magma_colormap, 
-    "Viridis" : viridis_colormap,
-    "Plasma" : plasma_colormap,
     }
 
 extend_colormaps(colormaps)
 
+# TODO replace all instances of this color with the next color_from_map function
 def color(colormap, i):
+    return to_rgb(colormap[i % len(colormap)])
+
+def color_from_map(colormap, i):
     return to_rgb(colormap[i % len(colormap)])
 
 def rgb_color(r,g,b,a = 255):

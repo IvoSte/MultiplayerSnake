@@ -1,7 +1,7 @@
 from enum import Enum
 from agent import Agent
 from colormaps import generate_colormap
-from colors import color, fade_colors, interpolate
+from colors import color, fade_colors, interpolate 
 from pygame import Color
 from env_variables import AGENT_EFFECT_STEP_SIZE
 
@@ -22,7 +22,7 @@ class Env_agent(Agent):
         self.colormap = generate_colormap(0, color.r, 255, color.g, 255, color.b)
         self.intensity = 255
 
-        self.mode = AgentMode.SMALL_WAVE
+        self.mode = AgentMode.BIG_WAVE
 
         self.active = False
         self.infectious = False

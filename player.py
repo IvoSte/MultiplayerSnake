@@ -1,8 +1,8 @@
-from colors import Color, colormaps
+from colors import Color, color_from_map, colormaps
 from input_controls import Controls, default_player_controls
 import pygame
 import random
-from env_variables import BODY_DECAY_RATE, DEATH_PUNISHMENT, FREEZE_FRAMES_ON_BITTEN, FREEZE_FRAMES_ON_EAT, SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, MAX_COLOR_SCALE, TAIL_BITING, TAIL_STEALING, TICKS_PER_SECOND, VERZET
+from env_variables import BODY_DECAY_RATE, DEATH_PUNISHMENT, FREEZE_FRAMES_ON_BITTEN, FREEZE_FRAMES_ON_EAT, SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, MAX_COLOR_SCALE, START_COUNTDOWN, TAIL_BITING, TAIL_STEALING, TICKS_PER_SECOND, VERZET
 
 class Player:
     def __init__(self, x_pos, y_pos, speed=SNAKE_SPEED, width = SNAKE_SIZE, length=INITIAL_SNAKE_LENGTH, color=random.randint(0, 255), colormap = random.choice(list(colormaps.values())), colorscale=random.randint(1, MAX_COLOR_SCALE), score=0, lives = 0, name="Player", controls=default_player_controls):
@@ -22,6 +22,7 @@ class Player:
         self.color = color
         self.colormap = colormap
         self.colorscale = colorscale
+        self.head_color = color_from_map(colormap, color)
         self.decay_body_color = []
 
         self.score = score
@@ -30,7 +31,7 @@ class Player:
         self.command = None
         self.move_dir_buffer = None
         self.move_dist_buffer = 0
-        self.move_freeze_timer = 0
+        self.move_freeze_timer = START_COUNTDOWN * TICKS_PER_SECOND
         self.body_buffer = 0
 
         self.ghost = False
@@ -115,9 +116,14 @@ class Player:
 
     def get_bitten(self, pos):
         bite_position = self.body.index(pos)
+
+        # Can't bite off my head
+        if bite_position >= len(self.body) - (1 * self.speed):
+            return 0
+
         tails_lost = 1 + (self.body_length() - ((len(self.body) - bite_position))) // self.speed
         if VERZET:
-            self.move_freeze_timer = FREEZE_FRAMES_ON_BITTEN + (TICKS_PER_SECOND * tails_lost)
+            self.move_freeze_timer = FREEZE_FRAMES_ON_BITTEN
         self.init_decaying_body(self.body[0 : bite_position])
         self.body = self.body[bite_position: len(self.body)]
         self.length = self.length - tails_lost

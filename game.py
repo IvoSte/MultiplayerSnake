@@ -1,14 +1,15 @@
+from operator import attrgetter
 from environment import Environment
 from player import Player
-from screens import set_end_screen, set_options_screen
+from screens import set_end_screen, set_final_score, set_options_screen
 from sounds import Sounds
 from viewer import Viewer
 from state import State
 from colors import Color, colormaps, extend_colormaps
 from food import Food
 from input_controls import controllerInputHandler, inputHandler, Controls, player_1_controls, player_2_controls, general_controls, player_3_controls, player_4_controls
-from env_variables import BACKGROUND_VISUALS, DISABLE_MUSIC, FREEZE_FRAMES_ON_EAT, INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
-    SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, TICKS_PER_SECOND, WAVE_RATE
+from env_variables import BACKGROUND_VISUALS, DISABLE_MUSIC, FREEZE_FRAMES_ON_EAT, GAME_TIMER, GAME_TIMER_SWITCH, INITIAL_FOOD, NUMBER_OF_PLAYERS, INITIAL_LIVES, SCREEN_SIZE_X, SCREEN_SIZE_Y, \
+    SNAKE_SIZE, INITIAL_SNAKE_LENGTH, SNAKE_SPEED, START_COUNTDOWN, TICKS_PER_SECOND, WAVE_RATE
 from screens import set_end_screen, set_pause_screen
 import pygame
 import time
@@ -29,6 +30,8 @@ class Game():
         self.clock = pygame.time.Clock()
         self.time_elapsed = 0
         
+        self.game_timer = (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND
+
         # Initialize display
         self.viewer = Viewer(snake_size=self.snake_size, display_size=display_size)
 
@@ -61,10 +64,10 @@ class Game():
         
         # Grow food
         self.init_food()
-        # Set state
+
+        # Set game state
         self.state = State(game_over = False, in_end_screen = False, in_pause_menu = False, in_options_menu = False, food = [])
-        
-        # Spawn food
+        self.game_timer = (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND
 
     def init_sounds(self):
         self.sounds.init()
@@ -84,7 +87,7 @@ class Game():
         for i in range(NUMBER_OF_PLAYERS):
             self.players.append(Player(
                 self.display_size[0] / 2, self.display_size[1] / 2, width = SNAKE_SIZE, length = INITIAL_SNAKE_LENGTH, speed=SNAKE_SPEED, lives = INITIAL_LIVES, \
-                    colormap = colormaps[[*colormaps][i]], name=f"{i+1} - {[*colormaps][i]}", controls=self.control_sets[i]))
+                    colormap = colormaps[[*colormaps][i]], name=f"{[*colormaps][i]}", controls=self.control_sets[i]))
 
     def init_environment(self):
         self.environment = Environment(self.display_size[0], self.display_size[1], self.snake_size, pygame.Color(50, 153, 213))
@@ -116,6 +119,7 @@ class Game():
     def end_screen(self):
         # This function should be somewhere else and probably not a function, but for now its fine #TODO
         set_end_screen(self)
+        set_final_score(self, self.get_final_score())
         self.viewer.display_players_information(self.players)
 
         pygame.display.update()
@@ -187,6 +191,14 @@ class Game():
         if command == Controls.PAUSE:
             self.pause_menu()
 
+    def get_final_score(self):
+        final_scores = {
+            "Most points" : max(self.players, key=attrgetter('score')),
+            "Longest tail" : max(self.players, key=attrgetter('length')),
+            "Tails stolen" : max(self.players, key=attrgetter('tails_eaten')),
+        }
+        return final_scores
+
     def players_alive(self) -> int:
         return sum(1 for player in self.players if player.alive)
         
@@ -204,6 +216,10 @@ class Game():
         if NUMBER_OF_PLAYERS == 1 and self.players_lives_left() == 0 or\
             (NUMBER_OF_PLAYERS > 1 and self.players_alive() == 1 and \
             self.dead_players_lives_left() == 0):
+            self.state.game_over = True
+
+        # Timer for timed games
+        if GAME_TIMER_SWITCH and self.game_timer <= 0:
             self.state.game_over = True
 
     def draw(self):
@@ -224,6 +240,9 @@ class Game():
         # Update score
         self.viewer.display_players_information(self.players)
 
+        # Draw timers
+        if GAME_TIMER_SWITCH:
+            self.viewer.draw_game_timer(self.game_timer)
         self.viewer.draw_player_counters(self.players)
 
         # Update screen
@@ -258,12 +277,13 @@ class Game():
             if event.type == pygame.JOYAXISMOTION or event.type == pygame.JOYHATMOTION:
                 command = controllerInputHandler(event)
                 if command != None and len(self.players) -1 >= event.instance_id:
-                    self.players[event.instance_id].set_command(command)
+                    self.players[event.instance_id + 1].set_command(command)
 
     def update_players(self):
-        # Move players snake
-        for idx, player in enumerate(self.players):
-
+        # Move players snake        
+        # Update players in random order
+        for player in random.sample(self.players, len(self.players)):
+            idx = self.players.index(player)
             # If the player is dead, 
             if not player.alive:
                 if player.lives_left > 0:
@@ -307,6 +327,8 @@ class Game():
             
             # Move time forward
             self.time_elapsed = self.clock.tick(TICKS_PER_SECOND)
+            if GAME_TIMER_SWITCH:
+                self.game_timer -= 1
     
         self.end_screen()
         # Quit the game if the main game loop breaks
