@@ -1,4 +1,11 @@
 import os
+import configparser
+
+config = configparser.RawConfigParser()
+configFilePath = os.path.join("config", "config.cfg")
+config.read(configFilePath)
+# TODO Reload config after write
+
 
 # Environment / Visual
 Resolutions = {
@@ -6,54 +13,54 @@ Resolutions = {
     'y' : [400, 800, 1200, 1600, 2000],
     's' : [10, 20, 30, 40, 50,]
 }
-RESOLUTION_SCALE = 3
-SCREEN_SIZE_X = 600 * RESOLUTION_SCALE #1200
-SCREEN_SIZE_Y = 400 * RESOLUTION_SCALE #800
-SNAKE_SIZE = 10 * RESOLUTION_SCALE #20
-TICKS_PER_SECOND = 60
-FULLSCREEN = False
+RESOLUTION_SCALE = config.getint("game","RESOLUTION_SCALE")
+SCREEN_SIZE_X = config.getint("game","SCREEN_SIZE_X") * RESOLUTION_SCALE #1200
+SCREEN_SIZE_Y = config.getint("game","SCREEN_SIZE_Y") * RESOLUTION_SCALE #800
+SNAKE_SIZE = config.getint("game","SNAKE_SIZE") * RESOLUTION_SCALE #20
+TICKS_PER_SECOND = config.getint("game","TICKS_PER_SECOND")
+FULLSCREEN = config.getboolean("game","FULLSCREEN")
 
 # Player
-NUMBER_OF_PLAYERS = 2
-INITIAL_FOOD = 1
-INITIAL_SNAKE_LENGTH = 1
-INITIAL_LIVES = 2
-SNAKE_SPEED = 4
-DEATH_PUNISHMENT = 5
+NUMBER_OF_PLAYERS = config.getint("player","NUMBER_OF_PLAYERS")
+INITIAL_FOOD = config.getint("player","INITIAL_FOOD")
+INITIAL_SNAKE_LENGTH = config.getint("player","INITIAL_SNAKE_LENGTH")
+INITIAL_LIVES = config.getint("player","INITIAL_LIVES")
+SNAKE_SPEED = config.getint("player","SNAKE_SPEED")
+DEATH_PUNISHMENT = config.getint("player","DEATH_PUNISHMENT")
 
 # Mode / Mechanics
-TAIL_BITING = True
-TAIL_STEALING = True
+TAIL_BITING = config.getboolean("mode","TAIL_BITING")
+TAIL_STEALING = config.getboolean("mode","TAIL_STEALING")
 
 # Gameplay
-VERZET = False
-FREEZE_FRAMES_ON_BITTEN = 300 # Only active if VERZET is True
-START_COUNTDOWN = 3 # seconds
-GAME_TIMER_SWITCH = False
-GAME_TIMER = 90     # seconds
+VERZET = config.getboolean("gameplay","VERZET")
+FREEZE_FRAMES_ON_BITTEN = config.getint("gameplay","FREEZE_FRAMES_ON_BITTEN") # Only active if VERZET is True
+START_COUNTDOWN = config.getint("gameplay","START_COUNTDOWN") # seconds
+GAME_TIMER_SWITCH = config.getboolean("gameplay","GAME_TIMER_SWITCH")
+GAME_TIMER = config.getint("gameplay","GAME_TIMER")     # seconds
 
 # Cosmetic
-BACKGROUND_VISUALS = True
-WAVE_RATE = 0.2
-MAX_COLOR_SCALE = 3 # higher value (potentially) compresses the colourmap so the hue shift is shorter
-NEIGHBOURHOOD_SHAPE = 0 # 0 for Von Neumann, 1 for Moore
-AGENT_EFFECT_STEP_SIZE = 5
-FREEZE_FRAMES_ON_EAT = 2
-PLAYER_SCORE_BOXES = True
-BODY_DECAY_RATE = 15
+BACKGROUND_VISUALS = config.getboolean("cosmetic","BACKGROUND_VISUALS")
+WAVE_RATE = config.getfloat("cosmetic","WAVE_RATE")
+MAX_COLOR_SCALE = config.getint("cosmetic","MAX_COLOR_SCALE") # higher value (potentially) compresses the colourmap so the hue shift is shorter
+NEIGHBOURHOOD_SHAPE = config.getint("cosmetic","NEIGHBOURHOOD_SHAPE") # 0 for Von Neumann, 1 for Moore
+AGENT_EFFECT_STEP_SIZE = config.getint("cosmetic","AGENT_EFFECT_STEP_SIZE")
+FREEZE_FRAMES_ON_EAT = config.getint("cosmetic","FREEZE_FRAMES_ON_EAT")
+PLAYER_SCORE_BOXES = config.getboolean("cosmetic","PLAYER_SCORE_BOXES")
+BODY_DECAY_RATE = config.getint("cosmetic","BODY_DECAY_RATE")
 
 # Controllers
-ENABLE_CONTOLLERS = True
-CONTROLLER_DEADZONE = 0.45
+ENABLE_CONTOLLERS = config.getboolean("controller","ENABLE_CONTOLLERS")
+CONTROLLER_DEADZONE = config.getfloat("controller","CONTROLLER_DEADZONE")
 
 # Music
 MUSIC_PATH = os.path.join('sounds', 'track_1_loop.wav') #os.path.join("sounds", "track_1_loop.wav"
-DISABLE_MUSIC = False
-MUSIC_VOLUME = 1.0    # float in the range [0,1] where 0 is off, 1 is loudest
+DISABLE_MUSIC = config.getboolean("music","DISABLE_MUSIC")
+MUSIC_VOLUME = config.getfloat("music","MUSIC_VOLUME")    # float in the range [0,1] where 0 is off, 1 is loudest
 
 # Sounds
-DISABLE_EFFECT_SOUNDS = False
-EFFECT_VOLUME = 0.5
+DISABLE_EFFECT_SOUNDS = config.getboolean("sound","DISABLE_EFFECT_SOUNDS")
+EFFECT_VOLUME = config.getfloat("sound","EFFECT_VOLUME")
 
 TEST_SOUND = os.path.join("sounds", "release_snare.wav")
 PLAYER_1_EAT_FRUIT_SOUNDS = [os.path.join("sounds", "1_pickupsound_1_C.wav"),  os.path.join("sounds", "1_pickupsound_2_D.wav"), os.path.join("sounds", "1_pickupsound_3_E.wav"), os.path.join("sounds", "1_pickupsound_4_G.wav"), os.path.join("sounds", "1_pickupsound_5_A.wav"), os.path.join("sounds", "1_pickupsound_6_C.wav")]

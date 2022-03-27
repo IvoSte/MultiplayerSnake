@@ -8,9 +8,9 @@ class Viewer():
         # Set display
         self.display_size = display_size
         if FULLSCREEN:
-            self.dis = pygame.display.set_mode((display_size[0], display_size[1]), pygame.FULLSCREEN)
+            self.display = pygame.playplay.set_mode((display_size[0], display_size[1]), pygame.FULLSCREEN)
         else: 
-            self.dis = pygame.display.set_mode((display_size[0], display_size[1]))
+            self.display = pygame.display.set_mode((display_size[0], display_size[1]))
         pygame.display.set_caption(game_title)
 
         # Set fonts
@@ -26,12 +26,8 @@ class Viewer():
 
         self.background_switch_timer = None
 
-        self.verzet_logo = pygame.image.load("images\\Verzet.tif")
-
     def update(self):
         pygame.display.update()
-
-
 
     # A bit obtuse way. Possibly better to print either per player, or per item itself.
     # This way is pretty workable for this stage. We can disable per column, and each player should
@@ -61,22 +57,10 @@ class Viewer():
         score =  pygame.font.SysFont("futura", 22 * RESOLUTION_SCALE).render(f"S {player.score}", True, color)
         eaten = pygame.font.SysFont("futura", 22 *  RESOLUTION_SCALE).render(f"B {player.tails_eaten}", True, color)
         lives =  pygame.font.SysFont("garamond", 22 * RESOLUTION_SCALE).render(f" {'♥'*(player.lives_left + player.alive)}", True, color)
-        self.dis.blit(length, pos)
-        self.dis.blit(score, [pos[0] + 52 * RESOLUTION_SCALE, pos[1]])
-        self.dis.blit(eaten, [pos[0] + 52 * RESOLUTION_SCALE, pos[1] + 12 * RESOLUTION_SCALE])
-        self.dis.blit(lives, [pos[0], pos[1] + 22 * RESOLUTION_SCALE])
-
-    # def display_player_score(self, player, position, color = Color.WHITE.value):
-    #     value = self.score_font.render(f"{player.name} - points: {player.score}", True, color)
-    #     self.dis.blit(value, position)
-
-    # def display_snake_length(self, player, position, color = Color.WHITE.value):
-    #     value = self.score_font.render(f"tail length: {player.length}", True, color)
-    #     self.dis.blit(value, position)
-
-    # def display_player_lives_left(self, player, position, color = Color.WHITE.value):
-    #     value = self.score_font.render(f"lives: {player.lives_left}", True, color)
-    #     self.dis.blit(value, position)
+        self.display.blit(length, pos)
+        self.display.blit(score, [pos[0] + 52 * RESOLUTION_SCALE, pos[1]])
+        self.display.blit(eaten, [pos[0] + 52 * RESOLUTION_SCALE, pos[1] + 12 * RESOLUTION_SCALE])
+        self.display.blit(lives, [pos[0], pos[1] + 22 * RESOLUTION_SCALE])
 
     def draw_game_timer(self, timer):
         # Start the countdown only after the game countdown
@@ -95,48 +79,45 @@ class Viewer():
 
     def draw_counter(self, value, pos, color, font, size):
         text = pygame.font.SysFont(font, size).render(f"{value}", True, color)
-        self.dis.blit(text, [pos[0], pos[1]])
+        self.display.blit(text, [pos[0], pos[1]])
 
     def draw_text_with_border(self, value, pos, color, bordercolor, font, size):
         border = pygame.font.SysFont(font, size).render(f"{value}", True, bordercolor)
-        self.dis.blit(border, [pos[0] + 2, pos[1]])
-        self.dis.blit(border, [pos[0] - 2, pos[1]])
-        self.dis.blit(border, [pos[0], pos[1] + 2])
-        self.dis.blit(border, [pos[0], pos[1] - 2])
+        self.display.blit(border, [pos[0] + 2, pos[1]])
+        self.display.blit(border, [pos[0] - 2, pos[1]])
+        self.display.blit(border, [pos[0], pos[1] + 2])
+        self.display.blit(border, [pos[0], pos[1] - 2])
         text = pygame.font.SysFont(font, size).render(f"{value}", True, color)
-        self.dis.blit(text, [pos[0], pos[1]])
-
+        self.display.blit(text, [pos[0], pos[1]])
 
     def clear_screen(self):
-        self.dis.fill(self.background_color)
-        #if VERZET:
-        #    self.dis.blit(self.verzet_logo, (0,0))
+        self.display.fill(self.background_color)
 
-    def render_message(self, msg, color, relative_x, relative_y):
+    def draw_text(self, msg, color, relative_x, relative_y):
         msg = self.font_style.render(msg, True, color)
-        self.dis.blit(msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y])
+        self.display.blit(msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y])
 
-    def render_message_bold(self, msg, color, relative_x, relative_y):
+    def draw_text_bold(self, msg, color, relative_x, relative_y):
         self.font_style.set_bold(True)
         msg = self.font_style.render(msg, True, color)
-        self.dis.blit(msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y])
+        self.display.blit(msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y])
         self.font_style.set_bold(False)
 
     def draw_snake(self, player):
         # Draw body
         for idx, pos in enumerate(player.body):
-            pygame.draw.rect(self.dis, color(player.colormap, player.color + ((len(player.body) - idx) * player.colorscale)), [
+            pygame.draw.rect(self.display, color(player.colormap, player.color + ((len(player.body) - idx) * player.colorscale)), [
                              pos[0], pos[1], self.snake_size[0], self.snake_size[1]])
         # Draw decaying body
         for idx, pos in enumerate(player.decaying_body):
-            pygame.draw.rect(self.dis, player.decay_body_color[idx], [
+            pygame.draw.rect(self.display, player.decay_body_color[idx], [
                              pos[0], pos[1], self.snake_size[0], self.snake_size[1]])
     
     def draw_food(self, food):
-        pygame.draw.rect(self.dis, food.color, [food.pos[0], food.pos[1], self.snake_size[0], self.snake_size[1]])
+        pygame.draw.rect(self.display, food.color, [food.pos[0], food.pos[1], self.snake_size[0], self.snake_size[1]])
 
     def draw_environment(self, environment):
         for idx, agent in enumerate(environment.active_agents):
             #print(f"drawing agent {idx + 1}/{len(environment.active_agents)} at {agent.x_pos} {agent.y_pos}") #, end = '\r'
-            pygame.draw.rect(self.dis, agent.color, [agent.x_pos, agent.y_pos, agent.size[0], agent.size[1]]) 
+            pygame.draw.rect(self.display, agent.color, [agent.x_pos, agent.y_pos, agent.size[0], agent.size[1]]) 
             

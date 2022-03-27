@@ -22,7 +22,7 @@ class Env_agent(Agent):
         self.colormap = generate_colormap(0, color.r, 255, color.g, 255, color.b)
         self.intensity = 255
 
-        self.mode = AgentMode.BIG_WAVE
+        self.mode = AgentMode.SMALL_WAVE
 
         self.active = False
         self.infectious = False

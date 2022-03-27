@@ -1,5 +1,6 @@
 from operator import attrgetter
 from environment import Environment
+from menu.pauseMenu import PauseMenu
 from player import Player
 from screens import set_end_screen, set_final_score, set_options_screen
 from sounds import Sounds
@@ -134,14 +135,16 @@ class Game():
                         self.quit_game()
 
     def pause_menu(self):
-        self.state.in_pause_menu = True
-        self.draw()
-        set_pause_screen(self)
-        pygame.display.update()
-        while self.state.in_pause_menu:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key in general_controls:
-                    self.pause_menu_options(event)
+        menu = PauseMenu(self)
+        menu.display_menu()
+        # self.state.in_pause_menu = True
+        # self.draw()
+        # set_pause_screen(self)
+        # pygame.display.update()
+        # while self.state.in_pause_menu:
+        #     for event in pygame.event.get():
+        #         if event.type == pygame.KEYDOWN and event.key in general_controls:
+        #             self.pause_menu_options(event)
 
     def pause_menu_options(self, event):
         if general_controls[event.key] == Controls.PAUSE:

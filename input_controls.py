@@ -80,6 +80,20 @@ general_controls = {
     pygame.K_e: Controls.EFFECTS,
 }
 
+menu_controls = {
+    pygame.K_LEFT: Controls.LEFT,
+    pygame.K_RIGHT: Controls.RIGHT,
+    pygame.K_UP: Controls.UP,
+    pygame.K_DOWN: Controls.DOWN,
+    pygame.K_q: Controls.QUIT,
+    pygame.K_BACKSPACE: Controls.QUIT,
+    pygame.K_ESCAPE: Controls.QUIT,
+    pygame.K_RETURN: Controls.CONFIRM,
+    pygame.K_o: Controls.OPTIONS,
+    pygame.K_c: Controls.CONFIRM,
+    pygame.K_p: Controls.PAUSE,
+}
+
 default_player_controls = {
     pygame.K_LEFT: Controls.LEFT,
     pygame.K_RIGHT: Controls.RIGHT,
