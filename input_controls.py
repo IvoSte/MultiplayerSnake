@@ -89,6 +89,7 @@ menu_controls = {
     pygame.K_BACKSPACE: Controls.QUIT,
     pygame.K_ESCAPE: Controls.QUIT,
     pygame.K_RETURN: Controls.CONFIRM,
+    pygame.K_r: Controls.RESTART,
     pygame.K_o: Controls.OPTIONS,
     pygame.K_c: Controls.CONFIRM,
     pygame.K_p: Controls.PAUSE,

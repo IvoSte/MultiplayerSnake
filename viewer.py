@@ -1,10 +1,11 @@
 import random
 import pygame
 from colors import Color, turbo_color, color, extend_colormaps
-from env_variables import FULLSCREEN, GAME_TIMER, PLAYER_SCORE_BOXES, RESOLUTION_SCALE, SCREEN_SIZE_X, SCREEN_SIZE_Y, SNAKE_SIZE, TICKS_PER_SECOND, VERZET
+from env_variables import FULLSCREEN, GAME_TIMER, GAME_TIMER_SWITCH, PLAYER_SCORE_BOXES, RESOLUTION_SCALE, SCREEN_SIZE_X, SCREEN_SIZE_Y, SNAKE_SIZE, TICKS_PER_SECOND, VERZET, BACKGROUND_VISUALS
 
 class Viewer():
     def __init__(self, snake_size=(SNAKE_SIZE,SNAKE_SIZE), display_size=(SCREEN_SIZE_X,SCREEN_SIZE_Y), game_title="Multiplayer Snake Game - Extraordinaire"):
+        
         # Set display
         self.display_size = display_size
         if FULLSCREEN:
@@ -12,6 +13,8 @@ class Viewer():
         else: 
             self.display = pygame.display.set_mode((display_size[0], display_size[1]))
         pygame.display.set_caption(game_title)
+
+        #self.screen = pygame.Surface()
 
         # Set fonts
         self.font_style = pygame.font.SysFont("bahnschrift", 35)
@@ -121,3 +124,35 @@ class Viewer():
             #print(f"drawing agent {idx + 1}/{len(environment.active_agents)} at {agent.x_pos} {agent.y_pos}") #, end = '\r'
             pygame.draw.rect(self.display, agent.color, [agent.x_pos, agent.y_pos, agent.size[0], agent.size[1]]) 
             
+
+    def draw_game(self, game):
+        self.clear_screen()
+
+        # Draw background / environment
+        if BACKGROUND_VISUALS:
+            self.draw_environment(game.environment)
+
+        # Draw food TODO draw items / draw entities
+        for food in game.food:
+            self.draw_food(food)
+
+        # Draw players
+        for player in game.players:
+            self.draw_snake(player)
+
+        # Update score
+        self.display_players_information(game.players)
+
+        # Draw timers
+        if GAME_TIMER_SWITCH:
+            self.draw_game_timer(game.game_timer)
+        self.draw_player_counters(game.players)
+
+        # Update screen
+        self.update()
+
+
+    def draw_menu(self, menu):
+        self.clear_screen()
+        # TODO Draw darkening screen over the game in the background
+        menu.draw_menu()

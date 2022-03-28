@@ -10,6 +10,8 @@ class BaseMenu():
         self.in_menu = True
         self.cursor_rect = pygame.Rect(0, 0, 20, 20)
         self.cursor_offset = - 100
+        self.state = ""
+        self.states = [""]
         #self.menu_screen = pygame.Surface()
 
     def draw_cursor(self):
@@ -22,8 +24,6 @@ class BaseMenu():
         self.in_menu = True
         while self.in_menu:
             self.game.draw()
-            # TODO Draw darkening screen over the game in the background
-            self.draw_menu()
             pygame.display.update()
             self.parse_menu_input()
 
@@ -34,11 +34,25 @@ class BaseMenu():
 
     # class to override
     def draw_menu(self):
+        print("ERROR: Trying to draw a base menu.")
         pass
 
     # class to override
     def menu_control(self, event):
-        pass
+        if menu_controls[event.key] == Controls.PAUSE:
+            self.quit_menu()
+        elif menu_controls[event.key] == Controls.QUIT:
+            self.game.end_screen()
 
+    def quit_menu(self):
+        self.in_menu = False
+
+    def move_cursor(self, direction):
+        if direction == Controls.UP:
+            self.state = self.states[(self.states.index(self.state) - 1)]
+            # TODO add MaartenFX sound
+        if direction == Controls.DOWN:
+            self.state = self.states[(self.states.index(self.state) + 1) % (len(self.states) - 1)]
+            # TODO add MaartenFX sound
 
     

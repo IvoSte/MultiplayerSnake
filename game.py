@@ -1,5 +1,7 @@
 from operator import attrgetter
 from environment import Environment
+from menu.baseMenu import BaseMenu
+from menu.optionsMenu import OptionsMenu
 from menu.pauseMenu import PauseMenu
 from player import Player
 from screens import set_end_screen, set_final_score, set_options_screen
@@ -45,8 +47,10 @@ class Game():
         self.environment = None
 
         # Set state
-        self.state = State(game_over = False, in_end_screen = False, in_pause_menu = True, in_options_menu = False, food = [])
-    
+        self.state = State(game_over = False, in_end_screen = False, in_pause_menu = True, in_options_menu = False, in_game = True, in_menu = False, food = [])
+        self.current_menu = BaseMenu(self)
+
+
     #### Game init -- Could be split to own file
     def init_game(self):
         # Pre game setup
@@ -67,7 +71,7 @@ class Game():
         self.init_food()
 
         # Set game state
-        self.state = State(game_over = False, in_end_screen = False, in_pause_menu = False, in_options_menu = False, food = [])
+        self.state = State(game_over = False, in_end_screen = False, in_pause_menu = False, in_options_menu = False, in_game = True, in_menu = False, food = [])
         self.game_timer = (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND
 
     def init_sounds(self):
@@ -135,44 +139,32 @@ class Game():
                         self.quit_game()
 
     def pause_menu(self):
-        menu = PauseMenu(self)
-        menu.display_menu()
-        # self.state.in_pause_menu = True
-        # self.draw()
-        # set_pause_screen(self)
-        # pygame.display.update()
-        # while self.state.in_pause_menu:
-        #     for event in pygame.event.get():
-        #         if event.type == pygame.KEYDOWN and event.key in general_controls:
-        #             self.pause_menu_options(event)
-
-    def pause_menu_options(self, event):
-        if general_controls[event.key] == Controls.PAUSE:
-            self.state.in_pause_menu = False
-            return
-        if general_controls[event.key] == Controls.QUIT:
-            self.end_screen()
-        if general_controls[event.key] == Controls.RESTART:
-            self.restart_game()
-        if general_controls[event.key] == Controls.OPTIONS:
-            if self.state.in_options_menu:
-                self.state.in_options_menu = False
-                self.pause_menu()
-            else : 
-                self.options_menu()
+        self.state.in_game = False
+        self.state.in_menu = True
+        self.menu = PauseMenu(self)
+        self.menu.display_menu()
+        self.state.in_game = True
+        self.state.in_menu = False
         
     def options_menu(self):
-        self.state.in_options_menu = True
-        self.draw()
-        set_pause_screen(self)
-        set_options_screen(self)
-        pygame.display.update()
+        self.state.in_game = False
+        self.state.in_menu = True
+        self.menu = OptionsMenu(self)
+        self.menu.display_menu()
+        self.state.in_game = True
+        self.state.in_menu = False
 
-        while self.state.in_options_menu:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key in general_controls:
-                    self.options_menu_options(event)
-                    self.pause_menu_options(event)
+        # self.state.in_options_menu = True
+        # self.draw()
+        # set_pause_screen(self)
+        # set_options_screen(self)
+        # pygame.display.update()
+
+        # while self.state.in_options_menu:
+        #     for event in pygame.event.get():
+        #         if event.type == pygame.KEYDOWN and event.key in general_controls:
+        #             self.options_menu_options(event)
+        #             self.pause_menu_options(event)
 
     def options_menu_options(self, event):
         if general_controls[event.key] == Controls.MUSIC:
@@ -226,31 +218,13 @@ class Game():
             self.state.game_over = True
 
     def draw(self):
-        self.viewer.clear_screen()
+        # Draw game when in game
+        if self.state.in_game:
+            self.viewer.draw_game(self)
 
-        # Draw background / environment
-        if BACKGROUND_VISUALS:
-            self.viewer.draw_environment(self.environment)
-
-        # Draw food TODO draw items / draw entities
-        for food in self.food:
-            self.viewer.draw_food(food)
-
-        # Draw players
-        for player in self.players:
-            self.viewer.draw_snake(player)
-
-        # Update score
-        self.viewer.display_players_information(self.players)
-
-        # Draw timers
-        if GAME_TIMER_SWITCH:
-            self.viewer.draw_game_timer(self.game_timer)
-        self.viewer.draw_player_counters(self.players)
-
-        # Update screen
-        self.viewer.update()
-
+        # Draw the menu when in a menu
+        if self.state.in_menu:
+            self.viewer.draw_menu(self.menu)
 
     def parse_input(self):
         # Read each input
