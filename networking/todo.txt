@@ -1,0 +1,8 @@
+- TODO Server that runs and accepts connections
+- TODO Client that can connect to the server
+- TODO Send/receive information between client and server
+- TODO Game to state encoder/decoder
+- TODO run game on server
+- TODO Client sends input to server
+- TODO server sends game to client
+- TODO Later dont send the entire game, just the new state delta

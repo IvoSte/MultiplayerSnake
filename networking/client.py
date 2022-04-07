@@ -1,32 +1,36 @@
 
-from twisted.internet.protocol import DatagramProtocol
-from twisted.internet import reactor
-
-
-class EchoClientDatagramProtocol(DatagramProtocol):
-    strings = [b"Hello, world!", b"What a fine day it is.", b"Bye-bye!"]
-
-    def startProtocol(self):
-        self.transport.connect("127.0.0.1", 5555)
-        self.sendDatagram()
-
-    def sendDatagram(self):
-        if len(self.strings):
-            datagram = self.strings.pop(0)
-            self.transport.write(datagram)
-        else:
-            reactor.stop()
-
-    def datagramReceived(self, datagram, host):
-        print("Datagram received: ", repr(datagram))
-        self.sendDatagram()
-
-
-def main():
-    protocol = EchoClientDatagramProtocol()
-    reactor.listenUDP(0, protocol)
-    reactor.run()
-
-
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.path.append("..")
+
+
+# Client depends on the Network
+from networking.network import Network
+
+class Client():
+
+    def __init__(self, server, port):
+        print("initializing client")
+        # server assigns player ids
+        # zoek naar de server, connect, get player_info
+        self.network = Network(server, port)
+        self.player_id = self.network.get_player_id()
+        
+        # receive game state, send to viewer
+        self.game_state = None
+        self.get_game_state()
+
+            
+    def send_player_input(self, command):
+        self.network.send_player_input(command)
+        # parse player input, send to server
+
+    def get_game_state(self):
+        self.game_state = self.network.get_game_state()
+
+    def disconnect(self):
+        self.network.disconnect_client(self.player_id)
+        
+if __name__=='__main__':
+    client = Client("localhost", 25565)
+    
