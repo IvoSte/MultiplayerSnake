@@ -5,7 +5,8 @@ if __name__ == "__main__":
 
 
 # Client depends on the Network
-from networking.network import Network
+from src.game.game import Game
+from src.networking.network import Network
 
 class Client():
 
@@ -19,7 +20,14 @@ class Client():
         # receive game state, send to viewer
         self.game_state = None
         self.get_game_state()
+        
+        # print(self.player_id)
+        # print(self.game_state)
 
+    def run():
+        g = Game()
+        g.init_game()
+        g.run()
             
     def send_player_input(self, command):
         self.network.send_player_input(command)
@@ -33,4 +41,5 @@ class Client():
         
 if __name__=='__main__':
     client = Client("localhost", 25565)
+    client.run()
     

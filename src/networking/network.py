@@ -7,7 +7,10 @@ import socket
 import pickle
 import json
 
-from networking.network_data import NetworkData, CreateGameCommand, DisconnectPlayerCommand, GetGameStateCommand, GetPlayerIDCommand, PlayerInfo, SendPlayerInput
+from src.networking.network_data_base import NetworkData
+from src.networking.network_commands import CreateGameCommand, DisconnectPlayerCommand, GetGameStateCommand, GetPlayerIDCommand, SendPlayerInput
+from src.networking.network_data import PlayerInfo
+
 
 class Network:
     # interface between connection and server
@@ -18,7 +21,6 @@ class Network:
         self.port = port
         self.addr = (self.server_ip, self.port)
         self.player_id = self.connect_player()
-        print(self.player_id)
 
     def get_player(self):
         # TODO: get player information as JSON
@@ -27,8 +29,8 @@ class Network:
     def connect_player(self):
         try:
             self.connection.connect(self.addr)
-            player_info = PlayerInfo("1337")
-            return player_info.from_packet(self.connection.recv(2048))
+            player_data = NetworkData.from_packet(self.connection.recv(2048), type_def=PlayerInfo)
+            return player_data
         except Exception as e:
             print(f"connect player error: {e}")
 

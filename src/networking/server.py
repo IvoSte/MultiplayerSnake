@@ -8,7 +8,8 @@ from _thread import start_new_thread
 import socket
 import uuid
 import json
-from networking.network_data import PlayerInfo
+from src.networking.network_data_base import NetworkData
+from src.networking.network_data import PlayerInfo, Message
 
 class Server:
 
@@ -28,6 +29,7 @@ class Server:
             self.server.bind(addr)
         except Exception as e:
             print(f"Failed to bind server: {e}")
+        print("Server has been bounded")
         self.server.listen()
         
     def disconnect_player(self, player_id):
@@ -65,25 +67,29 @@ class Server:
         pass
     
     def client_thread(self, connection, player_id):
+        """For each connected player, spawn a client thread. This now listens to
+        calls from the client, connecting the client with the server."""
         # on player connect
         connection.send(PlayerInfo(player_id).to_packet())
         
         while True:
-            # TODO: Make this into the proper object
-            data = json.loads(self.server.recv(4096).decode())
-            
+            data = NetworkData.from_packet(connection.recv(4096))
             # If nothing got sent, wait
             if not data:
                 break
             
             if data.command == "create_game":
                 self.create_game(player_id)
+                break
             
             elif data.command == "get_game_state":
+                msg = Message("Ivo kan beter smashen dan sommigen maar niet beter dan anderen.")
+                connection.send(msg.to_packet())
                 break
             
             elif data.command == "get_player_info":
                 connection.send(PlayerInfo(player_id).to_packet())
+                break
             
             elif data.command == "send_player_input":
                 break
