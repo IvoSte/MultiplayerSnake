@@ -1,56 +1,57 @@
 import pygame
+from game.event_manager import MenuControlInputEvent
+from game.event_manager import QuitEvent, RestartGameEvent
 from viewer.colors import Color
 from controls.input_controls import Controls, general_controls, menu_controls
 
 
 class BaseMenu:
-    def __init__(self, viewer):
-        self.viewer = viewer
-        self.display_size = self.viewer.display_size
+    def __init__(self, game):
+        self.name = "BaseMenu"
+        # self.evManager = evManager
+        # self.evManager.RegisterListener(self)
+        self.game = game
         self.in_menu = True
-        self.cursor_rect = pygame.Rect(0, 0, 20, 20)
-        self.cursor_offset = -100
         self.state = ""
         self.states = [""]
-        # self.menu_screen = pygame.Surface()
 
-    def draw_cursor(self):
-        self.viewer.draw_text(
-            "*", Color.WHITE.values, self.cursor_rect.x, self.cursor_rect.y
-        )
-
-    def blit_screen(self):
-        self.viewer.update()
+    # def notify(self, event):
+    #    if isinstance(event, MenuControlInputEvent):
+    #        self.menu_control(event.command)
 
     def display_menu(self):
         self.in_menu = True
-        while self.in_menu:
-            self.viewer.draw_menu()
-            pygame.display.update()
-            self.parse_menu_input()
-
-    def parse_menu_input(self):
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key in menu_controls:
-                self.menu_control(event)
 
     # class to override
-    def draw_menu(self):
-        print("ERROR: Trying to draw a base menu.")
-        pass
+    def menu_control(self, command):
+        if command == Controls.PAUSE:
+            self.game.pause_menu()
+        elif command == Controls.QUIT:
+            self.game.evManager.Post(QuitEvent)
+        elif command == Controls.CONFIRM:
+            print("Confirm menu option")
+            self.confirm_option()
+        elif command == Controls.RESTART:
+            self.game.evManager.Post(RestartGameEvent)
+        elif command == Controls.OPTIONS:
+            print("OPTIONS menu option")
 
-    # class to override
-    def menu_control(self, event):
-        if menu_controls[event.key] == Controls.PAUSE:
-            self.quit_menu()
-        elif menu_controls[event.key] == Controls.QUIT:
-            pass
-            # self.game.end_screen()
-            # TODO end screen function moved somewhere else, put it back here.
-            # Do I initiate a self.viewer.evManager.Post(QuitEvent) here, or should that not be controlled here?
+        elif command == Controls.UP:
+            self.move_cursor(command)
+        elif command == Controls.DOWN:
+            self.move_cursor(command)
+        elif command == Controls.LEFT:
+            self.move_cursor(command)
+        elif command == Controls.RIGHT:
+            self.move_cursor(command)
 
     def quit_menu(self):
         self.in_menu = False
+
+    # function to override
+    def confirm_option(self):
+        print(f"Confirming menu choice: {self.state}")
+        self.menu_functions[self.state]()
 
     def move_cursor(self, direction):
         if direction == Controls.UP:

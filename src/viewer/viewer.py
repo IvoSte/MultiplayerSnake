@@ -1,8 +1,10 @@
 import random
 import pygame
-from game.eventmanager import TickEvent
-from game.eventmanager import EventManager
+from game.event_manager import TickEvent
+from game.event_manager import EventManager
 from game.game import GameEngine
+from game.event_manager import GamePausedEvent
+from viewer.menus.pauseMenuView import PauseMenuView
 from viewer.colors import Color, turbo_color, color, extend_colormaps
 from game.env_variables import (
     FULLSCREEN,
@@ -63,6 +65,8 @@ class Viewer:
             Color.RED.value,
             Color.GREEN.value,
         ]
+
+        self.menus = {"PauseMenu": PauseMenuView}
 
         self.background_switch_timer = None
 
@@ -171,6 +175,8 @@ class Viewer:
                 self.draw_game()
             if self.game.state.in_menu:
                 self.draw_menu()
+        if isinstance(event, GamePausedEvent):
+            pass
 
     def draw_game(self):
         self.clear_screen()
@@ -201,4 +207,10 @@ class Viewer:
     def draw_menu(self):
         self.clear_screen()
         # TODO Draw darkening screen over the game in the background
-        self.game.menu.draw_menu()
+        self.menus[self.game.current_menu.name](self, self.game.current_menu).draw()
+
+        self.update()
+        # self.game.menu.draw_menu()  # this is bad, there should not be a draw function in a gameengine object
+        # so it should be something like
+        # self.draw_menu(self.game.menu). But we're here already.
+        # then, do we draw all elements from the gameengine menu? is it an interpreter, or ready made thing?

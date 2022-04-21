@@ -6,7 +6,6 @@ from menus.baseMenu import BaseMenu
 class OptionsMenu(BaseMenu):
     def __init__(self, game):
         BaseMenu.__init__(self, game)
-        self.name = "OptionsMenu"
         self.state = "music"
         self.states = ["music", "game_sounds"]
         self.menu_functions = {

@@ -5,7 +5,10 @@ from menus.optionsMenu import OptionsMenu
 from menus.pauseMenu import PauseMenu
 from entities.player import Player
 from entities.snake import Snake
-from game.eventmanager import EventManager, TickEvent
+from game.event_manager import EventManager, TickEvent, GetInputsEvent
+from game.event_manager import GeneralControlInputEvent, PlayerInputEvent, QuitEvent
+from game.event_manager import GamePausedEvent, RestartGameEvent
+from game.event_manager import MenuControlInputEvent
 from viewer.screens.screens import set_end_screen, set_final_score, set_options_screen
 from audio.sounds import Sounds
 from game.state import State
@@ -80,6 +83,7 @@ class GameEngine:
         # Set state
         self.state = State(
             game_over=False,
+            game_paused=False,
             in_end_screen=False,
             in_pause_menu=True,
             in_options_menu=False,
@@ -87,7 +91,7 @@ class GameEngine:
             in_menu=False,
             food=[],
         )
-        # self.current_menu = BaseMenu(self)
+        self.current_menu = None
 
     #### Game init -- Could be split to own file
     def init_game(self):
@@ -111,6 +115,7 @@ class GameEngine:
         # Set game state
         self.state = State(
             game_over=False,
+            game_paused=False,
             in_end_screen=False,
             in_pause_menu=False,
             in_options_menu=False,
@@ -167,9 +172,23 @@ class GameEngine:
             self.spawn_food()
 
     def notify(self, event):
-        pass
-        # if isinstance(event, eventtype):
-        #   action
+        if isinstance(event, QuitEvent):
+            self.state.game_over = True
+            # self.end_screen()
+        if isinstance(event, PlayerInputEvent):
+            event.player.set_command(event.command)
+        if isinstance(event, GeneralControlInputEvent):
+            if event.command == Controls.QUIT:
+                self.state.game_over = True
+                self.evManager.Post(QuitEvent())
+            if event.command == Controls.PAUSE:
+                self.state.game_paused = True
+                self.evManager.Post(GamePausedEvent())
+                self.pause_menu()
+        if isinstance(event, RestartGameEvent):
+            self.restart_game()
+        if isinstance(event, MenuControlInputEvent):
+            self.current_menu.menu_control(event.command)
 
     #### End game init
 
@@ -220,18 +239,21 @@ class GameEngine:
                         self.quit_game()
 
     def pause_menu(self):
-        self.state.in_game = False
-        self.state.in_menu = True
-        self.menu = PauseMenu(self)
-        self.menu.display_menu()
-        self.state.in_game = True
-        self.state.in_menu = False
+        if isinstance(self.current_menu, PauseMenu):
+            print("Disabling pause menu")
+            self.state.in_game = True
+            self.state.in_menu = False
+            self.current_menu = None
+        else:
+            print("Enabling pause menu")
+            self.state.in_game = False
+            self.state.in_menu = True
+            self.current_menu = PauseMenu(self)
 
     def options_menu(self):
         self.state.in_game = False
         self.state.in_menu = True
-        self.menu = OptionsMenu(self)
-        self.menu.display_menu()
+        self.current_menu = OptionsMenu(self)
         self.state.in_game = True
         self.state.in_menu = False
 
@@ -246,13 +268,6 @@ class GameEngine:
                 self.sounds.mute_effects()
             else:
                 self.sounds.unmute_effects()
-
-    def parse_general_command(self, command):
-        # Quit key
-        if command == Controls.QUIT:
-            self.state.game_over = True
-        if command == Controls.PAUSE:
-            self.pause_menu()
 
     def get_final_score(self):
         final_scores = {
@@ -291,39 +306,6 @@ class GameEngine:
         if GAME_TIMER_SWITCH and self.game_timer <= 0:
             self.state.game_over = True
 
-    # TODO: Move to Input Manager
-    def parse_input(self):
-        # Read each input
-
-        for event in pygame.event.get():
-            # If the game is closed
-            if event.type == pygame.QUIT:
-                self.state.game_over = True
-                self.end_screen()
-
-            # If the event is a keypress
-            if event.type == pygame.KEYDOWN:
-
-                # Parse the keypress to a command
-                if event.key in general_controls:
-                    self.parse_general_command(general_controls[event.key])
-                    break
-
-                # Receive player command
-                for player in self.players:
-                    if event.key in player.controls:
-                        player.set_command(player.controls[event.key])
-
-            # TODO: This is needed to make the joystick work, but it makes no sense
-            # This needs to be removed at some point (ideally)
-            joysticks = [
-                pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())
-            ]
-            if event.type == pygame.JOYAXISMOTION or event.type == pygame.JOYHATMOTION:
-                command = controllerInputHandler(event)
-                if command != None and len(self.players) - 1 >= event.instance_id:
-                    self.players[event.instance_id + 1].set_command(command)
-
     def update_players(self):
         # Move players snake
         # Update players in random order
@@ -353,7 +335,7 @@ class GameEngine:
             player.update_body()
 
     def update(self):
-        self.parse_input()
+        # self.parse_input()
         self.update_players()
         self.environment.update_environment()
 
@@ -367,7 +349,13 @@ class GameEngine:
 
             ###  Main game
 
+            # Get and parse inputs
+            self.evManager.Post(GetInputsEvent())
+
+            # Update game state according to inputs
             self.update()
+
+            # Update viewer and all other objects
             self.evManager.Post(TickEvent())
 
             # Move time forward
