@@ -2,24 +2,34 @@ from dataclasses import dataclass
 from winreg import DeleteValue
 from src.networking.network_data_base import NetworkData
 
+## Naming convention:
+## DATA is something to be pulled from the server by the client, or from the client to the server -- Ik wil dit weten
+## A COMMAND is an instruction from the server or client to the other to do something specific. -- Ik wil dat je dit doet
+
 ## DATA ##
 @dataclass
 class PlayerInfo(NetworkData):
     player_id: str
 
+
 @dataclass
 class GameState(NetworkData):
     game_id: str
-    
+
+
 @dataclass
 class Message(NetworkData):
     message: str
-    
+
+
 @dataclass
-class UpdatePlayersData(NetworkData):
+class UpdatePlayerPositionsData(NetworkData):
+    """Received by players from the server"""
+
     player_list: dict
-        ## {player id: {snake positions : [list(snake_length)],
-        #               score : score_value}
+    ## {player id: {snake positions : [list(snake_length)],
+    #               score : score_value}
+
 
 # @dataclass
 # class UpdateScoreData(NetworkData):
@@ -28,13 +38,14 @@ class UpdatePlayersData(NetworkData):
 
 # on eat apple, if (multiplayer): send UpdateObjectsData
 ## Observer Pattern
-@dataclass
-class UpdateObjectsData(NetworkData):
-    # object id x removed / added
-    update_object: dict
-    ## object id
-    ## object type
-    ## object position
+# @dataclass
+# class UpdateObjectsData(NetworkData):
+#     # object id x removed / added
+#     update_object: dict
+#     ## object id
+#     ## object type
+#     ## object position
+
 
 # player code:
 #     eat_apple
@@ -58,6 +69,6 @@ class UpdateObjectsData(NetworkData):
 
 
 # GameState Future
-    ## (snake state)
-    # snake length
-    # snake colour (derived from player id)
+## (snake state)
+# snake length
+# snake colour (derived from player id)

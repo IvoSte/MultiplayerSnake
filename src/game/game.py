@@ -5,9 +5,9 @@ from menus.optionsMenu import OptionsMenu
 from menus.pauseMenu import PauseMenu
 from entities.player import Player
 from entities.snake import Snake
-from viewer.screens import set_end_screen, set_final_score, set_options_screen
+from game.eventmanager import EventManager, TickEvent
+from viewer.screens.screens import set_end_screen, set_final_score, set_options_screen
 from audio.sounds import Sounds
-from viewer.viewer import Viewer
 from game.state import State
 from viewer.colors import Color, colormaps, extend_colormaps
 from entities.food import Food
@@ -39,14 +39,18 @@ from game.env_variables import (
     TICKS_PER_SECOND,
     WAVE_RATE,
 )
-from viewer.screens import set_end_screen, set_pause_screen
+
 import pygame
 import time
 import random
 
 
-class Game:
-    def __init__(self, display_size=(SCREEN_SIZE_X, SCREEN_SIZE_Y)):
+class GameEngine:
+    def __init__(
+        self, evManager: EventManager, display_size=(SCREEN_SIZE_X, SCREEN_SIZE_Y)
+    ):
+        self.evManager = evManager
+        self.evManager.RegisterListener(self)
         # Global variables
         self.snake_size = (SNAKE_SIZE, SNAKE_SIZE)
         self.display_size = display_size
@@ -59,9 +63,6 @@ class Game:
         self.time_elapsed = 0
 
         self.game_timer = (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND
-
-        # Initialize display
-        self.viewer = Viewer(snake_size=self.snake_size, display_size=display_size)
 
         # Keep a list of all the players
         self.control_sets = [
@@ -86,7 +87,7 @@ class Game:
             in_menu=False,
             food=[],
         )
-        self.current_menu = BaseMenu(self)
+        # self.current_menu = BaseMenu(self)
 
     #### Game init -- Could be split to own file
     def init_game(self):
@@ -165,6 +166,11 @@ class Game:
         for _ in range(INITIAL_FOOD):
             self.spawn_food()
 
+    def notify(self, event):
+        pass
+        # if isinstance(event, eventtype):
+        #   action
+
     #### End game init
 
     def restart_game(self):
@@ -200,7 +206,7 @@ class Game:
         set_end_screen(self)
         set_final_score(self, self.get_final_score())
         # TODO this needs to be removed, ofcourse.
-        self.viewer.ui_player_information.display_players_information(self.players)
+        # self.viewer.ui_player_information.display_players_information(self.players)
 
         pygame.display.update()
         in_end_screen = True
@@ -228,18 +234,6 @@ class Game:
         self.menu.display_menu()
         self.state.in_game = True
         self.state.in_menu = False
-
-        # self.state.in_options_menu = True
-        # self.draw()
-        # set_pause_screen(self)
-        # set_options_screen(self)
-        # pygame.display.update()
-
-        # while self.state.in_options_menu:
-        #     for event in pygame.event.get():
-        #         if event.type == pygame.KEYDOWN and event.key in general_controls:
-        #             self.options_menu_options(event)
-        #             self.pause_menu_options(event)
 
     def options_menu_options(self, event):
         if general_controls[event.key] == Controls.MUSIC:
@@ -297,15 +291,6 @@ class Game:
         if GAME_TIMER_SWITCH and self.game_timer <= 0:
             self.state.game_over = True
 
-    def draw(self):
-        # Draw game when in game
-        if self.state.in_game:
-            self.viewer.draw_game(self)
-
-        # Draw the menu when in a menu
-        if self.state.in_menu:
-            self.viewer.draw_menu(self.menu)
-
     # TODO: Move to Input Manager
     def parse_input(self):
         # Read each input
@@ -352,7 +337,7 @@ class Game:
                 continue
             player.move()
 
-            player.is_dead(self.viewer.display_size, snakes=self.players)
+            player.is_dead(self.display_size, snakes=self.players)
 
             eaten_food = []
             for food in self.food:
@@ -383,7 +368,7 @@ class Game:
             ###  Main game
 
             self.update()
-            self.draw()
+            self.evManager.Post(TickEvent())
 
             # Move time forward
             self.time_elapsed = self.clock.tick(TICKS_PER_SECOND)

@@ -1,6 +1,6 @@
-
 if __name__ == "__main__":
     import sys
+
     sys.path.append("..")
 
 import socket
@@ -8,7 +8,14 @@ import pickle
 import json
 
 from src.networking.network_data_base import NetworkData
-from src.networking.network_commands import CreateGameCommand, DisconnectPlayerCommand, GetGameStateCommand, GetPlayerIDCommand, SendPlayerInput
+from src.networking.network_commands import (
+    CreateGameCommand,
+    DisconnectPlayerCommand,
+    GetGameStateCommand,
+    GetPlayerIDCommand,
+    SendPlayerPositionCommand,
+    GetPlayerPositionsCommand,
+)
 from src.networking.network_data import PlayerInfo
 
 
@@ -29,20 +36,22 @@ class Network:
     def connect_player(self):
         try:
             self.connection.connect(self.addr)
-            player_data = NetworkData.from_packet(self.connection.recv(2048), type_def=PlayerInfo)
+            player_data = NetworkData.from_packet(
+                self.connection.recv(2048), type_def=PlayerInfo
+            )
             return player_data
         except Exception as e:
             print(f"connect player error: {e}")
 
-    def send_command(self,command: NetworkData):
+    def send_command(self, command: NetworkData):
         try:
             return self.connection.send(command.to_packet())
         except Exception as e:
             print(f"Network error for {command.command}: {e}")
-    
+
     def get_player_id(self):
         return self.send_command(GetPlayerIDCommand())
-        
+
     def get_game_state(self):
         return self.send_command(GetGameStateCommand())
 
@@ -51,14 +60,17 @@ class Network:
 
     def create_game(self):
         return self.send_command(CreateGameCommand())
-        
-    def send_player_input(self, command):
-        return self.send_command(SendPlayerInput(command))
+
+    def send_player_position(self, player_position: list):
+        return self.send_command(SendPlayerPositionCommand(player_position))
+
+    def get_player_positions(self):
+        return self.send_command(GetPlayerPositionsCommand())
 
     def send(self, data):
         try:
             # TODO make this JSON format
             self.connection.send(str.encode(data))
-            return pickle.loads(self.connection.recv(2048*2))
+            return pickle.loads(self.connection.recv(2048 * 2))
         except Exception as e:
             print(f"Send error: {e}")

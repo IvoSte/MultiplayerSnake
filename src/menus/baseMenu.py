@@ -2,28 +2,30 @@ import pygame
 from viewer.colors import Color
 from controls.input_controls import Controls, general_controls, menu_controls
 
-class BaseMenu():
 
-    def __init__(self, game):
-        self.game = game
-        self.display_size = self.game.viewer.display_size
+class BaseMenu:
+    def __init__(self, viewer):
+        self.viewer = viewer
+        self.display_size = self.viewer.display_size
         self.in_menu = True
         self.cursor_rect = pygame.Rect(0, 0, 20, 20)
-        self.cursor_offset = - 100
+        self.cursor_offset = -100
         self.state = ""
         self.states = [""]
-        #self.menu_screen = pygame.Surface()
+        # self.menu_screen = pygame.Surface()
 
     def draw_cursor(self):
-        self.game.viewer.draw_text('*', Color.WHITE.values, self.cursor_rect.x, self.cursor_rect.y)
+        self.viewer.draw_text(
+            "*", Color.WHITE.values, self.cursor_rect.x, self.cursor_rect.y
+        )
 
     def blit_screen(self):
-        self.game.viewer.update()
+        self.viewer.update()
 
     def display_menu(self):
         self.in_menu = True
         while self.in_menu:
-            self.game.draw()
+            self.viewer.draw_menu()
             pygame.display.update()
             self.parse_menu_input()
 
@@ -42,7 +44,10 @@ class BaseMenu():
         if menu_controls[event.key] == Controls.PAUSE:
             self.quit_menu()
         elif menu_controls[event.key] == Controls.QUIT:
-            self.game.end_screen()
+            pass
+            # self.game.end_screen()
+            # TODO end screen function moved somewhere else, put it back here.
+            # Do I initiate a self.viewer.evManager.Post(QuitEvent) here, or should that not be controlled here?
 
     def quit_menu(self):
         self.in_menu = False
@@ -52,7 +57,7 @@ class BaseMenu():
             self.state = self.states[(self.states.index(self.state) - 1)]
             # TODO add MaartenFX sound
         if direction == Controls.DOWN:
-            self.state = self.states[(self.states.index(self.state) + 1) % (len(self.states) - 1)]
+            self.state = self.states[
+                (self.states.index(self.state) + 1) % (len(self.states) - 1)
+            ]
             # TODO add MaartenFX sound
-
-    
