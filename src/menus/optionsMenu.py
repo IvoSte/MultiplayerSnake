@@ -10,12 +10,19 @@ class OptionsMenu(BaseMenu):
         self.state = "music"
         self.states = ["music", "game_sounds"]
         self.menu_functions = {
-            "music": self.unpause,
+            "music": self.music_button,
         }
 
     # def draw_menu(self):
     #     self.game.viewer.draw_text("M enable/disable music", Color.WHITE.value, 0.05, 0.4)
     #     self.game.viewer.draw_text("E enable/disable game sounds", Color.WHITE.value, 0.05, 0.5)
+
+    def music_button(self):
+        if not self.game.sounds.music_paused:
+            self.game.sounds.pause_music()
+        else:
+            self.game.sounds.unpause_music()
+
 
     def menu_control(self, event):
         if menu_controls[event.key] == Controls.PAUSE:

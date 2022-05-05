@@ -176,6 +176,7 @@ class GameEngine:
             self.state.game_over = True
             # self.end_screen()
         if isinstance(event, PlayerInputEvent):
+
             event.player.set_command(event.command)
         if isinstance(event, GeneralControlInputEvent):
             if event.command == Controls.QUIT:
@@ -276,6 +277,12 @@ class GameEngine:
             "Tails stolen": max(self.players, key=attrgetter("tails_eaten")),
         }
         return final_scores
+
+    def get_player_from_name(self, player_name):
+        for player in self.players:
+            if player.name == player_name:
+                return player
+        return None
 
     def players_alive(self) -> int:
         return sum(1 for player in self.players if player.alive)

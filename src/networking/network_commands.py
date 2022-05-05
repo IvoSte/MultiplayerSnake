@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from src.networking.network_data_base import NetworkData
+from networking.network_data_base import NetworkData
+from game.event_manager import PlayerInputEvent
+from controls.input_controls import Controls
 
 ## Naming convention:
 ## DATA is something to be pulled from the server by the client, or from the client to the server
@@ -38,3 +40,10 @@ class GetPlayerPositionsCommand(NetworkData):
 class SendPlayerPositionCommand(NetworkData):
     player_position: list
     command: str = "send_player_position"
+
+
+@dataclass
+class SendPlayerInputCommand(NetworkData):
+    player_name: str
+    player_input: Controls
+    command: str = "send_player_input"

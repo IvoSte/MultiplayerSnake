@@ -1,8 +1,9 @@
-from enum import Enum
+from enum import IntEnum
 from game.env_variables import CONTROLLER_DEADZONE
 import pygame
 
-class Controls(Enum):
+
+class Controls(IntEnum):
     UP = 0
     DOWN = 1
     LEFT = 2
@@ -15,8 +16,11 @@ class Controls(Enum):
     MUSIC = 9
     EFFECTS = 10
 
+
 def inputHandler(command):
-    assert command.type == pygame.KEYDOWN, "Command issued to inputHandler when event type is not a keypress."
+    assert (
+        command.type == pygame.KEYDOWN
+    ), "Command issued to inputHandler when event type is not a keypress."
     if command.key == pygame.K_LEFT:
         return Controls.LEFT
     elif command.key == pygame.K_RIGHT:
@@ -33,8 +37,9 @@ def inputHandler(command):
         return Controls.CONFIRM
     elif command.key == pygame.K_r:
         return Controls.RESTART
-    else :
+    else:
         return None
+
 
 def controllerInputHandler(event):
     deadzone = CONTROLLER_DEADZONE
@@ -55,7 +60,7 @@ def controllerInputHandler(event):
                     return Controls.DOWN
 
     if event.type == pygame.JOYHATMOTION:
-        x,y = event.value
+        x, y = event.value
         if x == -1:
             return Controls.LEFT
         if x == 1:
@@ -64,9 +69,6 @@ def controllerInputHandler(event):
             return Controls.UP
         if y == -1:
             return Controls.DOWN
-
-
-
 
 
 # Crude implementation, make better later

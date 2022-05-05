@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from winreg import DeleteValue
-from src.networking.network_data_base import NetworkData
+from networking.network_data_base import NetworkData
 
 ## Naming convention:
 ## DATA is something to be pulled from the server by the client, or from the client to the server -- Ik wil dit weten

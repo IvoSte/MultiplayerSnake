@@ -8,16 +8,10 @@ from controls.input_controls import Controls, general_controls, menu_controls
 class BaseMenu:
     def __init__(self, game):
         self.name = "BaseMenu"
-        # self.evManager = evManager
-        # self.evManager.RegisterListener(self)
         self.game = game
         self.in_menu = True
         self.state = ""
         self.states = [""]
-
-    # def notify(self, event):
-    #    if isinstance(event, MenuControlInputEvent):
-    #        self.menu_control(event.command)
 
     def display_menu(self):
         self.in_menu = True

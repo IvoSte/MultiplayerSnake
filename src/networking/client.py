@@ -6,28 +6,31 @@ if __name__ == "__main__":
 from dataclasses import dataclass
 from distutils.log import info
 import time
+import keyboard
 
 from matplotlib.backend_bases import LocationEvent
+from game.event_manager import PlayerInputEvent
 
 # Client depends on the Network
 # from src.game.game import GameEngine
-from src.networking.network import Network, NetworkData
-from src.networking.network_data import UpdatePlayerPositionsData, PlayerInfo, GameState
+from networking.network import Network, NetworkData
+from networking.network_commands import SendPlayerInputCommand
+from networking.network_data import UpdatePlayerPositionsData, PlayerInfo, GameState
 
 from _thread import start_new_thread
 
 
 class Client:
-    def __init__(self, server, port):
+    def __init__(self, evManager, game, server, port):
+        self.evManager = evManager
+        self.evManager.RegisterListener(self)
+        self.game = game
         print("initializing client")
         # server assigns player ids
         # zoek naar de server, connect, get player_info
         self.network = Network(server, port)
 
         start_new_thread(self.listen, ())
-        print("started thread, gonna run some commands")
-
-        time.sleep(2)
 
         # receive game state, send to viewer
         # self.game_state = None
@@ -39,13 +42,10 @@ class Client:
         # print(self.player_id)
         # print(self.game_state)
         # TODO: send player position on change in model
-        print("Sending player position")
-        self.network.send_player_position([1, 2, 3, 4, 5])
-        # TODO: Ask that this happens in the game model rather than in the client
-        print("Getting player position")
-        self.network.get_player_positions()
 
-        self.run()
+    def notify(self, event):
+        if isinstance(event, PlayerInputEvent):
+            self.network.send_player_input(event.player.name, event.command)
 
     def listen(self):
 
@@ -62,6 +62,37 @@ class Client:
 
             elif isinstance(data, PlayerInfo):
                 print(f"{data=}")
+
+            elif isinstance(data, SendPlayerInputCommand):
+                player = self.game.get_player_from_name(data.player_name)
+                if player is None:
+                    print(f"No existing player with name {data.player_name}")
+                    continue
+
+                self.evManager.Post(
+                    PlayerInputEvent(player=player, command=data.player_input)
+                )
+
+    def keep_alive(self):
+        while True:
+            try:
+                time.sleep(5)
+                continue
+            except KeyboardInterrupt:
+                print("Exiting from client.")
+                exit()
+        # g = GameEngine()
+        # g.init_game()
+        # g.run()
+
+    def disconnect(self):
+        self.network.disconnect_client(self.player_id)
+
+
+if __name__ == "__main__":
+    client = Client("localhost", 25565)
+    client.keep_alive()
+    # client.run()
 
     # TODO: Determine where the move command over the network is triggered
     # Is this gonna be in the client? in the model? with an event? not with an event but with direct coupling?
@@ -95,23 +126,3 @@ class Client:
     #         get game state
     #         get player info
     #         handle all trafic
-
-    def run(self):
-        while True:
-            try:
-                time.sleep(5)
-                continue
-            except KeyboardInterrupt:
-                print("Exiting from client.")
-                exit()
-        # g = GameEngine()
-        # g.init_game()
-        # g.run()
-
-    def disconnect(self):
-        self.network.disconnect_client(self.player_id)
-
-
-if __name__ == "__main__":
-    client = Client("localhost", 25565)
-    # client.run()

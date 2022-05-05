@@ -7,16 +7,17 @@ import socket
 import pickle
 import json
 
-from src.networking.network_data_base import NetworkData
-from src.networking.network_commands import (
+from networking.network_data_base import NetworkData
+from networking.network_commands import (
     CreateGameCommand,
     DisconnectPlayerCommand,
     GetGameStateCommand,
     GetPlayerIDCommand,
     SendPlayerPositionCommand,
     GetPlayerPositionsCommand,
+    SendPlayerInputCommand,
 )
-from src.networking.network_data import PlayerInfo
+from networking.network_data import PlayerInfo
 
 
 class Network:
@@ -67,6 +68,7 @@ class Network:
     def get_player_positions(self):
         return self.send_command(GetPlayerPositionsCommand())
 
+    # NOTE: this is not used, remove
     def send(self, data):
         try:
             # TODO make this JSON format
@@ -74,3 +76,6 @@ class Network:
             return pickle.loads(self.connection.recv(2048 * 2))
         except Exception as e:
             print(f"Send error: {e}")
+
+    def send_player_input(self, player_name, player_input):
+        return self.send_command(SendPlayerInputCommand(player_name, player_input))

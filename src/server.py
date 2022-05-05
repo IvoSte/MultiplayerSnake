@@ -8,17 +8,18 @@ from _thread import start_new_thread
 import socket
 import uuid
 import json
-from src.networking.network_commands import (
+from networking.network_commands import (
     CreateGameCommand,
     DisconnectPlayerCommand,
     GetGameStateCommand,
     GetPlayerIDCommand,
     GetPlayerPositionsCommand,
     SendPlayerPositionCommand,
+    SendPlayerInputCommand,
 )
 
-from src.networking.network_data_base import NetworkData
-from src.networking.network_data import PlayerInfo, Message, UpdatePlayerPositionsData
+from networking.network_data_base import NetworkData
+from networking.network_data import PlayerInfo, Message, UpdatePlayerPositionsData
 
 
 class Server:
@@ -31,6 +32,7 @@ class Server:
         self.bind_server(self.addr)
         self.connections = set()
         self.games = {}
+        # self.log = []
 
     def bind_server(self, addr):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -70,8 +72,9 @@ class Server:
                 print("Shutting down...")
                 exit()
 
-    def send_to_all(self, packet):
-        raise NotImplementedError("")
+    def send_to_all(self, packet: bytes):
+        for (conn, _, _) in self.connections:
+            conn.send(packet)
 
     def create_game(self, player_id):
         # TODO: create game
@@ -116,7 +119,9 @@ class Server:
 
             elif isinstance(data, DisconnectPlayerCommand):
                 self.disconnect_player(data.player_id)
-                return
+
+            elif isinstance(data, SendPlayerInputCommand):
+                self.send_to_all(data.to_packet())
 
     def ping_connections(self):
         for connection in self.connections:

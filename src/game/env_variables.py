@@ -1,9 +1,10 @@
 import os
 import configparser
 
+# TODO: Set to dynaconf: https://dynaconf.readthedocs.io/en/docs_223/guides/usage.html#usage
 config = configparser.RawConfigParser()
 configFilePath = os.path.join("config", "config.cfg")
-config.read(configFilePath)
+result = config.read(configFilePath)
 # TODO Reload config after write
 
 # Environment / Visual
