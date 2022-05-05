@@ -8,7 +8,6 @@ from distutils.log import info
 import time
 import keyboard
 
-from matplotlib.backend_bases import LocationEvent
 from game.event_manager import PlayerInputEvent
 
 # Client depends on the Network

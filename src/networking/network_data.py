@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from winreg import DeleteValue
 from networking.network_data_base import NetworkData
 
 ## Naming convention:
