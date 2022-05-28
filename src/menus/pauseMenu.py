@@ -10,11 +10,26 @@ class PauseMenu(BaseMenu):
         self.state = "unpause"
         self.states = ["unpause", "restart", "options", "quit"]
         self.menu_functions = {
-            "unpause": self.quit_menu,
-            "restart": self.game.restart_game,
-            "options": self.game.options_menu,
-            "quit": self.game.end_screen,
+            "unpause": self.unpause_function,
+            "restart": self.restart_function,
+            "options": self.options_function,
+            "quit": self.quit_function,
         }
+
+    def unpause_function(self):
+        self.quit_menu()
+
+    def restart_function(self):
+        self.quit_menu()
+        self.game.restart_game()
+
+    def options_function(self):
+        self.quit_menu()
+        self.game.options_menu()
+
+    def quit_function(self):
+        self.quit_menu()
+        self.game.quit_game()
 
 
 # when a menu is entered, it is created in game as Menu. Then, in viewer, viewer knows game is

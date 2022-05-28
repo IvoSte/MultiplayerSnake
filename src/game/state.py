@@ -4,6 +4,7 @@ from entities.food import Food
 
 @dataclass
 class State:
+    running: bool
     game_over: bool
     game_paused: bool
     in_end_screen: bool

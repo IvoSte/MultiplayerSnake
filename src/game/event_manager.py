@@ -73,6 +73,11 @@ class RestartGameEvent(Event):
     name: str = "Restart game event"
 
 
+@dataclass
+class GameEndedEvent(Event):
+    name: str = "Game ended event"
+
+
 class EventManager:
     """
     Coordinates communication between the Model, View and Controller

@@ -4,6 +4,12 @@ from game.event_manager import TickEvent
 from game.event_manager import EventManager
 from game.game import GameEngine
 from game.event_manager import GamePausedEvent
+from viewer.menus.controlsOptionsMenuView import ControlsOptionsMenuView
+from viewer.menus.gameplayOptionsMenuView import GameplayOptionsMenuView
+from viewer.menus.graphicsOptionsMenuView import GraphicsOptionsMenuView
+from viewer.menus.optionsMenuView import OptionsMenuView
+from viewer.menus.soundOptionsMenuView import SoundOptionsMenuView
+from viewer.menus.postGameMenuView import PostGameMenuView
 from viewer.menus.pauseMenuView import PauseMenuView
 from viewer.colors import Color, turbo_color, color, extend_colormaps
 from game.env_variables import (
@@ -60,13 +66,20 @@ class Viewer:
         self.background_colors = [
             Color.WHITE.value,
             Color.BLUE.value,
-            Color.WHITE.value,
             Color.YELLOW.value,
             Color.RED.value,
             Color.GREEN.value,
         ]
 
-        self.menus = {"PauseMenu": PauseMenuView}
+        self.menus = {
+            "PauseMenu": PauseMenuView,
+            "OptionsMenu": OptionsMenuView,
+            "GameplayOptionsMenu": GameplayOptionsMenuView,
+            "SoundOptionsMenu": SoundOptionsMenuView,
+            "ControlsOptionsMenu": ControlsOptionsMenuView,
+            "GraphicsOptionsMenu": GraphicsOptionsMenuView,
+            "PostGameMenu": PostGameMenuView,
+        }
 
         self.background_switch_timer = None
 

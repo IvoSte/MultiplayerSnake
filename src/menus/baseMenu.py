@@ -9,21 +9,15 @@ class BaseMenu:
     def __init__(self, game):
         self.name = "BaseMenu"
         self.game = game
-        self.in_menu = True
         self.state = ""
         self.states = [""]
-
-    def display_menu(self):
-        self.in_menu = True
+        self.enable_menu()
 
     # class to override
     def menu_control(self, command):
-        if command == Controls.PAUSE:
-            self.game.pause_menu()
-        elif command == Controls.QUIT:
-            self.game.evManager.Post(QuitEvent)
+        if command == Controls.QUIT:
+            self.quit_menu()
         elif command == Controls.CONFIRM:
-            print("Confirm menu option")
             self.confirm_option()
         elif command == Controls.RESTART:
             self.game.evManager.Post(RestartGameEvent)
@@ -35,16 +29,21 @@ class BaseMenu:
         elif command == Controls.DOWN:
             self.move_cursor(command)
         elif command == Controls.LEFT:
-            self.move_cursor(command)
+            self.change_option_value(command)
         elif command == Controls.RIGHT:
-            self.move_cursor(command)
+            self.change_option_value(command)
+
+    def enable_menu(self):
+        self.game.state.in_menu = True
+        self.game.state.in_game = False
 
     def quit_menu(self):
-        self.in_menu = False
+        self.game.current_menu = None
+        self.game.state.in_menu = False
+        self.game.state.in_game = True
 
     # function to override
     def confirm_option(self):
-        print(f"Confirming menu choice: {self.state}")
         self.menu_functions[self.state]()
 
     def move_cursor(self, direction):
@@ -53,6 +52,15 @@ class BaseMenu:
             # TODO add MaartenFX sound
         if direction == Controls.DOWN:
             self.state = self.states[
-                (self.states.index(self.state) + 1) % (len(self.states) - 1)
+                (self.states.index(self.state) + 1) % len(self.states)
             ]
-            # TODO add MaartenFX sound
+        # TODO add MaartenFX sound
+
+    def change_option_value(self, direction):
+        # Change the value of an option up or down (e.g. sound volume in the range [0-10])
+        if direction == Controls.LEFT:
+            print("TODO Decrease option value")
+            pass
+        if direction == Controls.RIGHT:
+            print("TODO Increase option value")
+            pass

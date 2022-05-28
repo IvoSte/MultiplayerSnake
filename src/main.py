@@ -6,7 +6,7 @@ from networking.client import Client
 
 
 def main():
-    local = False
+    local = True
 
     if local:
         print(" -- Running in LOCAL SYSTEM mode.")
