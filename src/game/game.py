@@ -341,15 +341,16 @@ class GameEngine:
         # Loop
         while self.state.running:
 
-            # Check if the game is over
-            self.is_game_over()
-
             ###  Main game
 
             # Get and parse inputs
             self.evManager.Post(GetInputsEvent())
 
             if self.state.in_game:
+
+                # Check if the game is over
+                self.is_game_over()
+
                 # Update game state according to inputs
                 self.update()
 
