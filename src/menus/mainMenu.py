@@ -1,24 +1,18 @@
-from menus.baseMenu import BaseMenu
+from menus.baseMenu import BaseMenu, MenuOption
 from viewer.colors import Color
 
 
 class MainMenu(BaseMenu):
     def __init__(self, game):
         BaseMenu.__init__(self, game)
-        self.name = "StartMenu"
-        self.state = "start"
-        self.states = [
-            "start",
-            "options",
-            "credits",
-            "quit",
-        ]  # Singleplayer, multiplayer, online, offline
-        self.menu_functions = {
-            "start": self.start_function,
-            "options": self.options_function,
-            "credits": self.credits_function,
-            "quit": self.quit_function,
+        self.name = "MainMenu"
+        self.options = {
+            "start": MenuOption("start", function=self.start_function),
+            "options": MenuOption("options", function=self.options_function),
+            "credits": MenuOption("credits", function=self.credits_function),
+            "quit": MenuOption("quit", function=self.quit_function),
         }
+        self.selected_option = self.options["start"]
 
     def start_function(self):
         self.quit_menu()

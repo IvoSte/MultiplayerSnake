@@ -1,20 +1,19 @@
 from viewer.colors import Color
 from controls.input_controls import Controls, menu_controls, general_controls
-from menus.baseMenu import BaseMenu
+from menus.baseMenu import BaseMenu, MenuOption
 
 
 class OptionsMenu(BaseMenu):
     def __init__(self, game):
         BaseMenu.__init__(self, game)
         self.name = "OptionsMenu"
-        self.state = "gameplay"
-        self.states = ["gameplay", "graphics", "sound", "controls"]
-        self.menu_functions = {
-            "gameplay": self.gameplay_function,
-            "graphics": self.graphics_function,
-            "sound": self.sound_function,
-            "controls": self.controls_function,
+        self.options = {
+            "gameplay": MenuOption("gameplay", function=self.gameplay_function),
+            "graphics": MenuOption("graphics", function=self.graphics_function),
+            "sound": MenuOption("sound", function=self.sound_function),
+            "controls": MenuOption("controls", function=self.controls_function),
         }
+        self.selected_option = self.options["gameplay"]
 
     def gameplay_function(self):
         self.quit_menu()

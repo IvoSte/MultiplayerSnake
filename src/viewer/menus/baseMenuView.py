@@ -20,7 +20,11 @@ class BaseMenuView:
     def draw_options(self):
         for option_view in self.options.values():
             self.viewer.draw_text(
-                option_view.text, option_view.text_color, option_view.x_pos, option_view.y_pos)
+                option_view.text,
+                option_view.text_color,
+                option_view.x_pos,
+                option_view.y_pos,
+            )
 
     def draw_option_values(self):
         for option_view in self.options.values():
@@ -28,13 +32,20 @@ class BaseMenuView:
                 self.draw_option_value(option_view)
 
     def draw_option_value(self, option_view):
-        self.viewer.draw_text(option_view.option.optionValue.value, option_view.value_color,
-                              option_view.x_pos + option_view.value_x_offset, option_view.y_pos + option_view.value_y_offset)
+        self.viewer.draw_text(
+            str(option_view.option.optionValue.value),
+            option_view.value_color,
+            option_view.x_pos + option_view.value_x_offset,
+            option_view.y_pos + option_view.value_y_offset,
+        )
 
     def draw_cursor(self):
-        self.cursor.x_pos = self.options[self.menu.selected_option.name].x_pos + self.cursor.x_offset
-        self.cursor.y_pos = self.options[self.menu.selected_option.name].y_pos + \
-            self.cursor.y_offset
+        self.cursor.x_pos = (
+            self.options[self.menu.selected_option.name].x_pos + self.cursor.x_offset
+        )
+        self.cursor.y_pos = (
+            self.options[self.menu.selected_option.name].y_pos + self.cursor.y_offset
+        )
         self.viewer.draw_text(
             self.cursor.sign, self.cursor.color, self.cursor.x_pos, self.cursor.y_pos
         )
@@ -48,10 +59,12 @@ class MenuOptionView:
     x_pos: float
     y_pos: float
     value_color: tuple
-    value_x_offset: float = 0.15
+    value_x_offset: float = 0.3
     value_y_offset: float = 0.0
 
+
 # Text of the option, the thing being selected
+# DEPRECIATED
 @dataclass
 class OptionText:
     text: str
@@ -59,12 +72,15 @@ class OptionText:
     x_pos: float
     y_pos: float
 
+
 # Option value to be displayed. Later include more drawing options (like arrows and such)
+# DEPRECIATED
 @dataclass
 class OptionValueView:
     color: tuple
     x_offset: float = 0.15
     y_offset: float = 0.0
+
 
 # Cursor indicating currently selected option
 @dataclass

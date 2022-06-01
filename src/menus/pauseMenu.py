@@ -9,10 +9,11 @@ class PauseMenu(BaseMenu):
         BaseMenu.__init__(self, game)
         self.name = "PauseMenu"
         self.options = {
-            "unpause" : MenuOption("unpause", None, self.unpause_function),
-            "restart" : MenuOption("restart", None, self.restart_function),
-            "options" : MenuOption("options", None, self.options_function),
-            "quit" : MenuOption("quit", None, self.quit_function)}
+            "unpause": MenuOption("unpause", function=self.unpause_function),
+            "restart": MenuOption("restart", function=self.restart_function),
+            "options": MenuOption("options", function=self.options_function),
+            "quit": MenuOption("quit", function=self.quit_function),
+        }
         self.selected_option = self.options["unpause"]
 
     def unpause_function(self):

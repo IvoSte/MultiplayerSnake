@@ -1,5 +1,5 @@
 from controls.input_controls import Controls, general_controls, menu_controls
-from menus.baseMenu import BaseMenu
+from menus.baseMenu import BaseMenu, MenuOption
 from viewer.colors import Color
 
 
@@ -7,13 +7,12 @@ class PostGameMenu(BaseMenu):
     def __init__(self, game):
         BaseMenu.__init__(self, game)
         self.name = "PostGameMenu"
-        self.state = "restart"
-        self.states = ["restart", "options", "quit"]
-        self.menu_functions = {
-            "restart": self.restart_function,
-            "options": self.options_function,
-            "quit": self.quit_function,
+        self.options = {
+            "restart": MenuOption("restart", function=self.restart_function),
+            "options": MenuOption("options", function=self.options_function),
+            "quit": MenuOption("quit", function=self.quit_function),
         }
+        self.selected_option = self.options["restart"]
 
     def restart_function(self):
         self.quit_menu()

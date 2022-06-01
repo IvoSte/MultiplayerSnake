@@ -6,6 +6,7 @@ from controls.input_controls import Controls, general_controls, menu_controls
 from dataclasses import dataclass, replace
 from typing import Callable
 
+
 class BaseMenu:
     def __init__(self, game):
         self.name = "BaseMenu"
@@ -40,18 +41,22 @@ class BaseMenu:
 
     # function to override
     def confirm_option(self):
-        self.selected_option.function()
+        if isinstance(self.selected_option.function, Callable):
+            self.selected_option.function()
 
     def move_cursor(self, direction):
         if direction == Controls.UP:
             # select the next option in the dict (using lists to get indices)
-            self.selected_option = list(self.options.values())[(
-                list(self.options.values()).index(self.selected_option) - 1)]
-            #self.selected_option = self.options[(self.options.index(self.selected_option) - 1)]
+            self.selected_option = list(self.options.values())[
+                (list(self.options.values()).index(self.selected_option) - 1)
+            ]
+            # self.selected_option = self.options[(self.options.index(self.selected_option) - 1)]
             # TODO add MaartenFX sound
         if direction == Controls.DOWN:
-            self.selected_option = list(self.options.values())[(
-                list(self.options.values()).index(self.selected_option) + 1) % len(self.options)]
+            self.selected_option = list(self.options.values())[
+                (list(self.options.values()).index(self.selected_option) + 1)
+                % len(self.options)
+            ]
             # self.selected_option = self.options[
             #     (self.options.index(self.selected_option) + 1) % len(self.options)
             # ]
@@ -59,8 +64,11 @@ class BaseMenu:
 
     def change_option_value(self, direction):
         # If this selected option does not have values, we can't change it.
-        if not self.selected_option.optionValue == None:
+        if self.selected_option.optionValue == None:
             return
+
+        print(self.selected_option.optionValue)
+        print(self.selected_option.optionValue.value)
 
         # Change the value of an option up or down (e.g. sound volume in the range [0-10])
         if isinstance(self.selected_option.optionValue, OptionValueBool):
@@ -70,8 +78,7 @@ class BaseMenu:
             self.change_option_int(self.selected_option.optionValue, direction)
 
         if isinstance(self.selected_option.optionValue, OptionValueList):
-            self.change_option_list(
-                self.selected_option.optionValue, direction)
+            self.change_option_list(self.selected_option.optionValue, direction)
 
     def change_option_bool(self, optionValue, direction):
         # Change the value of a boolean option (e.g. tail biting true or false)
@@ -79,15 +86,19 @@ class BaseMenu:
             optionValue.value = True
         if direction == Controls.RIGHT:
             optionValue.value = False
-    
+
     def change_option_int(self, optionValue, direction):
         # Change the value of an integer option  (e.g. number of players)
         if direction == Controls.LEFT:
             # Decrease the value or set the min
-            optionValue.value = max(optionValue.min_value, optionValue.min_value - optionValue.step_size)
+            optionValue.value = max(
+                optionValue.min_value, optionValue.value - optionValue.step_size
+            )
         if direction == Controls.RIGHT:
             # Increase the value or set the max
-            optionValue.value = min(optionValue.max_value, optionValue.min_value + optionValue.step_size)
+            optionValue.value = min(
+                optionValue.max_value, optionValue.value + optionValue.step_size
+            )
 
     def change_option_list(self, optionValue, direction):
         # Change the value of a list option (e.g. player colourmap)
@@ -127,5 +138,5 @@ class OptionValueList(OptionValue):
 @dataclass
 class MenuOption:
     name: str
-    optionValue: OptionValue
-    function: Callable
+    optionValue: OptionValue = None
+    function: Callable = None
