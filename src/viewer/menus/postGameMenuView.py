@@ -5,9 +5,7 @@ from viewer.colors import Color
 
 class PostGameMenuView(BaseMenuView):
     def __init__(self, viewer, menu):
-        self.viewer = viewer
-        self.menu = menu
-        self.display_size = self.viewer.display_size
+        BaseMenuView.__init__(self, viewer, menu)
         self.options = {
             # Bit of a hack to have text here, create another dict for this TODO
             "match over": OptionText("Game over!", Color.WHITE.value, 0.45, 0.4),

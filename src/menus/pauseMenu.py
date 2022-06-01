@@ -1,3 +1,4 @@
+from menus.baseMenu import MenuOption
 from controls.input_controls import Controls, general_controls, menu_controls
 from menus.baseMenu import BaseMenu
 from viewer.colors import Color
@@ -7,14 +8,12 @@ class PauseMenu(BaseMenu):
     def __init__(self, game):
         BaseMenu.__init__(self, game)
         self.name = "PauseMenu"
-        self.state = "unpause"
-        self.states = ["unpause", "restart", "options", "quit"]
-        self.menu_functions = {
-            "unpause": self.unpause_function,
-            "restart": self.restart_function,
-            "options": self.options_function,
-            "quit": self.quit_function,
-        }
+        self.options = {
+            "unpause" : MenuOption("unpause", None, self.unpause_function),
+            "restart" : MenuOption("restart", None, self.restart_function),
+            "options" : MenuOption("options", None, self.options_function),
+            "quit" : MenuOption("quit", None, self.quit_function)}
+        self.selected_option = self.options["unpause"]
 
     def unpause_function(self):
         self.quit_menu()

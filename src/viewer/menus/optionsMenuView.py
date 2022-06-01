@@ -4,9 +4,7 @@ from .baseMenuView import BaseMenuView, OptionText, Cursor
 
 class OptionsMenuView(BaseMenuView):
     def __init__(self, viewer, menu):
-        self.viewer = viewer
-        self.menu = menu
-        self.display_size = self.viewer.display_size
+        BaseMenuView.__init__(self, viewer, menu)
         self.options = {
             "gameplay": OptionText("Gameplay", Color.WHITE.value, 0.5, 0.4),
             "graphics": OptionText("Graphics", Color.WHITE.value, 0.5, 0.5),

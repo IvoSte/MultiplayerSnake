@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from menus.baseMenu import MenuOption
+from menus.baseMenu import OptionValueBool, OptionValueInt, OptionValueList
 from viewer.colors import Color
 
 
@@ -7,37 +9,47 @@ class BaseMenuView:
         self.viewer = viewer
         self.menu = menu
         self.display_size = self.viewer.display_size
-        self.options = {}
-        self.option_values = {}
-        self.cursor = Cursor()
+        self.options: dict[str, MenuOptionView]  # Dict of options
+        self.cursor = Cursor("➜", Color.WHITE.value, 0.0, 0.0, -0.05, 0.01)
 
     def draw(self):
         self.draw_options()
-        # self.draw_option_values()
+        self.draw_option_values()
         self.draw_cursor()
 
     def draw_options(self):
-        for option in self.options.values():
-            self.viewer.draw_text(option.text, option.color, option.x_pos, option.y_pos)
+        for option_view in self.options.values():
+            self.viewer.draw_text(
+                option_view.text, option_view.text_color, option_view.x_pos, option_view.y_pos)
 
     def draw_option_values(self):
-        for option_value in self.option_values.values():
-            if isinstance(option_value, OptionValueBool):
-                self.viewer.draw_option_value_bool(option_value)
+        for option_view in self.options.values():
+            if option_view.option.optionValue != None:
+                self.draw_option_value(option_view)
 
-            if isinstance(option_value, OptionValueInt):
-                self.viewer.draw_option_value_int(option_value)
-
-            if isinstance(option_value, OptionValueList):
-                self.viewer.draw_option_value_list(option_value)
+    def draw_option_value(self, option_view):
+        self.viewer.draw_text(option_view.option.optionValue.value, option_view.value_color,
+                              option_view.x_pos + option_view.value_x_offset, option_view.y_pos + option_view.value_y_offset)
 
     def draw_cursor(self):
-        self.cursor.x_pos = self.options[self.menu.state].x_pos + self.cursor.x_offset
-        self.cursor.y_pos = self.options[self.menu.state].y_pos + self.cursor.y_offset
+        self.cursor.x_pos = self.options[self.menu.selected_option.name].x_pos + self.cursor.x_offset
+        self.cursor.y_pos = self.options[self.menu.selected_option.name].y_pos + \
+            self.cursor.y_offset
         self.viewer.draw_text(
             self.cursor.sign, self.cursor.color, self.cursor.x_pos, self.cursor.y_pos
         )
 
+
+@dataclass
+class MenuOptionView:
+    option: MenuOption
+    text: str
+    text_color: tuple
+    x_pos: float
+    y_pos: float
+    value_color: tuple
+    value_x_offset: float = 0.15
+    value_y_offset: float = 0.0
 
 # Text of the option, the thing being selected
 @dataclass
@@ -47,26 +59,12 @@ class OptionText:
     x_pos: float
     y_pos: float
 
-
-# Option values are the setting for the option,
-# e.g. a boolean toggle (mute music true/false), an int value or list of options
+# Option value to be displayed. Later include more drawing options (like arrows and such)
 @dataclass
-class OptionValueBool:
-    value: bool
-
-
-@dataclass
-class OptionValueInt:
-    value: int
-    min_value: int
-    max_value: int
-
-
-@dataclass
-class OptionValueList:
-    value: list
-    index: int
-
+class OptionValueView:
+    color: tuple
+    x_offset: float = 0.15
+    y_offset: float = 0.0
 
 # Cursor indicating currently selected option
 @dataclass

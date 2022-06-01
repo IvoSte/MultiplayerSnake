@@ -1,3 +1,4 @@
+from menus.baseMenu import OptionValueBool, OptionValueInt
 from viewer.colors import Color
 from controls.input_controls import Controls, menu_controls, general_controls
 from menus.baseMenu import BaseMenu
@@ -23,6 +24,11 @@ class GameplayOptionsMenu(BaseMenu):
             "tail biting" : self.set_tail_biting_function,
             "tail stealing" : self.set_tail_stealing_function,
             "snake speed" : self.set_snake_speed_function,
+        }
+        self.option_values = {
+            "players": OptionValueInt(2, 1, 1, 4),
+            "time limit" : OptionValueInt(45, 5, 5, 90),
+            "tail biting" : OptionValueBool(True)
         }
 
     def set_players_function(self):
