@@ -16,11 +16,11 @@ class PostGameMenu(BaseMenu):
 
     def restart_function(self):
         self.quit_menu()
-        self.game.restart_game()
+        self.game.menuHandler.restart_game()
 
     def options_function(self):
         self.quit_menu()
-        self.game.options_menu()
+        self.game.menuHandler.options_menu()
 
     def quit_function(self):
         self.quit_menu()

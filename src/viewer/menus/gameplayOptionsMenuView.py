@@ -1,9 +1,7 @@
 from viewer.colors import Color
 from .baseMenuView import (
     BaseMenuView,
-    OptionText,
     Cursor,
-    OptionValueView,
     MenuOptionView,
 )
 

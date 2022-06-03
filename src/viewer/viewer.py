@@ -64,7 +64,6 @@ class Viewer:
         symbols_font_path = os.path.join("assets", "fonts", "seguisym.ttf")
         self.symbols_font = pygame.font.Font(symbols_font_path, 35)
 
-
         # Snake Display variables
         self.snake_size = snake_size
 
@@ -148,7 +147,8 @@ class Viewer:
     def draw_unicode(self, uni_char, color, relative_x, relative_y):
         char = self.symbols_font.render(uni_char, True, color)
         self.display.blit(
-            char, (self.display_size[0] * relative_x, self.display_size[1] * relative_y))
+            char, (self.display_size[0] * relative_x, self.display_size[1] * relative_y)
+        )
 
     def draw_text_bold(self, msg, color, relative_x, relative_y):
         self.font_style.set_bold(True)
@@ -231,7 +231,9 @@ class Viewer:
     def draw_menu(self):
         self.clear_screen()
         # TODO Draw darkening screen over the game in the background
-        self.menus[self.game.current_menu.name](self, self.game.current_menu).draw()
+        self.menus[self.game.menuHandler.current_menu.name](
+            self, self.game.menuHandler.current_menu
+        ).draw()
 
         self.update()
         # self.game.menu.draw_menu()  # this is bad, there should not be a draw function in a gameengine object

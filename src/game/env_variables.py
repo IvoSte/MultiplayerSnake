@@ -7,6 +7,19 @@ configFilePath = os.path.join("config", "config.cfg")
 result = config.read(configFilePath)
 # TODO Reload config after write
 
+
+def reload_config():
+    config = configparser.RawConfigParser()
+    configFilePath = os.path.join("config", "config.cfg")
+    result = config.read(configFilePath)
+
+
+def set_config(category, setting, value):
+    config.set(category, setting, value)
+    with open(configFilePath, "w") as configfile:
+        config.write(configfile)
+
+
 # Environment / Visual
 Resolutions = {
     "x": [600, 1200, 1800, 2400, 3000],

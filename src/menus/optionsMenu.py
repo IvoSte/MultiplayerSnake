@@ -17,16 +17,16 @@ class OptionsMenu(BaseMenu):
 
     def gameplay_function(self):
         self.quit_menu()
-        self.game.gameplay_options_menu()
+        self.game.menuHandler.gameplay_options_menu()
 
     def graphics_function(self):
         self.quit_menu()
-        self.game.graphics_options_menu()
+        self.game.menuHandler.graphics_options_menu()
 
     def sound_function(self):
         self.quit_menu()
-        self.game.sound_options_menu()
+        self.game.menuHandler.sound_options_menu()
 
     def controls_function(self):
         self.quit_menu()
-        self.game.controls_options_menu()
+        self.game.menuHandler.controls_options_menu()

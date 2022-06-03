@@ -1,4 +1,5 @@
 from menus.baseMenu import OptionValueBool, OptionValueInt, MenuOption
+from game.env_variables import TAIL_BITING, TAIL_STEALING, set_config
 from viewer.colors import Color
 from controls.input_controls import Controls, menu_controls, general_controls
 from menus.baseMenu import BaseMenu
@@ -26,12 +27,12 @@ class GameplayOptionsMenu(BaseMenu):
             ),
             "tail biting": MenuOption(
                 "tail biting",
-                optionValue=OptionValueBool(True),
+                optionValue=OptionValueBool(TAIL_BITING),
                 function=self.set_tail_biting_function,
             ),
             "tail stealing": MenuOption(
                 "tail stealing",
-                optionValue=OptionValueBool(True),
+                optionValue=OptionValueBool(TAIL_STEALING),
                 function=self.set_tail_stealing_function,
             ),
             "snake speed": MenuOption(
@@ -52,7 +53,11 @@ class GameplayOptionsMenu(BaseMenu):
         pass
 
     def set_tail_biting_function(self):
-        pass
+        print(f"tail biting before set: {TAIL_BITING}")
+        new_value = self.options["tail biting"].optionValue.value
+        print(f"setting tail biting to {new_value}")
+        set_config("mode", "TAIL_BITING", new_value)
+        print(f"tail biting after set: {TAIL_BITING}")
 
     def set_tail_stealing_function(self):
         pass

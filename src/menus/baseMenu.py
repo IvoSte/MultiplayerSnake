@@ -35,7 +35,7 @@ class BaseMenu:
         self.game.state.in_game = False
 
     def quit_menu(self):
-        self.game.current_menu = None
+        self.game.menuHandler.current_menu = None
         self.game.state.in_menu = False
         self.game.state.in_game = True
 

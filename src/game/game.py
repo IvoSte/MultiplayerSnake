@@ -1,19 +1,13 @@
 from operator import attrgetter, length_hint
 from entities.environment import Environment
 from menus.baseMenu import BaseMenu
-from menus.optionsMenu import OptionsMenu
-from menus.pauseMenu import PauseMenu
-from menus.postGameMenu import PostGameMenu
 from entities.player import Player
 from entities.snake import Snake
 from game.event_manager import EventManager, TickEvent, GetInputsEvent
 from game.event_manager import GeneralControlInputEvent, PlayerInputEvent, QuitEvent
 from game.event_manager import GamePausedEvent, RestartGameEvent
 from game.event_manager import MenuControlInputEvent, GameEndedEvent
-from menus.controlsOptionsMenu import ControlsOptionsMenu
-from menus.gameplayOptionsMenu import GameplayOptionsMenu
-from menus.graphicsOptionsMenu import GraphicsOptionsMenu
-from menus.soundOptionsMenu import SoundOptionsMenu
+from menus.menuHandler import MenuHandler
 from viewer.screens.screens import set_end_screen, set_final_score, set_options_screen
 from audio.sounds import Sounds
 from game.state import State
@@ -59,6 +53,9 @@ class GameEngine:
     ):
         self.evManager = evManager
         self.evManager.RegisterListener(self)
+
+        self.menuHandler = MenuHandler(self)
+
         # Global variables
         self.snake_size = (SNAKE_SIZE, SNAKE_SIZE)
         self.display_size = display_size
@@ -90,14 +87,10 @@ class GameEngine:
             running=True,
             game_over=False,
             game_paused=False,
-            in_end_screen=False,
-            in_pause_menu=True,
-            in_options_menu=False,
             in_game=True,
             in_menu=False,
             food=[],
         )
-        self.current_menu = None
 
     #### Game init -- Could be split to own file
     def init_game(self):
@@ -123,9 +116,6 @@ class GameEngine:
             running=True,
             game_over=False,
             game_paused=False,
-            in_end_screen=False,
-            in_pause_menu=False,
-            in_options_menu=False,
             in_game=True,
             in_menu=False,
             food=[],
@@ -193,15 +183,15 @@ class GameEngine:
             if event.command == Controls.PAUSE:
                 self.state.game_paused = True
                 self.evManager.Post(GamePausedEvent())
-                self.pause_menu()
+                self.menuHandler.pause_menu()
         if isinstance(event, RestartGameEvent):
             # TODO not sure why this is not reached when RestartGameEvent is sent.
             self.restart_game()
         if isinstance(event, MenuControlInputEvent):
-            self.current_menu.menu_control(event.command)
+            self.menuHandler.current_menu.menu_control(event.command)
             print(f"game notify {event} {event.command}")
         if isinstance(event, GameEndedEvent):
-            self.postgame_menu()
+            self.menuHandler.postgame_menu()
 
     #### End game init
 
@@ -236,28 +226,6 @@ class GameEngine:
 
     def end_screen(self):
         pass
-
-    # Move these to some menu master/handler or something. But first just build them, and move when done. TODO
-    def postgame_menu(self):
-        self.current_menu = PostGameMenu(self)
-
-    def pause_menu(self):
-        self.current_menu = PauseMenu(self)
-
-    def options_menu(self):
-        self.current_menu = OptionsMenu(self)
-
-    def gameplay_options_menu(self):
-        self.current_menu = GameplayOptionsMenu(self)
-
-    def graphics_options_menu(self):
-        self.current_menu = GraphicsOptionsMenu(self)
-
-    def sound_options_menu(self):
-        self.current_menu = SoundOptionsMenu(self)
-
-    def controls_options_menu(self):
-        self.current_menu = ControlsOptionsMenu(self)
 
     def get_final_score(self):
         final_scores = {

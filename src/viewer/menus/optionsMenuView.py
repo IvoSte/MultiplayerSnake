@@ -1,5 +1,5 @@
 from viewer.colors import Color
-from .baseMenuView import BaseMenuView, OptionText, Cursor, MenuOptionView
+from .baseMenuView import BaseMenuView, Cursor, MenuOptionView
 
 
 class OptionsMenuView(BaseMenuView):

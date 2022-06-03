@@ -19,11 +19,11 @@ class MainMenu(BaseMenu):
 
     def options_function(self):
         self.quit_menu()
-        self.game.options_menu()
+        self.game.menuHandler.options_menu()
 
     def credits_function(self):
         self.quit_menu()
-        # self.game.show_credits()
+        # self.game.menuHandler.show_credits()
         # TODO make credits screen.
 
     def quit_function(self):

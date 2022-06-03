@@ -25,11 +25,11 @@ class PauseMenu(BaseMenu):
 
     def options_function(self):
         self.quit_menu()
-        self.game.options_menu()
+        self.game.menuHandler.options_menu()
 
     def quit_function(self):
         self.quit_menu()
-        self.game.quit_game()
+        self.game.menuHandler.quit_game()
 
 
 # when a menu is entered, it is created in game as Menu. Then, in viewer, viewer knows game is
