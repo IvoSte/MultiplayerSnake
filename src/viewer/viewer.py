@@ -57,12 +57,24 @@ class Viewer:
         # self.screen = pygame.Surface()
 
         # Set fonts
-        self.font_style = pygame.font.SysFont("bahnschrift", 35)
+        # Old fonts, for reference
+        # self.text_font = pygame.font.SysFont("bahnschrift", 35)
         # self.score_font = pygame.font.SysFont("comicsansms", 35)
-        self.score_font = pygame.font.SysFont("futura", 35)
+        # self.score_font = pygame.font.SysFont("futura", 35)
 
-        symbols_font_path = os.path.join("assets", "fonts", "seguisym.ttf")
-        self.symbols_font = pygame.font.Font(symbols_font_path, 35)
+        # For symbols list check https://freefontsdownload.net/free-segoeuisymbol-font-135679.htm
+        self.text_font_path = os.path.join("assets", "fonts", "seguisym.ttf")
+        self.symbols_font_path = os.path.join("assets", "fonts", "seguisym.ttf")
+        self.score_font_path = os.path.join("assets", "fonts", "quickens.ttf")
+
+        self.text_font = pygame.font.Font(self.text_font_path, 35)
+        self.text_font_large = pygame.font.Font(self.text_font_path, 45)
+
+        self.score_font = pygame.font.Font(self.score_font_path, 35)
+        self.score_font_large = pygame.font.Font(self.score_font_path, 45)
+        
+        self.symbols_font = pygame.font.Font(self.symbols_font_path, 35)
+        self.symbols_font_large = pygame.font.Font(self.symbols_font_path, 45)
 
         # Snake Display variables
         self.snake_size = snake_size
@@ -76,6 +88,7 @@ class Viewer:
             Color.GREEN.value,
         ]
 
+        # Linking the menu to the menuView object
         self.menus = {
             "PauseMenu": PauseMenuView,
             "OptionsMenu": OptionsMenuView,
@@ -85,8 +98,6 @@ class Viewer:
             "GraphicsOptionsMenu": GraphicsOptionsMenuView,
             "PostGameMenu": PostGameMenuView,
         }
-
-        self.background_switch_timer = None
 
         self.ui_player_information = UI_player_information(self)
 
@@ -139,9 +150,16 @@ class Viewer:
         self.display.fill(self.background_color)
 
     def draw_text(self, msg, color, relative_x, relative_y):
-        msg = self.font_style.render(msg, True, color)
+        msg = self.text_font.render(msg, True, color)
         self.display.blit(
             msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y]
+        )
+
+    def draw_text_large(self, msg, color, relative_x, relative_y):
+        msg = self.text_font_large.render(msg, True, color)
+        self.display.blit(
+            msg, [self.display_size[0] * relative_x,
+                  self.display_size[1] * relative_y]
         )
 
     def draw_unicode(self, uni_char, color, relative_x, relative_y):
@@ -150,13 +168,20 @@ class Viewer:
             char, (self.display_size[0] * relative_x, self.display_size[1] * relative_y)
         )
 
+    def draw_score(self, msg, color, relative_x, relative_y):
+        msg = self.score_font_large.render(msg, True, color)
+        self.display.blit(
+            msg, [self.display_size[0] * relative_x,
+                  self.display_size[1] * relative_y]
+        )
+
     def draw_text_bold(self, msg, color, relative_x, relative_y):
-        self.font_style.set_bold(True)
-        msg = self.font_style.render(msg, True, color)
+        self.text_font.set_bold(True)
+        msg = self.text_font.render(msg, True, color)
         self.display.blit(
             msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y]
         )
-        self.font_style.set_bold(False)
+        self.text_font.set_bold(False)
 
     def draw_snake(self, player):
         # Draw body

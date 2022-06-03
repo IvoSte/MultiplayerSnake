@@ -16,7 +16,7 @@ class PostGameMenu(BaseMenu):
 
     def restart_function(self):
         self.quit_menu()
-        self.game.menuHandler.restart_game()
+        self.game.restart_game()
 
     def options_function(self):
         self.quit_menu()
