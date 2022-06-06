@@ -25,7 +25,7 @@ class GameModel:
     def add_player(self, player):
         if player not in self.players:
             self.players.append(player)
-    
+
     def remove_player(self, player):
         if player in self.players:
             self.players.remove(player)
@@ -54,7 +54,6 @@ class GameModel:
 
     def clear_food(self):
         self.food = []
-
 
     def get_final_score(self):
         final_scores = {
@@ -102,7 +101,7 @@ class GameModel:
 # What do I want in the game state?
 # The game state should be the general handler to know all information about the game
 # Like all snakes' positions, positions of food,
-# so, it has all entities. 
+# so, it has all entities.
 # but also be able to derive / update information about the game like
 # How many times which player has won.
 # It should also be able to package itsself in a tiny format to be sent over the

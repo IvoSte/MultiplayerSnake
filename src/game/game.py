@@ -119,8 +119,7 @@ class GameEngine:
             in_menu=False,
             food=[],
         )
-        self.model.set_game_timer(
-            (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
+        self.model.set_game_timer((GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
 
     def reset_game(self):
 
@@ -142,9 +141,7 @@ class GameEngine:
             in_menu=False,
             food=[],
         )
-        self.model.set_game_timer(
-            (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
-
+        self.model.set_game_timer((GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
 
     def init_sounds(self):
         self.sounds.init()
@@ -167,20 +164,21 @@ class GameEngine:
 
         for i in range(NUMBER_OF_PLAYERS):
             snake = Snake(
-                    self.display_size[0] / 2,
-                    self.display_size[1] / 2,
-                    width=SNAKE_SIZE,
-                    length=INITIAL_SNAKE_LENGTH,
-                    speed=SNAKE_SPEED,
-                    lives=INITIAL_LIVES,
-                    colormap=colormaps[[*colormaps][i]],
-                    name=f"{[*colormaps][i]}",
-                    controls=self.control_sets[i],
-                )
+                self.display_size[0] / 2,
+                self.display_size[1] / 2,
+                width=SNAKE_SIZE,
+                length=INITIAL_SNAKE_LENGTH,
+                speed=SNAKE_SPEED,
+                lives=INITIAL_LIVES,
+                colormap=colormaps[[*colormaps][i]],
+                name=f"{[*colormaps][i]}",
+                controls=self.control_sets[i],
+            )
             player = Player(
                 name=f"{[*colormaps][i]}",
-                snake = snake,
-                controls = self.control_sets[i],
+                snake=snake,
+                controls=self.control_sets[i],
+                snake_colormap=colormaps[[*colormaps][i]],
             )
             self.model.add_player(player)
             self.model.add_snake(snake)
@@ -200,8 +198,21 @@ class GameEngine:
             self.spawn_food()
 
     def reset_snakes(self):
+        self.model.clear_snakes()
         for player in self.model.players:
-            
+            snake = Snake(
+                self.display_size[0] / 2,
+                self.display_size[1] / 2,
+                width=SNAKE_SIZE,
+                length=INITIAL_SNAKE_LENGTH,
+                speed=SNAKE_SPEED,
+                lives=INITIAL_LIVES,
+                colormap=player.snake_colormap,
+                name=f"{player.name}",
+                controls=player.controls,
+            )
+            player.set_snake(snake)
+            self.model.add_snake(snake)
 
     def notify(self, event):
         if isinstance(event, QuitEvent):
@@ -231,7 +242,7 @@ class GameEngine:
     #### End game init
 
     def restart_game(self):
-        self.init_game()
+        self.reset_game()
         self.run()
 
     def quit_game(self):
@@ -261,7 +272,6 @@ class GameEngine:
 
     def end_screen(self):
         pass
-
 
     def update_snakes(self):
         # Move snakes snake

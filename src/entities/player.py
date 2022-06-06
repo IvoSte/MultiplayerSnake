@@ -21,10 +21,17 @@ from game.env_variables import (
 
 
 class Player:
-    def __init__(self, name="Player",  snake: Snake = None, controls=default_player_controls):
+    def __init__(
+        self,
+        name="Player",
+        snake: Snake = None,
+        controls=default_player_controls,
+        snake_colormap=None,
+    ):
         self.name = name
-        self.snake = snake
         self.controls = controls
+        self.snake = snake
+        self.snake_colormap = snake_colormap
 
     def set_snake(self, snake):
         self.snake = snake
