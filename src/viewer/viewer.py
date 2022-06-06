@@ -59,22 +59,29 @@ class Viewer:
         # Set fonts
         # Old fonts, for reference
         # self.text_font = pygame.font.SysFont("bahnschrift", 35)
-        # self.score_font = pygame.font.SysFont("comicsansms", 35)
         # self.score_font = pygame.font.SysFont("futura", 35)
 
         # For symbols list check https://freefontsdownload.net/free-segoeuisymbol-font-135679.htm
         self.text_font_path = os.path.join("assets", "fonts", "seguisym.ttf")
         self.symbols_font_path = os.path.join("assets", "fonts", "seguisym.ttf")
-        self.score_font_path = os.path.join("assets", "fonts", "quickens.ttf")
+        self.score_font_path = os.path.join(
+            "assets", "fonts", "futura.ttf"
+        )  # quickens.ttf
 
         self.text_font = pygame.font.Font(self.text_font_path, 35)
-        self.text_font_large = pygame.font.Font(self.text_font_path, 45)
+        self.text_font_big = pygame.font.Font(self.text_font_path, 45)
+        self.text_font_large = pygame.font.Font(self.text_font_path, 60)
+        self.text_font_huge = pygame.font.Font(self.text_font_path, 90)
 
         self.score_font = pygame.font.Font(self.score_font_path, 35)
-        self.score_font_large = pygame.font.Font(self.score_font_path, 45)
-        
+        self.score_font_big = pygame.font.Font(self.score_font_path, 45)
+        self.score_font_large = pygame.font.Font(self.score_font_path, 60)
+        self.score_font_huge = pygame.font.Font(self.score_font_path, 90)
+
         self.symbols_font = pygame.font.Font(self.symbols_font_path, 35)
-        self.symbols_font_large = pygame.font.Font(self.symbols_font_path, 45)
+        self.symbols_font_big = pygame.font.Font(self.symbols_font_path, 45)
+        self.symbols_font_large = pygame.font.Font(self.symbols_font_path, 60)
+        self.symbols_font_huge = pygame.font.Font(self.symbols_font_path, 90)
 
         # Snake Display variables
         self.snake_size = snake_size
@@ -104,77 +111,63 @@ class Viewer:
     def update(self):
         pygame.display.update()
 
-    def draw_game_timer(self, timer):
-        # Start the countdown only after the game countdown
-        if timer <= GAME_TIMER * TICKS_PER_SECOND:
-            self.draw_counter_with_border(
-                (timer // TICKS_PER_SECOND) + 1,
-                ((SCREEN_SIZE_X // 2), (SCREEN_SIZE_Y) // 20),
-                Color.WHITE.value,
-                Color.BLACK.value,
-                "futura",
-                30 * RESOLUTION_SCALE,
-            )
-
-    def draw_player_counters(self, players):
-        for player in players:
-            if player.move_freeze_timer >= 10:
-                self.draw_counter_with_border(
-                    (player.move_freeze_timer // TICKS_PER_SECOND) + 1,
-                    [player.x_pos, player.y_pos],
-                    color(player.colormap, player.color),
-                    Color.WHITE.value,
-                    "futura",
-                    60 * RESOLUTION_SCALE,
-                )
-
-    def draw_counter_with_border(self, value, pos, color, bordercolor, font, size):
-        self.draw_text_with_border(
-            value, (pos[0] - 10, pos[1] - 25), color, bordercolor, font, size
-        )
-
-    def draw_counter(self, value, pos, color, font, size):
-        text = pygame.font.SysFont(font, size).render(f"{value}", True, color)
-        self.display.blit(text, [pos[0], pos[1]])
-
-    def draw_text_with_border(self, value, pos, color, bordercolor, font, size):
-        border = pygame.font.SysFont(font, size).render(f"{value}", True, bordercolor)
-        self.display.blit(border, [pos[0] + 2, pos[1]])
-        self.display.blit(border, [pos[0] - 2, pos[1]])
-        self.display.blit(border, [pos[0], pos[1] + 2])
-        self.display.blit(border, [pos[0], pos[1] - 2])
-        text = pygame.font.SysFont(font, size).render(f"{value}", True, color)
-        self.display.blit(text, [pos[0], pos[1]])
-
     def clear_screen(self):
         self.display.fill(self.background_color)
 
-    def draw_text(self, msg, color, relative_x, relative_y):
-        msg = self.text_font.render(msg, True, color)
+    def absolute_to_relative_position(
+        self, pos: tuple[int, int]
+    ) -> tuple[float, float]:
+        # Convert absolute x and y positions to relative x and y positions
+        return (pos[0] / self.display_size[0], pos[1] / self.display_size[1])
+
+    def relative_to_absolute_position(self, relative_x, relative_y) -> tuple[int, int]:
+        # Convert relative x and y positions to absolute x and y positions
+        return (relative_x * self.display_size[0], relative_y * self.display_size[1])
+
+    def draw_text(
+        self,
+        msg,
+        color,
+        relative_x,
+        relative_y,
+        font=None,
+        border=False,
+        bordercolor=None,
+    ):
+        # Make sure the message is a string
+        if not isinstance(msg, str):
+            msg = f"{msg}"
+        # If no font is given as argument, use the default text font
+        if font == None:
+            font = self.text_font
+        # Draw the border before the message
+        if border:
+            self.draw_text_border(msg, relative_x, relative_y, bordercolor, font)
+        # Draw the message to the screen
+        msg = font.render(msg, True, color)
         self.display.blit(
             msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y]
         )
 
-    def draw_text_large(self, msg, color, relative_x, relative_y):
-        msg = self.text_font_large.render(msg, True, color)
-        self.display.blit(
-            msg, [self.display_size[0] * relative_x,
-                  self.display_size[1] * relative_y]
-        )
+    def draw_text_border(self, msg, relative_x, relative_y, bordercolor, font):
+        # This function needs to be rewrote at some point TODO -- instead of making 9
+        # prints around the value, a better way is to get a circle of points
+        if bordercolor == None:
+            bordercolor = Color.WHITE.value
+        border = font.render(msg, True, bordercolor)
+        offset = 0.003
 
-    def draw_unicode(self, uni_char, color, relative_x, relative_y):
-        char = self.symbols_font.render(uni_char, True, color)
-        self.display.blit(
-            char, (self.display_size[0] * relative_x, self.display_size[1] * relative_y)
-        )
+        for x_offset in [-1 * offset, 0, offset]:
+            for y_offset in [-1 * offset, 0, offset]:
+                self.display.blit(
+                    border,
+                    [
+                        (self.display_size[0] * (relative_x + x_offset)),
+                        (self.display_size[1] * (relative_y + y_offset)),
+                    ],
+                )
 
-    def draw_score(self, msg, color, relative_x, relative_y):
-        msg = self.score_font_large.render(msg, True, color)
-        self.display.blit(
-            msg, [self.display_size[0] * relative_x,
-                  self.display_size[1] * relative_y]
-        )
-
+    # DEPRECIATED -- Should be called by a regular draw_text with a bold font.
     def draw_text_bold(self, msg, color, relative_x, relative_y):
         self.text_font.set_bold(True)
         msg = self.text_font.render(msg, True, color)
@@ -182,6 +175,35 @@ class Viewer:
             msg, [self.display_size[0] * relative_x, self.display_size[1] * relative_y]
         )
         self.text_font.set_bold(False)
+
+    def draw_game_timer(self, timer):
+        # Start the countdown only after the game countdown
+        if timer <= GAME_TIMER * TICKS_PER_SECOND:
+            self.draw_text(
+                msg=(timer // TICKS_PER_SECOND) + 1,
+                color=Color.WHITE.value,
+                relative_x=0.48,
+                relative_y=0.02,
+                font=self.score_font_large,
+                border=True,
+                bordercolor=Color.BLACK.value,
+            )
+
+    def draw_player_counters(self, players):
+        for player in players:
+            if player.move_freeze_timer >= 10:
+                relative_x, relative_y = self.absolute_to_relative_position(
+                    (player.x_pos, player.y_pos)
+                )
+                self.draw_text(
+                    msg=(player.move_freeze_timer // TICKS_PER_SECOND) + 1,
+                    color=color(player.colormap, player.color),
+                    relative_x=relative_x,
+                    relative_y=relative_y,
+                    font=self.score_font_big,
+                    border=True,
+                    bordercolor=Color.WHITE.value,
+                )
 
     def draw_snake(self, player):
         # Draw body

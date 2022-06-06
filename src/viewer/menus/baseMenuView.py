@@ -11,7 +11,7 @@ class BaseMenuView:
         self.display_size = self.viewer.display_size
         self.text: dict[str, TextView] = {}
         self.options: dict[str, MenuOptionView] = {}  # Dict of options
-        self.cursor = Cursor("➜", Color.WHITE.value, 0.0, 0.0, -0.05, -0.02)
+        self.cursor = Cursor("➜", Color.WHITE.value, 0.0, 0.0, -0.05, 0.0)
 
     def draw(self):
         self.draw_text()
@@ -57,8 +57,12 @@ class BaseMenuView:
         self.cursor.y_pos = (
             self.options[self.menu.selected_option.name].y_pos + self.cursor.y_offset
         )
-        self.viewer.draw_unicode(
-            self.cursor.sign, self.cursor.color, self.cursor.x_pos, self.cursor.y_pos
+        self.viewer.draw_text(
+            self.cursor.sign,
+            self.cursor.color,
+            self.cursor.x_pos,
+            self.cursor.y_pos,
+            self.viewer.symbols_font,
         )
 
 
