@@ -257,20 +257,20 @@ class Viewer:
             self.draw_environment(self.game.environment)
 
         # Draw food TODO draw items / draw entities
-        for food in self.game.food:
+        for food in self.game.model.food:
             self.draw_food(food)
 
         # Draw players
-        for player in self.game.players:
-            self.draw_snake(player)
+        for snake in self.game.model.snakes:
+            self.draw_snake(snake)
 
         # Update score
-        self.ui_player_information.display_players_information(self.game.players)
+        self.ui_player_information.display_players_information(self.game.model.snakes)
 
         # Draw timers
         if GAME_TIMER_SWITCH:
-            self.draw_game_timer(self.game.game_timer)
-        self.draw_player_counters(self.game.players)
+            self.draw_game_timer(self.game.model.game_timer)
+        self.draw_player_counters(self.game.model.snakes)
 
         # Update screen
         self.update()

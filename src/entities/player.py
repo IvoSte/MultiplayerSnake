@@ -1,3 +1,4 @@
+from entities.snake import Snake
 from viewer.colors import Color, color_from_map, colormaps
 from controls.input_controls import Controls, default_player_controls
 import pygame
@@ -20,12 +21,13 @@ from game.env_variables import (
 
 
 class Player:
-    def __init__(self, name="Player", controls=default_player_controls):
+    def __init__(self, name="Player",  snake: Snake = None, controls=default_player_controls):
         self.name = name
+        self.snake = snake
         self.controls = controls
+
+    def set_snake(self, snake):
+        self.snake = snake
 
     def report(self):
         print(f"Player report: {self.name}")
-        print(
-            f"    {self.score = }\n   {self.length = }\n  {self.tails_lost = }\n  {self.tails_eaten = }"
-        )

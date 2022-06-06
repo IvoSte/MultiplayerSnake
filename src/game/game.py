@@ -1,4 +1,5 @@
 from operator import attrgetter, length_hint
+from game.gameModel import GameModel
 from entities.environment import Environment
 from menus.baseMenu import BaseMenu
 from entities.player import Player
@@ -56,6 +57,8 @@ class GameEngine:
 
         self.menuHandler = MenuHandler(self)
 
+        self.model = GameModel()
+
         # Global variables
         self.snake_size = (SNAKE_SIZE, SNAKE_SIZE)
         self.display_size = display_size
@@ -67,8 +70,6 @@ class GameEngine:
         self.clock = pygame.time.Clock()
         self.time_elapsed = 0
 
-        self.game_timer = (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND
-
         # Keep a list of all the players
         self.control_sets = [
             player_1_controls,
@@ -77,9 +78,7 @@ class GameEngine:
             player_4_controls,
         ]
         self.controllers = {}
-        self.players = []
         # food can be moved to the environment. For now the environment is intended to experiment with the background
-        self.food = []
         self.environment = None
 
         # Set state
@@ -120,7 +119,32 @@ class GameEngine:
             in_menu=False,
             food=[],
         )
-        self.game_timer = (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND
+        self.model.set_game_timer(
+            (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
+
+    def reset_game(self):
+
+        # Setup enviroment
+        self.init_environment()
+
+        # Spawn new snakes for the players
+        self.reset_snakes()
+
+        # Grow food
+        self.init_food()
+
+        # Set game state
+        self.state = State(
+            running=True,
+            game_over=False,
+            game_paused=False,
+            in_game=True,
+            in_menu=False,
+            food=[],
+        )
+        self.model.set_game_timer(
+            (GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
+
 
     def init_sounds(self):
         self.sounds.init()
@@ -138,10 +162,11 @@ class GameEngine:
             # self.controllers[joystick.get_instance_id()] = joystick
 
     def init_players(self):
-        self.players = []
+        self.model.clear_players()
+        self.model.clear_snakes()
+
         for i in range(NUMBER_OF_PLAYERS):
-            self.players.append(
-                Snake(
+            snake = Snake(
                     self.display_size[0] / 2,
                     self.display_size[1] / 2,
                     width=SNAKE_SIZE,
@@ -152,7 +177,13 @@ class GameEngine:
                     name=f"{[*colormaps][i]}",
                     controls=self.control_sets[i],
                 )
+            player = Player(
+                name=f"{[*colormaps][i]}",
+                snake = snake,
+                controls = self.control_sets[i],
             )
+            self.model.add_player(player)
+            self.model.add_snake(snake)
 
     def init_environment(self):
         self.environment = Environment(
@@ -164,9 +195,13 @@ class GameEngine:
         self.environment.init_environment()
 
     def init_food(self):
-        self.food = []
+        self.model.clear_food()
         for _ in range(INITIAL_FOOD):
             self.spawn_food()
+
+    def reset_snakes(self):
+        for player in self.model.players:
+            
 
     def notify(self, event):
         if isinstance(event, QuitEvent):
@@ -174,8 +209,8 @@ class GameEngine:
             self.state.running = False
             # self.end_screen()
         if isinstance(event, PlayerInputEvent):
+            event.player.snake.set_command(event.command)
 
-            event.player.set_command(event.command)
         if isinstance(event, GeneralControlInputEvent):
             if event.command == Controls.QUIT:
                 self.state.game_over = True
@@ -222,86 +257,43 @@ class GameEngine:
         )
         food_color = pygame.Color(0, random.randint(200, 255), 0)
         food = Food(self, (foodx, foody), food_color)
-        self.food.append(food)
+        self.model.food.append(food)
 
     def end_screen(self):
         pass
 
-    def get_final_score(self):
-        final_scores = {
-            "Most points": max(self.players, key=attrgetter("score")),
-            "Longest tail": max(self.players, key=attrgetter("length")),
-            "Tails stolen": max(self.players, key=attrgetter("tails_eaten")),
-        }
-        return final_scores
 
-    def get_player_from_name(self, player_name):
-        for player in self.players:
-            if player.name == player_name:
-                return player
-        return None
-
-    def players_alive(self) -> int:
-        return sum(1 for player in self.players if player.alive)
-
-    def players_lives_left(self) -> int:
-        active_lives = self.players_alive()
-        reserve_lives = sum(player.lives_left for player in self.players)
-        return active_lives + reserve_lives
-
-    def dead_players_lives_left(self) -> int:
-        return sum(player.lives_left for player in self.players if not player.alive)
-
-    def is_game_over(self):
-        # In single player the player should be dead and have no lives left.
-        # In multiplayer all players but on should be dead and without lives left.
-        if (
-            # Single player mode where the player is dead
-            NUMBER_OF_PLAYERS == 1
-            and self.players_lives_left() == 0
-            # Multi player mode and only one player is alive and none respawning.
-            or (
-                NUMBER_OF_PLAYERS > 1
-                and self.players_alive() == 1
-                and self.dead_players_lives_left() == 0
-            )
-            # Timer for timed games
-            or (GAME_TIMER_SWITCH and self.game_timer <= 0)
-        ):
-            self.state.game_over = True
-            self.evManager.Post(GameEndedEvent())
-
-    def update_players(self):
-        # Move players snake
-        # Update players in random order
-        for player in random.sample(self.players, len(self.players)):
-            idx = self.players.index(player)
-            # If the player is dead,
-            if not player.alive:
-                if player.lives_left > 0:
-                    player.respawn()
-                    player.lives_left -= 1
+    def update_snakes(self):
+        # Move snakes snake
+        # Update snakes in random order
+        for snake in random.sample(self.model.snakes, len(self.model.snakes)):
+            idx = self.model.snakes.index(snake)
+            # If the snake is dead,
+            if not snake.alive:
+                if snake.lives_left > 0:
+                    snake.respawn()
+                    snake.lives_left -= 1
                 continue
-            player.move()
+            snake.move()
 
-            player.is_dead(self.display_size, snakes=self.players)
+            snake.is_dead(self.display_size, snakes=self.model.snakes)
 
             eaten_food = []
-            for food in self.food:
-                if player.eat_food(food=food):
-                    player.move_freeze_timer = FREEZE_FRAMES_ON_EAT
+            for food in self.model.food:
+                if snake.eat_food(food=food):
+                    snake.move_freeze_timer = FREEZE_FRAMES_ON_EAT
                     eaten_food.append(food)
                     if random.random() < WAVE_RATE:
                         self.environment.activate_agent_on_position(food.pos)
                     self.sounds.play_player_effect(idx)
             for food in eaten_food:
-                self.food.remove(food)
+                self.model.remove_food(food)
 
-            player.update_body()
+            snake.update_body()
 
     def update(self):
         # self.parse_input()
-        self.update_players()
+        self.update_snakes()
         self.environment.update_environment()
 
     def run(self):
@@ -317,7 +309,9 @@ class GameEngine:
             if self.state.in_game:
 
                 # Check if the game is over
-                self.is_game_over()
+                if self.model.is_game_over():
+                    self.state.game_over = True
+                    self.evManager.Post(GameEndedEvent())
 
                 # Update game state according to inputs
                 self.update()
@@ -326,7 +320,7 @@ class GameEngine:
                 self.time_elapsed = self.clock.tick(TICKS_PER_SECOND)
 
                 if GAME_TIMER_SWITCH:
-                    self.game_timer -= 1
+                    self.model.game_timer -= 1
 
             # Update viewer and all other objects
             self.evManager.Post(TickEvent())

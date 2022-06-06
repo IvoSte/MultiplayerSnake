@@ -63,7 +63,7 @@ class Client:
                 print(f"{data=}")
 
             elif isinstance(data, SendPlayerInputCommand):
-                player = self.game.get_player_from_name(data.player_name)
+                player = self.game.model.get_player_from_name(data.player_name)
                 if player is None:
                     print(f"No existing player with name {data.player_name}")
                     continue

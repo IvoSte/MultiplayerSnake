@@ -58,7 +58,7 @@ class Controller:
                     break
 
                 # Receive player command
-                for player in self.game.players:
+                for player in self.game.model.players:
                     if event.key in player.controls:
                         # NOTE sending the entire player, a problem? Seems the most easy, and its a reference so I don't see drawbacks right now.
                         self.evManager.Post(
