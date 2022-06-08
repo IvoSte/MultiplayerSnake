@@ -5,6 +5,8 @@ from entities.food import Food
 from game.env_variables import (
     NUMBER_OF_PLAYERS,
     GAME_TIMER_SWITCH,
+    GRID_SIZE_X,
+    GRID_SIZE_Y,
 )
 
 
@@ -12,12 +14,12 @@ class GameModel:
     def __init__(self):
         # Game variables
         self.game_timer: int
+        self.grid_size: tuple[int, int] = (GRID_SIZE_X, GRID_SIZE_Y)
 
         # Entities
         self.players: list[Player] = []
         self.snakes: list[Snake] = []
         self.food: list[Food] = []
-        print(self.snakes)
 
     def set_game_timer(self, time):
         self.game_timer = time

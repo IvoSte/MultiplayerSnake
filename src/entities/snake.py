@@ -95,14 +95,14 @@ class Snake:
                     c.r - BODY_DECAY_RATE, c.g - BODY_DECAY_RATE, c.b - BODY_DECAY_RATE
                 )
 
-    def is_dead(self, display_size, snakes=None):
+    def is_dead(self, grid_size, snakes=None):
         if snakes == None:
             snakes = [self]
         # hit edges/boundaries
         if (
-            self.x_pos >= display_size[0]
+            self.x_pos >= grid_size[0]
             or self.x_pos < 0
-            or self.y_pos >= display_size[1]
+            or self.y_pos >= grid_size[1]
             or self.y_pos < 0
         ):
             # print(f"{self.name} hit the edge and died")
@@ -174,12 +174,16 @@ class Snake:
     def move(self):
         # The move command is issued each tick. This function translates that check to the move speed
         # Updating the direction at required points
-        if self.x_pos % self.width == 0 and self.y_pos % self.width == 0:
+        # if self.x_pos % self.width == 0 and self.y_pos % self.width == 0:
+        step_size = 1.0 / self.speed
+        # When x or y crosses to the next grid position, we can change direction.
+        # NOTE: This gives problems at higher speeds, when floating point errors.
+        if self.x_pos % 1.0 == 0.0 and self.y_pos % 1.0 == 0.0:
             self.move_dir_buffer = self.command
         if self.move_freeze_timer > 0:
             self.move_freeze_timer -= 1
         else:
-            self.move_step(self.width / self.speed)
+            self.move_step(step_size)
 
     def move_step(self, step_size):
         # Determine move direction
@@ -205,6 +209,7 @@ class Snake:
         # current position of player head
         self.x_pos += x_pos_change
         self.y_pos += y_pos_change
+        # print(f"Snake moved to {self.x_pos} {self.y_pos}")
 
     def eat_food(self, food) -> bool:
         # TODO possibly should not be checked here but one place higher. This also works

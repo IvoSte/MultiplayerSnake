@@ -84,7 +84,14 @@ class Viewer:
         self.symbols_font_huge = pygame.font.Font(self.symbols_font_path, 90)
 
         # Snake Display variables
+        # DEPRECIATED
         self.snake_size = snake_size
+
+        # Size of units, x and y for a single grid thing. Base values, should be obtainable from objects themselves
+        self.unit_size = (
+            self.display_size[0] / self.game.model.grid_size[0],
+            self.display_size[1] / self.game.model.grid_size[1],
+        )
 
         self.background_color = Color.BLUE.value
         self.background_colors = [
@@ -205,30 +212,69 @@ class Viewer:
                     bordercolor=Color.WHITE.value,
                 )
 
-    def draw_snake(self, player):
+    def draw_coordinates(self):
+        for x in range(self.game.model.grid_size[0]):
+            for y in range(self.game.model.grid_size[1]):
+                pygame.draw.circle(
+                    self.display,
+                    Color.BLACK.value,
+                    (
+                        x * (self.display_size[0] / self.game.model.grid_size[0]),
+                        y * (self.display_size[1] / self.game.model.grid_size[1]),
+                    ),
+                    1.0,
+                )
+
+    def rect_pixels_from_coords(self, x, y, size_x, size_y, x_offset=0.0, y_offset=0.0):
+        # Retrieve the correct rectangle object parameters from grid coordinates.
+        # Offset arguments can be used to shift when the game space is not
+        # equal to the full display (e.g. with borders)
+        x_offset = 0.5 * size_x
+        y_offset = 0.5 * size_y
+        return [
+            (x * (self.display_size[0] / self.game.model.grid_size[0]))
+            - (0.5 * size_x)
+            + x_offset,
+            (y * (self.display_size[1] / self.game.model.grid_size[1]))
+            - (0.5 * size_y)
+            + y_offset,
+            size_x,
+            size_y,
+        ]
+
+    def draw_snake(self, snake):
         # Draw body
-        for idx, pos in enumerate(player.body):
+        for idx, pos in enumerate(snake.body):
             pygame.draw.rect(
                 self.display,
                 color(
-                    player.colormap,
-                    player.color + ((len(player.body) - idx) * player.colorscale),
+                    snake.colormap,
+                    snake.color + ((len(snake.body) - idx) * snake.colorscale),
                 ),
-                [pos[0], pos[1], self.snake_size[0], self.snake_size[1]],
+                self.rect_pixels_from_coords(
+                    pos[0],
+                    pos[1],
+                    self.unit_size[0],
+                    self.unit_size[1],
+                ),
             )
         # Draw decaying body
-        for idx, pos in enumerate(player.decaying_body):
+        for idx, pos in enumerate(snake.decaying_body):
             pygame.draw.rect(
                 self.display,
-                player.decay_body_color[idx],
-                [pos[0], pos[1], self.snake_size[0], self.snake_size[1]],
+                snake.decay_body_color[idx],
+                self.rect_pixels_from_coords(
+                    pos[0], pos[1], self.unit_size[0], self.unit_size[1]
+                ),
             )
 
     def draw_food(self, food):
         pygame.draw.rect(
             self.display,
             food.color,
-            [food.pos[0], food.pos[1], self.snake_size[0], self.snake_size[1]],
+            self.rect_pixels_from_coords(
+                food.pos[0], food.pos[1], self.unit_size[0], self.unit_size[1]
+            ),
         )
 
     def draw_environment(self, environment):
@@ -237,7 +283,9 @@ class Viewer:
             pygame.draw.rect(
                 self.display,
                 agent.color,
-                [agent.x_pos, agent.y_pos, agent.size[0], agent.size[1]],
+                self.rect_pixels_from_coords(
+                    agent.x_pos, agent.y_pos, self.unit_size[0], self.unit_size[1]
+                ),
             )
 
     def notify(self, event):
@@ -271,6 +319,8 @@ class Viewer:
         if GAME_TIMER_SWITCH:
             self.draw_game_timer(self.game.model.game_timer)
         self.draw_player_counters(self.game.model.snakes)
+
+        # self.draw_coordinates()
 
         # Update screen
         self.update()

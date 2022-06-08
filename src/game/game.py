@@ -33,8 +33,8 @@ from game.env_variables import (
     INITIAL_FOOD,
     NUMBER_OF_PLAYERS,
     INITIAL_LIVES,
-    SCREEN_SIZE_X,
-    SCREEN_SIZE_Y,
+    GRID_SIZE_X,
+    GRID_SIZE_Y,
     SNAKE_SIZE,
     INITIAL_SNAKE_LENGTH,
     SNAKE_SPEED,
@@ -49,9 +49,7 @@ import random
 
 
 class GameEngine:
-    def __init__(
-        self, evManager: EventManager, display_size=(SCREEN_SIZE_X, SCREEN_SIZE_Y)
-    ):
+    def __init__(self, evManager: EventManager, grid_size=(GRID_SIZE_X, GRID_SIZE_Y)):
         self.evManager = evManager
         self.evManager.RegisterListener(self)
 
@@ -61,7 +59,6 @@ class GameEngine:
 
         # Global variables
         self.snake_size = (SNAKE_SIZE, SNAKE_SIZE)
-        self.display_size = display_size
 
         # Call relevant init functions
         pygame.init()
@@ -164,8 +161,8 @@ class GameEngine:
 
         for i in range(NUMBER_OF_PLAYERS):
             snake = Snake(
-                self.display_size[0] / 2,
-                self.display_size[1] / 2,
+                self.model.grid_size[0] / 2,
+                self.model.grid_size[1] / 2,
                 width=SNAKE_SIZE,
                 length=INITIAL_SNAKE_LENGTH,
                 speed=SNAKE_SPEED,
@@ -185,8 +182,8 @@ class GameEngine:
 
     def init_environment(self):
         self.environment = Environment(
-            self.display_size[0],
-            self.display_size[1],
+            self.model.grid_size[0],
+            self.model.grid_size[1],
             self.snake_size,
             pygame.Color(50, 153, 213),
         )
@@ -201,8 +198,8 @@ class GameEngine:
         self.model.clear_snakes()
         for player in self.model.players:
             snake = Snake(
-                self.display_size[0] / 2,
-                self.display_size[1] / 2,
+                self.model.grid_size[0] / 2,
+                self.model.grid_size[1] / 2,
                 width=SNAKE_SIZE,
                 length=INITIAL_SNAKE_LENGTH,
                 speed=SNAKE_SPEED,
@@ -252,21 +249,12 @@ class GameEngine:
 
     def spawn_food(self):
         food_size = float(SNAKE_SIZE)
-        foodx = (
-            round(
-                random.randrange(0, self.display_size[0] - self.snake_size[0])
-                / food_size
-            )
-            * food_size
-        )
-        foody = (
-            round(
-                random.randrange(0, self.display_size[1] - self.snake_size[1])
-                / food_size
-            )
-            * food_size
-        )
+        foodx = round(random.randrange(0, self.model.grid_size[0]))
+        foody = round(random.randrange(0, self.model.grid_size[1]))
+
+        # Color should be in the viewer? Maybe? NOTE
         food_color = pygame.Color(0, random.randint(200, 255), 0)
+
         food = Food(self, (foodx, foody), food_color)
         self.model.food.append(food)
 
@@ -286,7 +274,7 @@ class GameEngine:
                 continue
             snake.move()
 
-            snake.is_dead(self.display_size, snakes=self.model.snakes)
+            snake.is_dead(self.model.grid_size, snakes=self.model.snakes)
 
             eaten_food = []
             for food in self.model.food:
