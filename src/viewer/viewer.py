@@ -26,6 +26,7 @@ from game.env_variables import (
     TICKS_PER_SECOND,
     VERZET,
     BACKGROUND_VISUALS,
+    DRAW_COORDINATES,
 )
 from viewer.ui_elements.player_information import UI_player_information
 
@@ -320,7 +321,9 @@ class Viewer:
             self.draw_game_timer(self.game.model.game_timer)
         self.draw_player_counters(self.game.model.snakes)
 
-        # self.draw_coordinates()
+        # Draw coordinates -- useful for development.
+        if DRAW_COORDINATES:
+            self.draw_coordinates()
 
         # Update screen
         self.update()

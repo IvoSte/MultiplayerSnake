@@ -118,3 +118,6 @@ WALL_COLLISION_SOUND = ""
 VICTORY_SOUND = ""  # "GAME!"
 DEFEAT_SOUND = ""  # "PLAYER 1, DEFEATED"
 # More for later: eat larger / golden fruit, powerups
+
+# Development
+DRAW_COORDINATES = config.getboolean("dev", "DRAW_COORDINATES")
