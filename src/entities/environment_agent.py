@@ -48,13 +48,13 @@ class Env_agent(Agent):
     def update_big_wave(self):
         self.decrease_intensity()
         self.color = fade_colors(self.top_color, self.base_color, 255/AGENT_EFFECT_STEP_SIZE, (255 - self.intensity)/AGENT_EFFECT_STEP_SIZE) 
-        #self.color = color(self.colormap, 255 - self.intensity)
+        #self.color = color_from_map(self.colormap, 255 - self.intensity)
         self.infectious = self.intensity == 250
 
     def update_small_wave(self):
         self.decrease_intensity(100)
         self.color = fade_colors(self.top_color, self.base_color, 255/AGENT_EFFECT_STEP_SIZE, (255 - self.intensity)/AGENT_EFFECT_STEP_SIZE) 
-        #self.color = color(self.colormap, 255 - self.intensity)
+        #self.color = color_from_map(self.colormap, 255 - self.intensity)
         self.infectious = self.intensity == 155
 
     def set_top_color(self, color):

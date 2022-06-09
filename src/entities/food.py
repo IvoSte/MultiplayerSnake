@@ -2,14 +2,14 @@ from entities.item import Item
 
 class Food(Item):
     
-    def __init__(self, gameManager, pos, color):
-        super().__init__(gameManager)
+    def __init__(self, gameEngine, pos, color):
+        super().__init__(gameEngine)
         self.pos = pos
         self.color = color
 
         
     def notify(self):
-        self.gameManager.spawn_food()
+        self.gameEngine.spawn_food()
             
     def eat(self):
         self.notify()

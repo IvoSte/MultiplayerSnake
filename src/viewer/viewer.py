@@ -13,7 +13,7 @@ from viewer.menus.optionsMenuView import OptionsMenuView
 from viewer.menus.soundOptionsMenuView import SoundOptionsMenuView
 from viewer.menus.postGameMenuView import PostGameMenuView
 from viewer.menus.pauseMenuView import PauseMenuView
-from viewer.colors import Color, turbo_color, color, extend_colormaps
+from viewer.colors import Color, turbo_color, color_from_map, extend_colormaps
 from game.env_variables import (
     FULLSCREEN,
     GAME_TIMER,
@@ -205,7 +205,7 @@ class Viewer:
                 )
                 self.draw_text(
                     msg=(player.move_freeze_timer // TICKS_PER_SECOND) + 1,
-                    color=color(player.colormap, player.color),
+                    color=color_from_map(player.colormap, player.color),
                     relative_x=relative_x,
                     relative_y=relative_y,
                     font=self.score_font_big,
@@ -248,7 +248,7 @@ class Viewer:
         for idx, pos in enumerate(snake.body):
             pygame.draw.rect(
                 self.display,
-                color(
+                color_from_map(
                     snake.colormap,
                     snake.color + ((len(snake.body) - idx) * snake.colorscale),
                 ),

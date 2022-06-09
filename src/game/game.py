@@ -248,7 +248,6 @@ class GameEngine:
         quit()
 
     def spawn_food(self):
-        food_size = float(SNAKE_SIZE)
         foodx = round(random.randrange(0, self.model.grid_size[0]))
         foody = round(random.randrange(0, self.model.grid_size[1]))
 

@@ -4,7 +4,7 @@ from game.env_variables import (
     SCREEN_SIZE_X,
     SCREEN_SIZE_Y,
 )
-from viewer.colors import color
+from viewer.colors import color_from_map
 import pygame
 
 
@@ -19,7 +19,7 @@ class UI_player_information:
         positions = [[0.05, 0.05], [0.88, 0.05], [0.05, 0.95], [0.88, 0.95]]
 
         for idx, player in enumerate(players):
-            text_color = color(player.colormap, player.color)
+            text_color = color_from_map(player.colormap, player.color)
             self.display_player_information_box(player, positions[idx], text_color)
 
     def display_player_information_box(self, player, pos, color):

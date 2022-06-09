@@ -45,9 +45,6 @@ class BaseMenu:
             self.quit_menu()
         elif menu_controls[event.key] == Controls.QUIT:
             pass
-            # self.game.end_screen()
-            # TODO end screen function moved somewhere else, put it back here.
-            # Do I initiate a self.viewer.evManager.Post(QuitEvent) here, or should that not be controlled here?
 
     def quit_menu(self):
         self.in_menu = False

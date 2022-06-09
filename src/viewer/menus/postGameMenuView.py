@@ -10,7 +10,6 @@ class PostGameMenuView(BaseMenuView):
             "match over": TextView("Game over!", Color.WHITE.value, 0.45, 0.4),
         }
         self.options = {
-            # Bit of a hack to have text here, create another dict for this TODO
             "restart": MenuOptionView(
                 menu.options["restart"],
                 "Restart",

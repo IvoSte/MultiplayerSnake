@@ -1,5 +1,14 @@
 from enum import Enum
-from viewer.colormaps import turbo_colormap, viridis_colormap, magma_colormap, inferno_colormap, plasma_colormap, green_colormap, red_colormap, blue_colormap
+from viewer.colormaps import (
+    turbo_colormap,
+    viridis_colormap,
+    magma_colormap,
+    inferno_colormap,
+    plasma_colormap,
+    green_colormap,
+    red_colormap,
+    blue_colormap,
+)
 from copy import deepcopy
 
 
@@ -12,46 +21,55 @@ class Color(Enum):
     BLUE = (50, 153, 213)
     GREY = (128, 128, 128)
 
+
 # I made this function because I didn't want to surround the colormaps in the colormaps dict with the make_continuous function. Maybe that is the better option though
 # Is there a third way?
+
 
 def extend_colormaps(colormaps):
     for name, colormap in colormaps.items():
         colormaps[name] = make_continuous(colormap)
+
 
 def make_continuous(colormap):
     tail = deepcopy(colormap)
     tail.reverse()
     return colormap + tail
 
+
 colormaps = {
-    "Turbo" : turbo_colormap, 
-    "Magma" : magma_colormap, 
-    "Viridis" : viridis_colormap,
-    "Inferno" : inferno_colormap, 
-    "Plasma" : plasma_colormap,
-    "Green" : green_colormap,
-    "Red" : red_colormap,
-    "Blue" : blue_colormap,
-    }
+    "Turbo": turbo_colormap,
+    "Magma": magma_colormap,
+    "Viridis": viridis_colormap,
+    "Inferno": inferno_colormap,
+    "Plasma": plasma_colormap,
+    "Green": green_colormap,
+    "Red": red_colormap,
+    "Blue": blue_colormap,
+}
 
 extend_colormaps(colormaps)
 
-# TODO replace all instances of this color with the next color_from_map function
+# DEPRECIATED
 def color(colormap, i):
     return to_rgb(colormap[i % len(colormap)])
+
 
 def color_from_map(colormap, i):
     return to_rgb(colormap[i % len(colormap)])
 
-def rgb_color(r,g,b,a = 255):
+
+def rgb_color(r, g, b, a=255):
     return ()
+
 
 def to_rgb(color_floats):
     return tuple(x * 255.0 for x in color_floats)
 
+
 def turbo_color(i):
-    return to_rgb(turbo_colormap[i%len(turbo_colormap)])
+    return to_rgb(turbo_colormap[i % len(turbo_colormap)])
+
 
 # Copyright 2019 Google LLC.
 # SPDX-License-Identifier: Apache-2.0
@@ -67,19 +85,27 @@ def turbo_color(i):
 # If you have 16-bit or 32-bit integer values, convert them to floating point values on the [0,1] range and then use interpolate(). Doing the interpolation in floating point will reduce banding.
 # If some of your values may lie outside the [0,1] range, use interpolate_or_clip() to highlight them.
 
+
 def fade_colors(from_color, to_color, steps, current_step):
-    return [x + ((y - x)/steps) * current_step for x, y in zip(from_color, to_color)]
+    return [x + ((y - x) / steps) * current_step for x, y in zip(from_color, to_color)]
+
 
 def interpolate(colormap, x):
-  x = max(0.0, min(1.0, x))
-  a = int(x*255.0)
-  b = min(255, a + 1)
-  f = x*255.0 - a
-  return [colormap[a][0] + (colormap[b][0] - colormap[a][0]) * f,
-          colormap[a][1] + (colormap[b][1] - colormap[a][1]) * f,
-          colormap[a][2] + (colormap[b][2] - colormap[a][2]) * f]
+    x = max(0.0, min(1.0, x))
+    a = int(x * 255.0)
+    b = min(255, a + 1)
+    f = x * 255.0 - a
+    return [
+        colormap[a][0] + (colormap[b][0] - colormap[a][0]) * f,
+        colormap[a][1] + (colormap[b][1] - colormap[a][1]) * f,
+        colormap[a][2] + (colormap[b][2] - colormap[a][2]) * f,
+    ]
+
 
 def interpolate_or_clip(colormap, x):
-  if   x < 0.0: return [0.0, 0.0, 0.0]
-  elif x > 1.0: return [1.0, 1.0, 1.0]
-  else: return interpolate(colormap, x)
+    if x < 0.0:
+        return [0.0, 0.0, 0.0]
+    elif x > 1.0:
+        return [1.0, 1.0, 1.0]
+    else:
+        return interpolate(colormap, x)
