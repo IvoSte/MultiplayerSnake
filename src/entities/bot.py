@@ -1,0 +1,122 @@
+from dataclasses import dataclass
+from typing import Optional
+
+import pygame
+
+from entities.player import Player
+from entities.snake import Snake
+from controls.input_controls import Controls, default_player_controls
+from enum import Enum
+
+
+@dataclass
+class ObjectiveDistance:
+    x: int
+    y: int
+
+
+class Direction(Enum):
+    UP = 1
+    DOWN = 2
+    LEFT = 3
+    RIGHT = 4
+
+
+class Bot(Player):
+    def __init__(
+        self,
+        model,
+        name="Bot",
+        snake: Snake = None,
+        controls=default_player_controls,
+        snake_colormap=None,
+    ):
+        Player.__init__(self, name, snake, controls, snake_colormap)
+        self.model = model
+        # This can be done better (line below comment). For now it needs the keypress for a control it is 'supposed' to press as a player
+        # it would be better to update the controller input handler to also handle all already converted inputs. TODO
+        self.control_keys = {value: key for key, value in self.controls.items()}
+        self.danger_distance: ObjectiveDistance
+        self.goal_distance: ObjectiveDistance
+        self.next_move: Direction
+
+    def observe(self):
+        self.find_danger()
+        self.find_goal()
+
+    def find_danger(self):
+        pass
+
+    def get_distance_to(self, direction, goal):
+        pass
+
+    def find_goal(self):
+        # set minimum distance to any food object in x and y direction
+        # clear previous distances and set them to the max
+        self.objective_distance = ObjectiveDistance(
+            x=self.model.grid_size[0], y=self.model.grid_size[1]
+        )
+
+        # For each food object, calculate the distance and overwrite the smallest distance
+        # if it is closer than any previously encountered
+        # TODO this is dumb, just find the closest food piece and move towards that, don't overwrite closest x or y, only both
+        for food in self.model.food:
+            dist_x, dist_y = self.find_distance(
+                self.snake.x_pos, self.snake.y_pos, food.pos[0], food.pos[1]
+            )
+            if abs(dist_x) < abs(self.objective_distance.x):
+                self.objective_distance.x = dist_x
+            if abs(dist_y) < abs(self.objective_distance.y):
+                self.objective_distance.y = dist_y
+
+    def find_distance(self, x1, y1, x2, y2):
+        dist_x = x2 - x1
+        dist_y = y2 - y1
+        return (dist_x, dist_y)
+
+    def decide_policy(self):
+        print(self.objective_distance)
+        if self.objective_distance.x != 0:
+            # Move horizontally
+            if self.objective_distance.x > 0:
+                self.next_move = Direction.RIGHT
+            else:
+                self.next_move = Direction.LEFT
+        if self.objective_distance.y != 0:
+            # Move vertically
+            if self.objective_distance.y > 0:
+                self.next_move = Direction.DOWN
+            else:
+                self.next_move = Direction.UP
+
+    def execute_policy(self):
+        key_event = pygame.event.Event(
+            pygame.KEYDOWN, {"key": self.control_keys[Controls.UP]}
+        )
+        print(f"{key_event} {type(key_event)}")
+        pygame.event.post(key_event)
+        if self.next_move == Direction.UP:
+            key_event = pygame.event.Event(
+                pygame.KEYDOWN, {"key": self.control_keys[Controls.UP]}
+            )
+            pygame.event.post(key_event)
+        if self.next_move == Direction.DOWN:
+            key_event = pygame.event.Event(
+                pygame.KEYDOWN, {"key": self.control_keys[Controls.DOWN]}
+            )
+            pygame.event.post(key_event)
+        if self.next_move == Direction.LEFT:
+            key_event = pygame.event.Event(
+                pygame.KEYDOWN, {"key": self.control_keys[Controls.LEFT]}
+            )
+            pygame.event.post(key_event)
+        if self.next_move == Direction.RIGHT:
+            key_event = pygame.event.Event(
+                pygame.KEYDOWN, {"key": self.control_keys[Controls.RIGHT]}
+            )
+            pygame.event.post(key_event)
+
+    def tick(self):
+        self.observe()
+        self.decide_policy()
+        self.execute_policy()

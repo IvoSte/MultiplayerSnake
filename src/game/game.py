@@ -9,6 +9,7 @@ from game.event_manager import GeneralControlInputEvent, PlayerInputEvent, QuitE
 from game.event_manager import GamePausedEvent, RestartGameEvent
 from game.event_manager import MenuControlInputEvent, GameEndedEvent
 from menus.menuHandler import MenuHandler
+from entities.bot import Bot
 from viewer.screens.screens import set_end_screen, set_final_score, set_options_screen
 from audio.sounds import Sounds
 from game.state import State
@@ -171,7 +172,14 @@ class GameEngine:
                 name=f"{[*colormaps][i]}",
                 controls=self.control_sets[i],
             )
-            player = Player(
+            # player = Player(
+            #     name=f"{[*colormaps][i]}",
+            #     snake=snake,
+            #     controls=self.control_sets[i],
+            #     snake_colormap=colormaps[[*colormaps][i]],
+            # )
+            player = Bot(
+                model=self.model,
                 name=f"{[*colormaps][i]}",
                 snake=snake,
                 controls=self.control_sets[i],
@@ -288,8 +296,14 @@ class GameEngine:
 
             snake.update_body()
 
+    def tick_bots(self):
+        for player in self.model.players:
+            if isinstance(player, Bot):
+                player.tick()
+
     def update(self):
         # self.parse_input()
+        self.tick_bots()
         self.update_snakes()
         self.environment.update_environment()
 
