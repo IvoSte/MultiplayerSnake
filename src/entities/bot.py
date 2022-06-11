@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import random
 from typing import Optional
 
 import pygame
@@ -38,7 +39,7 @@ class Bot(Player):
         self.control_keys = {value: key for key, value in self.controls.items()}
         self.danger_distance: ObjectiveDistance
         self.goal_distance: ObjectiveDistance
-        self.next_move: Direction
+        self.next_move: Controls
 
     def observe(self):
         self.find_danger()
@@ -76,45 +77,41 @@ class Bot(Player):
 
     def decide_policy(self):
         print(self.objective_distance)
-        if self.objective_distance.x != 0:
+        if self.objective_distance.x != 0.0:
             # Move horizontally
-            if self.objective_distance.x > 0:
-                self.next_move = Direction.RIGHT
+            if self.objective_distance.x > 0.0:
+                self.next_move = Controls.RIGHT
             else:
-                self.next_move = Direction.LEFT
-        if self.objective_distance.y != 0:
+                self.next_move = Controls.LEFT
+        elif self.objective_distance.y != 0.0:
             # Move vertically
-            if self.objective_distance.y > 0:
-                self.next_move = Direction.DOWN
+            if self.objective_distance.y > 0.0:
+                self.next_move = Controls.DOWN
             else:
-                self.next_move = Direction.UP
+                self.next_move = Controls.UP
+        self.unstuck_impossible_move()
+
+    def unstuck_impossible_move(self):
+        if self.opposite_direction(self.next_move, self.snake.move_dir_buffer):
+            print("UNSTUCKING MOVE")
+            self.next_move = Controls(random.randint(0, 3))
+
+    def opposite_direction(self, control_1, control_2):
+        if control_1 == Controls.UP and control_2 == Controls.DOWN:
+            return True
+        if control_1 == Controls.DOWN and control_2 == Controls.UP:
+            return True
+        if control_1 == Controls.LEFT and control_2 == Controls.RIGHT:
+            return True
+        if control_1 == Controls.RIGHT and control_2 == Controls.LEFT:
+            return True
+        return False
 
     def execute_policy(self):
         key_event = pygame.event.Event(
-            pygame.KEYDOWN, {"key": self.control_keys[Controls.UP]}
+            pygame.KEYDOWN, {"key": self.control_keys[self.next_move]}
         )
-        print(f"{key_event} {type(key_event)}")
         pygame.event.post(key_event)
-        if self.next_move == Direction.UP:
-            key_event = pygame.event.Event(
-                pygame.KEYDOWN, {"key": self.control_keys[Controls.UP]}
-            )
-            pygame.event.post(key_event)
-        if self.next_move == Direction.DOWN:
-            key_event = pygame.event.Event(
-                pygame.KEYDOWN, {"key": self.control_keys[Controls.DOWN]}
-            )
-            pygame.event.post(key_event)
-        if self.next_move == Direction.LEFT:
-            key_event = pygame.event.Event(
-                pygame.KEYDOWN, {"key": self.control_keys[Controls.LEFT]}
-            )
-            pygame.event.post(key_event)
-        if self.next_move == Direction.RIGHT:
-            key_event = pygame.event.Event(
-                pygame.KEYDOWN, {"key": self.control_keys[Controls.RIGHT]}
-            )
-            pygame.event.post(key_event)
 
     def tick(self):
         self.observe()

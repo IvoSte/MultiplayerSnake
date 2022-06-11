@@ -4,6 +4,7 @@ from entities.item import Item
 class Food(Item):
     def __init__(self, game, pos, color):
         super().__init__(game)
+        self.game = game
         self.pos = pos
         self.color = color
 
