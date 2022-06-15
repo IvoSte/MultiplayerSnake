@@ -89,7 +89,7 @@ class Bot(Player):
                 self.next_move = Controls.DOWN
             else:
                 self.next_move = Controls.UP
-        self.unstuck_impossible_move()
+        #self.unstuck_impossible_move()
 
     def unstuck_impossible_move(self):
         if self.opposite_direction(self.next_move, self.snake.move_dir_buffer):
