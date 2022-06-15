@@ -21,7 +21,10 @@ class NetworkData:
         data = json.loads(json_string)
         if type_def is None:
             type_def = cls.deduce_class_type(data["class_type"])
-        return dacite.from_dict(data_class=type_def, data=data)
+
+        type_hooks = {Controls: int}
+        type_hooks = {int: Controls}
+        return dacite.from_dict(data_class=type_def, data=data, config=dacite.Config(type_hooks=type_hooks))
 
     def to_packet(self):
         """Encode data object to packet to send, first packing to JSON, then to binary"""
