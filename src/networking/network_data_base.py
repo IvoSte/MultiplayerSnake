@@ -6,6 +6,7 @@ if __name__ == "__main__":
 from dataclasses import asdict
 import json
 import dacite
+from controls.input_controls import Controls
 
 
 class NetworkData:
@@ -22,8 +23,10 @@ class NetworkData:
         if type_def is None:
             type_def = cls.deduce_class_type(data["class_type"])
 
-        type_hooks = {Controls: int}
-        type_hooks = {int: Controls}
+        # TODO: Find a better place to instantiate these typehooks
+        # Custom types (such as int enums) don't automatically convert, this needs an explicit mention as a 'type_hook'
+        # The type hooks can be set here, where they are used. Or put in a location where it would be easier to add new special types.
+        type_hooks = {Controls: Controls}
         return dacite.from_dict(data_class=type_def, data=data, config=dacite.Config(type_hooks=type_hooks))
 
     def to_packet(self):
