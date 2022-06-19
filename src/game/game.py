@@ -172,19 +172,19 @@ class GameEngine:
                 name=f"{[*colormaps][i]}",
                 controls=self.control_sets[i],
             )
-            # player = Player(
-            #     name=f"{[*colormaps][i]}",
-            #     snake=snake,
-            #     controls=self.control_sets[i],
-            #     snake_colormap=colormaps[[*colormaps][i]],
-            # )
-            player = Bot(
-                model=self.model,
+            player = Player(
                 name=f"{[*colormaps][i]}",
                 snake=snake,
                 controls=self.control_sets[i],
                 snake_colormap=colormaps[[*colormaps][i]],
             )
+            # player = Bot(
+            #     model=self.model,
+            #     name=f"{[*colormaps][i]}",
+            #     snake=snake,
+            #     controls=self.control_sets[i],
+            #     snake_colormap=colormaps[[*colormaps][i]],
+            # )
             self.model.add_player(player)
             self.model.add_snake(snake)
 

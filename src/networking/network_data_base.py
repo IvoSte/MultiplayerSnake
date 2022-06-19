@@ -27,7 +27,9 @@ class NetworkData:
         # Custom types (such as int enums) don't automatically convert, this needs an explicit mention as a 'type_hook'
         # The type hooks can be set here, where they are used. Or put in a location where it would be easier to add new special types.
         type_hooks = {Controls: Controls}
-        return dacite.from_dict(data_class=type_def, data=data, config=dacite.Config(type_hooks=type_hooks))
+        return dacite.from_dict(
+            data_class=type_def, data=data, config=dacite.Config(type_hooks=type_hooks)
+        )
 
     def to_packet(self):
         """Encode data object to packet to send, first packing to JSON, then to binary"""
@@ -36,6 +38,7 @@ class NetworkData:
     @classmethod
     def from_packet(cls, packet, type_def=None):
         """Decode data object from received packet, first decoding from binary, then to data object from JSON"""
+        print(packet.decode())
         return cls.from_json(packet.decode(), type_def=type_def)
 
     @classmethod
