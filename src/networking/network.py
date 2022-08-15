@@ -18,6 +18,7 @@ from networking.network_commands import (
     SendPlayerInputCommand,
 )
 from networking.network_data import PlayerInfo
+from .network_commands import PlayerReadyCommand, PlayerUnreadyCommand
 
 
 class Network:
@@ -67,6 +68,18 @@ class Network:
 
     def get_player_positions(self):
         return self.send_command(GetPlayerPositionsCommand())
+
+    def send_multiplayer_command(self, command):
+        if isinstance(command, PlayerReadyCommand):
+            self.send_player_ready()
+        if isinstance(command, PlayerUnreadyCommand):
+            self.send_player_unready()
+
+    def send_player_ready(self):
+        return self.send_command(PlayerReadyCommand())
+
+    def send_player_ready(self):
+        return self.send_command(PlayerUnreadyCommand())
 
     # NOTE: this is not used, remove
     def send(self, data):

@@ -18,6 +18,8 @@ from networking.network_data import UpdatePlayerPositionsData, PlayerInfo, GameS
 
 from _thread import start_new_thread
 
+from game.event_manager import PlayerMultiplayerEvent
+
 
 class Client:
     def __init__(self, evManager, game, server, port):
@@ -28,8 +30,6 @@ class Client:
         # server assigns player ids
         # zoek naar de server, connect, get player_info
         self.network = Network(server, port)
-
-        self.num_notify = 0
 
         start_new_thread(self.listen, ())
 
@@ -47,6 +47,8 @@ class Client:
     def notify(self, event):
         if isinstance(event, PlayerInputEvent):
             self.network.send_player_input(event.player.name, event.command)
+        if isinstance(event, PlayerMultiplayerEvent):
+            self.network.send_multiplayer_command(event.command)
 
     def listen(self):
 

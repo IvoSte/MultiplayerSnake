@@ -9,8 +9,9 @@ from menus.multiplayerLoadMenu import MultiplayerLoadMenu
 
 
 class MenuHandler:
-    def __init__(self, game):
+    def __init__(self, game, evManager):
         self.game = game
+        self.evManager = evManager
         self.menu_stack = []  # so you don't quit out of all menus but you can traverse
         self.current_menu = None
 
@@ -36,4 +37,4 @@ class MenuHandler:
         self.current_menu = ControlsOptionsMenu(self.game)
 
     def multiplayer_menu(self):
-        self.current_menu = MultiplayerLoadMenu(self.game)
+        self.current_menu = MultiplayerLoadMenu(self.game, self.evManager)

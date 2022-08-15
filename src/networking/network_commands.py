@@ -49,11 +49,11 @@ class SendPlayerInputCommand(NetworkData):
     command: str = "send_player_input"
 
 
+# TODO The player name needs to be sent, more than one player needs to be able to ready and it should be player dependent
 @dataclass
 class PlayerReadyCommand(NetworkData):
     """Player is connected and ready for the game to start"""
 
-    player_name: str
     command: str = "player_ready"
 
 
@@ -61,5 +61,4 @@ class PlayerReadyCommand(NetworkData):
 class PlayerUnreadyCommand(NetworkData):
     """Player is connected and unredies for the game to start"""
 
-    player_name: str
     command: str = "player_unready"

@@ -5,7 +5,12 @@ from menus.baseMenu import BaseMenu
 from entities.player import Player
 from entities.snake import Snake
 from game.event_manager import EventManager, TickEvent, GetInputsEvent
-from game.event_manager import GeneralControlInputEvent, PlayerInputEvent, QuitEvent, PlayerInputFromServerEvent
+from game.event_manager import (
+    GeneralControlInputEvent,
+    PlayerInputEvent,
+    QuitEvent,
+    PlayerInputFromServerEvent,
+)
 from game.event_manager import GamePausedEvent, RestartGameEvent
 from game.event_manager import MenuControlInputEvent, GameEndedEvent
 from menus.menuHandler import MenuHandler
@@ -54,7 +59,7 @@ class GameEngine:
         self.evManager = evManager
         self.evManager.RegisterListener(self)
 
-        self.menuHandler = MenuHandler(self)
+        self.menuHandler = MenuHandler(self, evManager)
 
         self.model = GameModel()
 

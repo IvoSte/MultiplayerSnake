@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from controls.input_controls import Controls
 from entities.snake import Snake
+from networking.network_data_base import NetworkData
 
 
 @dataclass
@@ -38,11 +39,20 @@ class PlayerInputEvent(Event):
     name: str = "Player input event"
     player: Snake = None
     command: Controls = None
+
+
 @dataclass
 class PlayerInputFromServerEvent(Event):
     name: str = "Player input from server event"
     player: Snake = None
     command: Controls = None
+
+
+# TODO The player name needs to be sent, more than one player needs to be able to ready and it should be player dependent
+@dataclass
+class PlayerMultiplayerCommand(Event):
+    name: str = "Player command from game to client"
+    command: NetworkData = None
 
 
 @dataclass
