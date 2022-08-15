@@ -11,6 +11,9 @@ class MainMenu(BaseMenu):
             "options": MenuOption("options", function=self.options_function),
             "credits": MenuOption("credits", function=self.credits_function),
             "quit": MenuOption("quit", function=self.quit_function),
+            "multiplayer": MenuOption(
+                "multiplayer", function=self.multiplayer_function
+            ),
         }
         self.selected_option = self.options["start"]
 
@@ -29,3 +32,7 @@ class MainMenu(BaseMenu):
     def quit_function(self):
         self.quit_menu()
         self.game.quit_game()
+
+    def multiplayer_function(self):
+        self.quit_menu()
+        self.game.menuHandler.multiplayer_menu()

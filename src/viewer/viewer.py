@@ -6,6 +6,7 @@ from game.event_manager import TickEvent
 from game.event_manager import EventManager
 from game.game import GameEngine
 from game.event_manager import GamePausedEvent
+from viewer.menus.multiplayerLoadMenuView import MultiplayerLoadMenuView
 from viewer.menus.controlsOptionsMenuView import ControlsOptionsMenuView
 from viewer.menus.gameplayOptionsMenuView import GameplayOptionsMenuView
 from viewer.menus.graphicsOptionsMenuView import GraphicsOptionsMenuView
@@ -112,6 +113,7 @@ class Viewer:
             "ControlsOptionsMenu": ControlsOptionsMenuView,
             "GraphicsOptionsMenu": GraphicsOptionsMenuView,
             "PostGameMenu": PostGameMenuView,
+            "MultiplayerLoadMenu": MultiplayerLoadMenuView,
         }
 
         self.ui_player_information = UI_player_information(self)

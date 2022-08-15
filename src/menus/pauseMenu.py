@@ -13,6 +13,9 @@ class PauseMenu(BaseMenu):
             "restart": MenuOption("restart", function=self.restart_function),
             "options": MenuOption("options", function=self.options_function),
             "quit": MenuOption("quit", function=self.quit_function),
+            "multiplayer": MenuOption(
+                "multiplayer", function=self.multiplayer_function
+            ),
         }
         self.selected_option = self.options["unpause"]
 
@@ -30,6 +33,10 @@ class PauseMenu(BaseMenu):
     def quit_function(self):
         self.quit_menu()
         self.game.menuHandler.quit_game()
+
+    def multiplayer_function(self):
+        self.quit_menu()
+        self.game.menuHandler.multiplayer_menu()
 
 
 # when a menu is entered, it is created in game as Menu. Then, in viewer, viewer knows game is

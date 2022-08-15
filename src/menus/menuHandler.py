@@ -5,6 +5,7 @@ from menus.soundOptionsMenu import SoundOptionsMenu
 from menus.optionsMenu import OptionsMenu
 from menus.pauseMenu import PauseMenu
 from menus.postGameMenu import PostGameMenu
+from menus.multiplayerLoadMenu import MultiplayerLoadMenu
 
 
 class MenuHandler:
@@ -33,3 +34,6 @@ class MenuHandler:
 
     def controls_options_menu(self):
         self.current_menu = ControlsOptionsMenu(self.game)
+
+    def multiplayer_menu(self):
+        self.current_menu = MultiplayerLoadMenu(self.game)

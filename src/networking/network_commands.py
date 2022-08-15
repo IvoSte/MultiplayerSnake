@@ -47,3 +47,19 @@ class SendPlayerInputCommand(NetworkData):
     player_name: str
     player_input: Controls
     command: str = "send_player_input"
+
+
+@dataclass
+class PlayerReadyCommand(NetworkData):
+    """Player is connected and ready for the game to start"""
+
+    player_name: str
+    command: str = "player_ready"
+
+
+@dataclass
+class PlayerUnreadyCommand(NetworkData):
+    """Player is connected and unredies for the game to start"""
+
+    player_name: str
+    command: str = "player_unready"

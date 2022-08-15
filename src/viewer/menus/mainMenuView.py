@@ -38,4 +38,12 @@ class MainMenuView(BaseMenuView):
                 0.7,
                 Color.WHITE.value,
             ),
+            "multiplayer": MenuOptionView(
+                menu.options["multiplayer"],
+                "Multiplayer (temp)",
+                Color.WHITE.value,
+                0.5,
+                0.8,
+                Color.WHITE.value,
+            ),
         }
