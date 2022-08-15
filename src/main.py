@@ -8,11 +8,12 @@ from networking.client import Client
 def main():
     local = False
     abes_ip = "217.105.109.132"
+    laptop_abe_local_ip = "192.168.1.104"
     ivos_ip = "87.214.136.100"
     ivo_local = "192.168.1.101"
     local_ip = "localhost"
 
-    ip = ivo_local
+    ip = laptop_abe_local_ip
 
     if local:
         print(" -- Running in LOCAL SYSTEM mode.")
