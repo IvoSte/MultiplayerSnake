@@ -23,7 +23,7 @@ from networking.network_data import PlayerInfo, Message, UpdatePlayerPositionsDa
 
 
 class Server:
-    def __init__(self, server_ip="192.168.1.101", port=25565):
+    def __init__(self, server_ip="192.168.1.104", port=25565):
         print("initializing server")
         self.server_ip = server_ip
         self.port = port

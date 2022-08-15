@@ -19,6 +19,7 @@ class NetworkData:
     @classmethod
     def from_json(cls, json_string, type_def=None):
         """Return data object of input JSON object, used when receiving data."""
+        # print(json_string)
         data = json.loads(json_string)
         if type_def is None:
             type_def = cls.deduce_class_type(data["class_type"])
@@ -38,7 +39,7 @@ class NetworkData:
     @classmethod
     def from_packet(cls, packet, type_def=None):
         """Decode data object from received packet, first decoding from binary, then to data object from JSON"""
-        print(packet.decode())
+        # print(packet.decode())
         return cls.from_json(packet.decode(), type_def=type_def)
 
     @classmethod

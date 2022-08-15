@@ -35,7 +35,6 @@ class Controller:
 
     def parse_input(self):
         # Read each input
-
         for event in pygame.event.get():
             # If the game is closed
             if event.type == pygame.QUIT:
@@ -70,7 +69,6 @@ class Controller:
             # DO NOT REMOVE THIS CODE -- REMOVING CONTROLLER SUPPORT FOR NOW
             # TODO: This is needed to make the joystick work, but it makes no sense
             # This needs to be removed at some point (ideally)
-            # joysticks = [
             #     pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())
             # ]
             # if event.type == pygame.JOYAXISMOTION or event.type == pygame.JOYHATMOTION:

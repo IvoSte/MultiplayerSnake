@@ -5,7 +5,7 @@ from menus.baseMenu import BaseMenu
 from entities.player import Player
 from entities.snake import Snake
 from game.event_manager import EventManager, TickEvent, GetInputsEvent
-from game.event_manager import GeneralControlInputEvent, PlayerInputEvent, QuitEvent
+from game.event_manager import GeneralControlInputEvent, PlayerInputEvent, QuitEvent, PlayerInputFromServerEvent
 from game.event_manager import GamePausedEvent, RestartGameEvent
 from game.event_manager import MenuControlInputEvent, GameEndedEvent
 from menus.menuHandler import MenuHandler
@@ -225,6 +225,9 @@ class GameEngine:
             self.state.running = False
             # self.end_screen()
         if isinstance(event, PlayerInputEvent):
+            event.player.snake.set_command(event.command)
+
+        if isinstance(event, PlayerInputFromServerEvent):
             event.player.snake.set_command(event.command)
 
         if isinstance(event, GeneralControlInputEvent):

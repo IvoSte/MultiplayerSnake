@@ -38,6 +38,11 @@ class PlayerInputEvent(Event):
     name: str = "Player input event"
     player: Snake = None
     command: Controls = None
+@dataclass
+class PlayerInputFromServerEvent(Event):
+    name: str = "Player input from server event"
+    player: Snake = None
+    command: Controls = None
 
 
 @dataclass
@@ -114,8 +119,10 @@ class EventManager:
         It will be broadcast to all listeners.
         """
 
-        if not isinstance(event, TickEvent) and not isinstance(event, GetInputsEvent):
-            # print the event unless it is a TickEvent or getInpuntsEvent
-            print(event)
+        # if not isinstance(event, TickEvent) and not isinstance(event, GetInputsEvent):
+        #     # print the event unless it is a TickEvent or getInpuntsEvent
+        #     print(event)
         for listener in self.listeners:
+            # print("================================")
+            # print(event)
             listener.notify(event)
