@@ -8,7 +8,7 @@ from distutils.log import info
 import time
 import keyboard
 
-from game.event_manager import PlayerInputEvent
+from game.event_manager import PlayerInputEvent, PlayerInputFromServerEvent
 
 # Client depends on the Network
 # from src.game.game import GameEngine
@@ -28,6 +28,8 @@ class Client:
         # server assigns player ids
         # zoek naar de server, connect, get player_info
         self.network = Network(server, port)
+
+        self.num_notify = 0
 
         start_new_thread(self.listen, ())
 
@@ -69,7 +71,7 @@ class Client:
                     continue
 
                 self.evManager.Post(
-                    PlayerInputEvent(player=player, command=data.player_input)
+                    PlayerInputFromServerEvent(player=player, command=data.player_input)
                 )
 
     def keep_alive(self):
