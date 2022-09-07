@@ -21,6 +21,8 @@ class GameModel:
         self.snakes: list[Snake] = []
         self.food: list[Food] = []
 
+        self.connected_player_ids = []
+
     def set_game_timer(self, time):
         self.game_timer = time
 

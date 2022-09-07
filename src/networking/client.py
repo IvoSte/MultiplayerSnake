@@ -14,7 +14,12 @@ from game.event_manager import PlayerInputEvent, PlayerInputFromServerEvent
 # from src.game.game import GameEngine
 from networking.network import Network, NetworkData
 from networking.network_commands import SendPlayerInputCommand
-from networking.network_data import UpdatePlayerPositionsData, PlayerInfo, GameState
+from networking.network_data import (
+    UpdatePlayerPositionsData,
+    PlayerInfo,
+    GameState,
+    PlayerJoinedNotification,
+)
 
 from _thread import start_new_thread
 
@@ -30,6 +35,7 @@ class Client:
         # server assigns player ids
         # zoek naar de server, connect, get player_info
         self.network = Network(server, port)
+        self.network.join_game()
 
         start_new_thread(self.listen, ())
 
@@ -48,6 +54,7 @@ class Client:
         if isinstance(event, PlayerInputEvent):
             self.network.send_player_input(event.player.name, event.command)
         if isinstance(event, PlayerMultiplayerEvent):
+            print(f"received {event.command}")
             self.network.send_multiplayer_command(event.command)
 
     def listen(self):
@@ -59,6 +66,13 @@ class Client:
             if isinstance(data, UpdatePlayerPositionsData):
                 player_positions = data.player_list
                 print(f"CLIENT: player positions= {player_positions}")
+
+            if isinstance(data, PlayerJoinedNotification):
+                print("Player has joined!")
+                player_ids = data.total_player_list
+                self.game.model.connected_player_ids = data.total_player_list
+                print(f"{self.game.model.connected_player_ids=}")
+                print(f"CLIENT: full player list= {player_ids}")
 
             elif isinstance(data, GameState):
                 print(f"{data=}")

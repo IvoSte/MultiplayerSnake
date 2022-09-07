@@ -16,9 +16,11 @@ from networking.network_commands import (
     SendPlayerPositionCommand,
     GetPlayerPositionsCommand,
     SendPlayerInputCommand,
+    PlayerReadyCommand,
+    PlayerUnreadyCommand,
+    JoinGameCommand,
 )
 from networking.network_data import PlayerInfo
-from .network_commands import PlayerReadyCommand, PlayerUnreadyCommand
 
 
 class Network:
@@ -33,7 +35,7 @@ class Network:
 
     def get_player(self):
         # TODO: get player information as JSON
-        return self.player_id
+        return {"player_id": self.player_id.player_id}
 
     def connect_player(self):
         try:
@@ -50,6 +52,10 @@ class Network:
             return self.connection.send(command.to_packet())
         except Exception as e:
             print(f"Network error for {command.command}: {e}")
+
+    def join_game(self):
+        print(f"Player trying to join is {self.get_player()}")
+        return self.send_command(JoinGameCommand(self.get_player()))
 
     def get_player_id(self):
         return self.send_command(GetPlayerIDCommand())
@@ -78,8 +84,11 @@ class Network:
     def send_player_ready(self):
         return self.send_command(PlayerReadyCommand())
 
-    def send_player_ready(self):
+    def send_player_unready(self):
         return self.send_command(PlayerUnreadyCommand())
+
+    def start_game_if_players_are_ready(self):
+        pass
 
     # NOTE: this is not used, remove
     def send(self, data):

@@ -61,3 +61,11 @@ class PlayerUnreadyCommand(NetworkData):
     """Player is connected and unredies for the game to start"""
 
     command: str = "player_unready"
+
+
+@dataclass
+class JoinGameCommand(NetworkData):
+    """A socket connection has joined the game"""
+
+    player_info: dict
+    command: str = "join_game"

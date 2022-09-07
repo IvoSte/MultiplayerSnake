@@ -30,6 +30,14 @@ class UpdatePlayerPositionsData(NetworkData):
     #               score : score_value}
 
 
+@dataclass
+class PlayerJoinedNotification(NetworkData):
+    """Received by players from the server on connection join"""
+
+    player_id: str
+    total_player_list: list
+
+
 # @dataclass
 # class UpdateScoreData(NetworkData):
 #     player_id: str

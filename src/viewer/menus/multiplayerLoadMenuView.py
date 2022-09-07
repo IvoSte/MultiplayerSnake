@@ -1,10 +1,21 @@
-from .baseMenuView import BaseMenuView, MenuOptionView
+from .baseMenuView import BaseMenuView, MenuOptionView, TextView
 from viewer.colors import Color
 
 
 class MultiplayerLoadMenuView(BaseMenuView):
     def __init__(self, viewer, menu):
         BaseMenuView.__init__(self, viewer, menu)
+        self.text = {
+            "connected players:": TextView(
+                "connected players", Color.WHITE.value, 0.45, 0.6
+            )
+        }
+
+        for idx, player in enumerate(menu.connected_players):
+            self.text[player] = TextView(
+                player, Color.WHITE.value, 0.5, 0.6 + (0.05 * (idx + 1))
+            )
+
         self.options = {
             "ready check": MenuOptionView(
                 menu.options["ready check"],

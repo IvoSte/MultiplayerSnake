@@ -16,10 +16,16 @@ from networking.network_commands import (
     GetPlayerPositionsCommand,
     SendPlayerPositionCommand,
     SendPlayerInputCommand,
+    JoinGameCommand,
 )
 
 from networking.network_data_base import NetworkData
-from networking.network_data import PlayerInfo, Message, UpdatePlayerPositionsData
+from networking.network_data import (
+    PlayerInfo,
+    Message,
+    UpdatePlayerPositionsData,
+    PlayerJoinedNotification,
+)
 
 
 class Server:
@@ -60,17 +66,17 @@ class Server:
         # Players can connect to the server. A connection is added to the connection list
         # PLayers are assigned a rondom ID
         # A thread is spawned per player
-        while True:
-            try:
+        try:
+            while True:
                 conn, addr = self.server.accept()
                 # Generate random player id
                 player_id = str(uuid.uuid4())
                 self.connections.add((conn, addr, player_id))
 
                 start_new_thread(self.client_thread, (conn, player_id))
-            except KeyboardInterrupt:
-                print("Shutting down...")
-                exit()
+        except KeyboardInterrupt:
+            print("Shutting down...")
+            exit()
 
     def send_to_all(self, packet: bytes):
         for (conn, _, _) in self.connections:
@@ -79,6 +85,19 @@ class Server:
     def create_game(self, player_id):
         # TODO: create game
         raise NotImplementedError("")
+
+    def join_game(self, data):
+        # TODO: Make different games instead of one hardcoded one
+        player_id = data.player_info["player_id"]
+        if "FIRST_GAME" not in self.games:
+            self.games["FIRST_GAME"] = [player_id]
+        else:
+            self.games["FIRST_GAME"].append(player_id)
+        print(f"{self.games=}")
+
+        self.send_to_all(
+            PlayerJoinedNotification(player_id, self.games["FIRST_GAME"]).to_packet()
+        )
 
     def client_thread(self, connection, player_id):
         """For each connected player, spawn a client thread. This now listens to
@@ -93,10 +112,16 @@ class Server:
             if not data:
                 continue
 
-            print(f"{data.command} {data.player_input}")
+            print(f"-- Network Data Command: {data.command}")
+
+            # print(f"{data.command} {data.player_input}")
 
             if isinstance(data, CreateGameCommand):
                 self.create_game(player_id)
+
+            if isinstance(data, JoinGameCommand):
+                print("Joining Game Command logic")
+                self.join_game(data)
 
             elif isinstance(data, GetGameStateCommand):
                 msg = Message(
@@ -132,8 +157,8 @@ if __name__ == "__main__":
     abes_ip = "217.105.109.132"
     laptop_abe_local_ip = "192.168.1.104"
     ivos_ip = "87.214.136.100"
-    ivo_local = "192.168.1.101"
+    ivo_local = "192.168.1.124"
     local_ip = "localhost"
 
-    server = Server(server_ip="localhost")
+    server = Server(server_ip=ivo_local)
     server.listen_for_connections()
