@@ -10,7 +10,7 @@ class MultiplayerLoadMenu(BaseMenu):
     def __init__(self, game, evManager):
         BaseMenu.__init__(self, game)
         self.name = "MultiplayerLoadMenu"
-        self.connected_players = game.model.connected_player_ids
+        self.connected_players = []
         self.options = {
             "ready check": MenuOption(
                 "ready check",
@@ -20,6 +20,9 @@ class MultiplayerLoadMenu(BaseMenu):
         }
         self.selected_option = self.options["ready check"]
         self.evManager = evManager
+
+    def set_connected_players(self):
+        self.connected_players = self.game.model.connected_player_ids
 
     def set_player_ready(self):
         if self.options["ready check"].optionValue.value:

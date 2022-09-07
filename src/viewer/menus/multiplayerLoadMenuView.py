@@ -11,6 +11,8 @@ class MultiplayerLoadMenuView(BaseMenuView):
             )
         }
 
+        self.menu.set_connected_players()  # TODO Dirty, please check if there is another way
+        print(f"connected players : {menu.connected_players}")
         for idx, player in enumerate(menu.connected_players):
             self.text[player] = TextView(
                 player, Color.WHITE.value, 0.5, 0.6 + (0.05 * (idx + 1))
