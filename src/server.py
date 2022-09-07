@@ -129,5 +129,11 @@ class Server:
 
 
 if __name__ == "__main__":
-    server = Server()
+    abes_ip = "217.105.109.132"
+    laptop_abe_local_ip = "192.168.1.104"
+    ivos_ip = "87.214.136.100"
+    ivo_local = "192.168.1.101"
+    local_ip = "localhost"
+
+    server = Server(server_ip="localhost")
     server.listen_for_connections()

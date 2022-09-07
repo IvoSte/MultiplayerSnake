@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from networking.network_data_base import NetworkData
-from game.event_manager import PlayerInputEvent
 from controls.input_controls import Controls
 
 ## Naming convention:

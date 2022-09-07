@@ -50,7 +50,7 @@ class PlayerInputFromServerEvent(Event):
 
 # TODO The player name needs to be sent, more than one player needs to be able to ready and it should be player dependent
 @dataclass
-class PlayerMultiplayerCommand(Event):
+class PlayerMultiplayerEvent(Event):
     name: str = "Player command from game to client"
     command: NetworkData = None
 

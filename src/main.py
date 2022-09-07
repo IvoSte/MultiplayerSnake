@@ -13,7 +13,7 @@ def main():
     ivo_local = "192.168.1.101"
     local_ip = "localhost"
 
-    ip = laptop_abe_local_ip
+    ip = local_ip
 
     if local:
         print(" -- Running in LOCAL SYSTEM mode.")
