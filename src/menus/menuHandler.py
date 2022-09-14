@@ -6,6 +6,8 @@ from menus.optionsMenu import OptionsMenu
 from menus.pauseMenu import PauseMenu
 from menus.postGameMenu import PostGameMenu
 from menus.multiplayerLoadMenu import MultiplayerLoadMenu
+from menus.mainMenu import MainMenu
+from menus.multiplayerRoomMenu import MultiplayerRoomMenu
 
 
 class MenuHandler:
@@ -14,6 +16,9 @@ class MenuHandler:
         self.evManager = evManager
         self.menu_stack = []  # so you don't quit out of all menus but you can traverse
         self.current_menu = None
+
+    def main_menu(self):
+        self.current_menu = MainMenu(self.game)
 
     def postgame_menu(self):
         self.current_menu = PostGameMenu(self.game)
@@ -38,3 +43,6 @@ class MenuHandler:
 
     def multiplayer_menu(self):
         self.current_menu = MultiplayerLoadMenu(self.game, self.evManager)
+
+    def multiplayer_room_menu(self):
+        self.current_menu = MultiplayerRoomMenu(self.game, self.evManager)

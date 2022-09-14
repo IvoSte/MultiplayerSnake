@@ -26,11 +26,6 @@ class DisconnectPlayerCommand(NetworkData):
 
 
 @dataclass
-class CreateGameCommand(NetworkData):
-    command: str = "create_game"
-
-
-@dataclass
 class GetPlayerPositionsCommand(NetworkData):
     command: str = "get_player_positions"
 
@@ -64,8 +59,17 @@ class PlayerUnreadyCommand(NetworkData):
 
 
 @dataclass
-class JoinGameCommand(NetworkData):
-    """A socket connection has joined the game"""
+class CreateRoomCommand(NetworkData):
+    """Create a new room on the server"""
 
     player_info: dict
-    command: str = "join_game"
+    command: str = "create_room"
+
+
+@dataclass
+class JoinRoomCommand(NetworkData):
+    """A socket connection has joined the game"""
+
+    room_code: str
+    player_info: dict
+    command: str = "join_room"

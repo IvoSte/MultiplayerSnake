@@ -4,20 +4,22 @@ if __name__ == "__main__":
     sys.path.append("..")
 
 
-from _thread import start_new_thread
+import threading
 import socket
 import uuid
 import json
 from networking.network_commands import (
-    CreateGameCommand,
+    CreateRoomCommand,
     DisconnectPlayerCommand,
     GetGameStateCommand,
     GetPlayerIDCommand,
     GetPlayerPositionsCommand,
     SendPlayerPositionCommand,
     SendPlayerInputCommand,
-    JoinGameCommand,
+    JoinRoomCommand,
 )
+
+from networking.room_manager import RoomManager
 
 from networking.network_data_base import NetworkData
 from networking.network_data import (
@@ -25,6 +27,8 @@ from networking.network_data import (
     Message,
     UpdatePlayerPositionsData,
     PlayerJoinedNotification,
+    RoomJoinedData,
+    RoomCreatedData,
 )
 
 
@@ -38,6 +42,7 @@ class Server:
         self.bind_server(self.addr)
         self.connections = set()
         self.games = {}
+        self.room_manager = RoomManager()
         # self.log = []
 
     def bind_server(self, addr):
@@ -66,38 +71,44 @@ class Server:
         # Players can connect to the server. A connection is added to the connection list
         # PLayers are assigned a rondom ID
         # A thread is spawned per player
-        try:
-            while True:
+        while True:
+            try:
                 conn, addr = self.server.accept()
-                # Generate random player id
-                player_id = str(uuid.uuid4())
-                self.connections.add((conn, addr, player_id))
+            except KeyboardInterrupt:
+                print("Shutting down...")
+                exit()
+            # Generate random player id
+            player_id = str(uuid.uuid4())
+            self.connections.add((conn, addr, player_id))
 
-                start_new_thread(self.client_thread, (conn, player_id))
-        except KeyboardInterrupt:
-            print("Shutting down...")
-            exit()
+            t = threading.Thread(target=self.client_thread, args=(conn, player_id))
+            t.daemon = True
+            t.start()
+
+    def send_to_room(self, packet: bytes):
+        raise NotImplementedError("Send to room")
 
     def send_to_all(self, packet: bytes):
         for (conn, _, _) in self.connections:
             conn.send(packet)
 
-    def create_game(self, player_id):
-        # TODO: create game
-        raise NotImplementedError("")
+    def create_room(self, conn, data):
+        print("Creating room...")
+        room_code, _ = self.room_manager.create_room()
+        self.room_manager.join_room(room_code, data.player_info)
+        conn.send(RoomCreatedData(room_code).to_packet())
 
-    def join_game(self, data):
+    def join_room(self, conn, data):
+        print("Joining room...")
         # TODO: Make different games instead of one hardcoded one
-        player_id = data.player_info["player_id"]
-        if "FIRST_GAME" not in self.games:
-            self.games["FIRST_GAME"] = [player_id]
-        else:
-            self.games["FIRST_GAME"].append(player_id)
-        print(f"{self.games=}")
+        self.room_manager.join_room(data.room_code, data.player_info)
 
         self.send_to_all(
-            PlayerJoinedNotification(player_id, self.games["FIRST_GAME"]).to_packet()
+            PlayerJoinedNotification(
+                data.player_info, self.room_manager.get_room(data.room_code).player_list
+            ).to_packet()
         )
+        conn.send(RoomJoinedData(data.room_code).to_packet())
 
     def client_thread(self, connection, player_id):
         """For each connected player, spawn a client thread. This now listens to
@@ -116,12 +127,12 @@ class Server:
 
             # print(f"{data.command} {data.player_input}")
 
-            if isinstance(data, CreateGameCommand):
-                self.create_game(player_id)
+            if isinstance(data, CreateRoomCommand):
+                self.create_room(connection, data)
 
-            if isinstance(data, JoinGameCommand):
+            if isinstance(data, JoinRoomCommand):
                 print("Joining Game Command logic")
-                self.join_game(data)
+                self.join_room(connection, data)
 
             elif isinstance(data, GetGameStateCommand):
                 msg = Message(

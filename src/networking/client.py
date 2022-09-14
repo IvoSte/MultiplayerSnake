@@ -19,9 +19,11 @@ from networking.network_data import (
     PlayerInfo,
     GameState,
     PlayerJoinedNotification,
+    RoomJoinedData,
+    RoomCreatedData,
 )
 
-from _thread import start_new_thread
+import threading
 
 from game.event_manager import PlayerMultiplayerEvent
 
@@ -35,9 +37,10 @@ class Client:
         # server assigns player ids
         # zoek naar de server, connect, get player_info
         self.network = Network(server, port)
-        self.network.join_game()
 
-        start_new_thread(self.listen, ())
+        t = threading.Thread(target=self.listen, args=())
+        t.daemon = True
+        t.start()
 
         # receive game state, send to viewer
         # self.game_state = None
@@ -66,6 +69,16 @@ class Client:
             if isinstance(data, UpdatePlayerPositionsData):
                 player_positions = data.player_list
                 print(f"CLIENT: player positions= {player_positions}")
+
+            if isinstance(data, RoomCreatedData):
+                print(f"Created and connected to room with room code {data.room_code}")
+                self.game.model.room_code = data.room_code
+                self.game.menuHandler.multiplayer_room_menu()
+
+            if isinstance(data, RoomJoinedData):
+                print(f"Connected to room with room code {data.room_code}")
+                self.game.model.room_code = data.room_code
+                self.game.menuHandler.multiplayer_room_menu()
 
             if isinstance(data, PlayerJoinedNotification):
                 print("Player has joined!")

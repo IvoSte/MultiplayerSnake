@@ -124,6 +124,9 @@ class GameEngine:
         )
         self.model.set_game_timer((GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
 
+        # Set the main menu as the first view
+        self.menuHandler.main_menu()
+
     def reset_game(self):
 
         # Setup enviroment

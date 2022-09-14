@@ -24,6 +24,9 @@ class Player:
     def set_snake(self, snake):
         self.snake = snake
 
+    def to_json(self):
+        return {"name": self.name}
+
     def report(self):
         print(f"Player report: {self.name}")
 

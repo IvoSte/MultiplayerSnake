@@ -9,7 +9,6 @@ import json
 
 from networking.network_data_base import NetworkData
 from networking.network_commands import (
-    CreateGameCommand,
     DisconnectPlayerCommand,
     GetGameStateCommand,
     GetPlayerIDCommand,
@@ -18,7 +17,7 @@ from networking.network_commands import (
     SendPlayerInputCommand,
     PlayerReadyCommand,
     PlayerUnreadyCommand,
-    JoinGameCommand,
+    JoinRoomCommand,
 )
 from networking.network_data import PlayerInfo
 
@@ -53,10 +52,6 @@ class Network:
         except Exception as e:
             print(f"Network error for {command.command}: {e}")
 
-    def join_game(self):
-        print(f"Player trying to join is {self.get_player()}")
-        return self.send_command(JoinGameCommand(self.get_player()))
-
     def get_player_id(self):
         return self.send_command(GetPlayerIDCommand())
 
@@ -66,9 +61,6 @@ class Network:
     def disconnect_client(self, player_id):
         return self.send_command(DisconnectPlayerCommand(player_id))
 
-    def create_game(self):
-        return self.send_command(CreateGameCommand())
-
     def send_player_position(self, player_position: list):
         return self.send_command(SendPlayerPositionCommand(player_position))
 
@@ -76,16 +68,10 @@ class Network:
         return self.send_command(GetPlayerPositionsCommand())
 
     def send_multiplayer_command(self, command):
-        if isinstance(command, PlayerReadyCommand):
-            self.send_player_ready()
-        if isinstance(command, PlayerUnreadyCommand):
-            self.send_player_unready()
-
-    def send_player_ready(self):
-        return self.send_command(PlayerReadyCommand())
-
-    def send_player_unready(self):
-        return self.send_command(PlayerUnreadyCommand())
+        if not isinstance(command, NetworkData):
+            print("Received something that was not an instance of network data")
+            return
+        return self.send_command(command)
 
     def start_game_if_players_are_ready(self):
         pass

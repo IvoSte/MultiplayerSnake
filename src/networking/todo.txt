@@ -1,4 +1,0 @@
-- TODO Game to state encoder/decoder
-- TODO run game on server
-- TODO Client sends input to server
-- TODO Later dont send the entire game, just the new state delta

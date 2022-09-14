@@ -22,6 +22,18 @@ class Message(NetworkData):
 
 
 @dataclass
+class RoomJoinedData(NetworkData):
+    room_code: str
+    command: str = "room_joined_data"
+
+
+@dataclass
+class RoomCreatedData(NetworkData):
+    room_code: str
+    command: str = "room_created_data"
+
+
+@dataclass
 class UpdatePlayerPositionsData(NetworkData):
     """Received by players from the server"""
 
@@ -34,7 +46,7 @@ class UpdatePlayerPositionsData(NetworkData):
 class PlayerJoinedNotification(NetworkData):
     """Received by players from the server on connection join"""
 
-    player_id: str
+    player: dict
     total_player_list: list
 
 
