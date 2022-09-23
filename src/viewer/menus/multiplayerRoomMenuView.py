@@ -8,7 +8,9 @@ class MultiplayerRoomMenuView(BaseMenuView):
         self.text = {
             "connected players:": TextView(
                 "connected players", Color.WHITE.value, 0.45, 0.6
-            )
+            ),
+            "room code:": TextView("room code", Color.WHITE.value, 0.45, 0.3),
+            "ROOM_CODE": TextView(self.menu.room_code, Color.WHITE.value, 0.55, 0.3),
         }
 
         self.menu.set_connected_players()  # TODO Dirty, please check if there is another way
@@ -25,6 +27,14 @@ class MultiplayerRoomMenuView(BaseMenuView):
                 Color.WHITE.value,
                 0.5,
                 0.4,
+                Color.WHITE.value,
+            ),
+            "start game": MenuOptionView(
+                menu.options["start game"],
+                "Start Game",
+                Color.WHITE.value,
+                0.5,
+                0.45,
                 Color.WHITE.value,
             ),
         }

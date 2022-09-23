@@ -135,8 +135,12 @@ class Server:
             try:
                 data = NetworkData.from_packet(connection.recv(4096))
             except ConnectionResetError:
-                log.error(f"Remote host lost connection")
+                log.warning(f"Remote host lost connection")
                 break
+            except Exception as e:
+                log.error(
+                    f"Client thread encountered exception: {e}\nTrying to keep alive..."
+                )
             # If nothing got sent, wait
             if not data:
                 continue

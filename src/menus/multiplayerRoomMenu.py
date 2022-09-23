@@ -15,6 +15,8 @@ class MultiplayerRoomMenu(BaseMenu):
         BaseMenu.__init__(self, game)
         self.name = "MultiplayerRoomMenu"
         self.connected_players = []
+        self.room_code = self.game.model.room_code
+        print(f"{self.room_code = }")
         self.options = {
             "ready check": MenuOption(
                 "ready check",
@@ -40,7 +42,9 @@ class MultiplayerRoomMenu(BaseMenu):
             ## Send the command to the client here.
 
     def start_game(self):
-        self.evManager.Post(PlayerMultiplayerEvent(command=StartGameCommand()))
+        self.evManager.Post(
+            PlayerMultiplayerEvent(command=StartGameCommand(self.room_code))
+        )
         # send message to server to check if all connected players are ready
         # receive reply yes or no
         # if yes, send start game command
