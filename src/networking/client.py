@@ -19,6 +19,8 @@ from networking.network_data import (
     PlayerInfo,
     GameState,
     PlayerJoinedNotification,
+    ErrorNotification,
+    GameStartNotification,
     RoomJoinedData,
     RoomCreatedData,
 )
@@ -80,12 +82,22 @@ class Client:
                 self.game.model.room_code = data.room_code
                 self.game.menuHandler.multiplayer_room_menu()
 
+            if isinstance(data, GameStartNotification):
+                print(f"Game has started...")
+                # TODO: Start game
+                self.game.init_game()
+                # NOTE: Feels a bit iffy, but maybe this is how it should be
+
             if isinstance(data, PlayerJoinedNotification):
                 print("Player has joined!")
                 player_ids = data.total_player_list
                 self.game.model.connected_player_ids = data.total_player_list
                 print(f"{self.game.model.connected_player_ids=}")
                 print(f"CLIENT: full player list= {player_ids}")
+
+            if isinstance(data, ErrorNotification):
+                print("ERROR - We received an error:")
+                print(data.error_message)
 
             elif isinstance(data, GameState):
                 print(f"{data=}")

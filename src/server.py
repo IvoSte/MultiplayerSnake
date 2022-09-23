@@ -5,6 +5,7 @@ if __name__ == "__main__":
 
 
 import threading
+from logger import log
 import socket
 import uuid
 import json
@@ -16,6 +17,7 @@ from networking.network_commands import (
     GetPlayerPositionsCommand,
     SendPlayerPositionCommand,
     SendPlayerInputCommand,
+    StartGameCommand,
     JoinRoomCommand,
 )
 
@@ -27,6 +29,8 @@ from networking.network_data import (
     Message,
     UpdatePlayerPositionsData,
     PlayerJoinedNotification,
+    ErrorNotification,
+    GameStartNotification,
     RoomJoinedData,
     RoomCreatedData,
 )
@@ -50,7 +54,7 @@ class Server:
         try:
             self.server.bind(addr)
         except Exception as e:
-            print(f"Failed to bind server: {e}")
+            raise Exception(f"Failed to bind server: {e}")
         print("Server has been bounded")
         self.server.listen()
 
@@ -86,7 +90,7 @@ class Server:
             t.start()
 
     def send_to_room(self, packet: bytes):
-        raise NotImplementedError("Send to room")
+        raise NotImplementedError()
 
     def send_to_all(self, packet: bytes):
         for (conn, _, _) in self.connections:
@@ -103,9 +107,19 @@ class Server:
         # TODO: Make different games instead of one hardcoded one
         self.room_manager.join_room(data.room_code, data.player_info)
 
+        player_room = self.room_manager.get_room(data.room_code)
+        if player_room is None:
+            # TODO: Send to connection
+            conn.send(
+                ErrorNotification(
+                    f"Failed to connect to room - no room with room code {data.room_code} found."
+                ).to_packet()
+            )
+            return
+
         self.send_to_all(
             PlayerJoinedNotification(
-                data.player_info, self.room_manager.get_room(data.room_code).player_list
+                data.player_info, player_room.player_list
             ).to_packet()
         )
         conn.send(RoomJoinedData(data.room_code).to_packet())
@@ -118,7 +132,11 @@ class Server:
         connection.send(PlayerInfo(player_id).to_packet())
 
         while True:
-            data = NetworkData.from_packet(connection.recv(4096))
+            try:
+                data = NetworkData.from_packet(connection.recv(4096))
+            except ConnectionResetError:
+                log.error(f"Remote host lost connection")
+                break
             # If nothing got sent, wait
             if not data:
                 continue
@@ -133,6 +151,12 @@ class Server:
             if isinstance(data, JoinRoomCommand):
                 print("Joining Game Command logic")
                 self.join_room(connection, data)
+
+            if isinstance(data, StartGameCommand):
+                print("Start game, but first check if players in room are all ready")
+                if self.room_manager.all_ready_in_room(data.room_code):
+                    # TODO: Replace with send_to_room
+                    connection.send_to_all(GameStartNotification().to_packet())
 
             elif isinstance(data, GetGameStateCommand):
                 msg = Message(

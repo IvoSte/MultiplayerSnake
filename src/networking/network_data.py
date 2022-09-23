@@ -50,6 +50,20 @@ class PlayerJoinedNotification(NetworkData):
     total_player_list: list
 
 
+@dataclass
+class GameStartNotification(NetworkData):
+    """Received by players from the server on connection join"""
+
+    start_game: bool = True
+
+
+@dataclass
+class ErrorNotification(NetworkData):
+    """Received by players from the server on connection join"""
+
+    error_message: str
+
+
 # @dataclass
 # class UpdateScoreData(NetworkData):
 #     player_id: str
