@@ -127,6 +127,11 @@ class GameEngine:
         # Set the main menu as the first view
         self.menuHandler.main_menu()
 
+    def start_game(self):
+        # TODO: Rename to be more explicit (start_game leads to in-game, rather than menu)
+        self.init_game()
+        self.menuHandler.quit_menu()
+
     def reset_game(self):
 
         # Setup enviroment

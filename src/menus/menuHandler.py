@@ -17,6 +17,11 @@ class MenuHandler:
         self.menu_stack = []  # so you don't quit out of all menus but you can traverse
         self.current_menu = None
 
+    def quit_menu(self):
+        self.current_menu = None
+        self.game.state.in_menu = False
+        self.game.state.in_game = True
+
     def main_menu(self):
         self.current_menu = MainMenu(self.game)
 

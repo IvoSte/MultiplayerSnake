@@ -91,7 +91,7 @@ class Server:
             t.daemon = True
             t.start()
 
-    def send_to_room(self, packet: bytes):
+    def send_to_room(self, room_code: str, packet: bytes):
         raise NotImplementedError()
 
     def send_to_all(self, packet: bytes):
@@ -174,7 +174,7 @@ class Server:
                 if self.room_manager.all_ready_in_room(data.room_code):
                     print("All players in room are ready")
                     # TODO: Replace with send_to_room
-                    connection.send_to_all(GameStartNotification().to_packet())
+                    self.send_to_all(GameStartNotification().to_packet())
 
             elif isinstance(data, GetGameStateCommand):
                 msg = Message(
