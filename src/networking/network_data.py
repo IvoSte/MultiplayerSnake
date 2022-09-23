@@ -52,9 +52,17 @@ class PlayerJoinedNotification(NetworkData):
 
 @dataclass
 class GameStartNotification(NetworkData):
-    """Received by players from the server on connection join"""
+    """Notification to notify everyone of game start"""
 
     start_game: bool = True
+
+
+@dataclass
+class ReadyCheckUpdatedNotification(NetworkData):
+    """Notify players of a change to someones ready status"""
+
+    player_name: str
+    ready_status: bool
 
 
 @dataclass

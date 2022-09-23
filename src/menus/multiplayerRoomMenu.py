@@ -14,7 +14,14 @@ class MultiplayerRoomMenu(BaseMenu):
     def __init__(self, game, evManager):
         BaseMenu.__init__(self, game)
         self.name = "MultiplayerRoomMenu"
-        self.connected_players = []
+        # self.connected_players = {
+        #     PLAYER_ID: {
+        #         "name": "",
+        #         "color": "",
+        #         "ready_status": False,
+        #     }
+        # }
+        self.connected_players = {}
         self.room_code = self.game.model.room_code
         print(f"{self.room_code = }")
         self.options = {

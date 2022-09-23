@@ -19,6 +19,7 @@ from networking.network_data import (
     PlayerInfo,
     GameState,
     PlayerJoinedNotification,
+    ReadyCheckUpdatedNotification,
     ErrorNotification,
     GameStartNotification,
     RoomJoinedData,
@@ -85,14 +86,21 @@ class Client:
             if isinstance(data, GameStartNotification):
                 print(f"Game has started...")
                 # TODO: Start game
-                self.game.init_game()
+                self.game.start_game()
                 # NOTE: Feels a bit iffy, but maybe this is how it should be
+
+            if isinstance(data, ReadyCheckUpdatedNotification):
+                print(f"Ready check was updated")
+                for player in self.game.model.connected_player_ids:
+                    if player["name"] == data.player_name:
+                        self.game.model.connected_player_ids[player["name"]][
+                            "is_ready"
+                        ] = data.ready_status
 
             if isinstance(data, PlayerJoinedNotification):
                 print("Player has joined!")
                 player_ids = data.total_player_list
                 self.game.model.connected_player_ids = data.total_player_list
-                print(f"{self.game.model.connected_player_ids=}")
                 print(f"CLIENT: full player list= {player_ids}")
 
             if isinstance(data, ErrorNotification):

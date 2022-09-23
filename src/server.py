@@ -33,6 +33,7 @@ from networking.network_data import (
     PlayerJoinedNotification,
     ErrorNotification,
     GameStartNotification,
+    ReadyCheckUpdatedNotification,
     RoomJoinedData,
     RoomCreatedData,
 )
@@ -136,6 +137,72 @@ class Server:
         while True:
             try:
                 data = NetworkData.from_packet(connection.recv(4096))
+                # If nothing got sent, wait
+                if not data:
+                    continue
+
+                print(f"-- Network Data Command: {data.command}")
+
+                # print(f"{data.command} {data.player_input}")
+
+                if isinstance(data, CreateRoomCommand):
+                    self.create_room(connection, data)
+
+                elif isinstance(data, PlayerReadyCommand):
+                    self.room_manager.set_player_ready_in_room(
+                        data.room_code, data.player_name
+                    )
+                    self.send_to_all(
+                        ReadyCheckUpdatedNotification(data.player_name, True)
+                    )
+
+                elif isinstance(data, PlayerUnreadyCommand):
+                    self.room_manager.set_player_unready_in_room(
+                        data.room_code, data.player_name
+                    )
+                    self.send_to_all(
+                        ReadyCheckUpdatedNotification(data.player_name, False)
+                    )
+
+                elif isinstance(data, JoinRoomCommand):
+                    print("Joining Game Command logic")
+                    self.join_room(connection, data)
+
+                elif isinstance(data, StartGameCommand):
+                    print("Trying to start game")
+                    print("Checking if players in room are ready...")
+                    if self.room_manager.all_ready_in_room(data.room_code):
+                        print("All players in room are ready")
+                        # TODO: Replace with send_to_room
+                        self.send_to_all(GameStartNotification().to_packet())
+
+                elif isinstance(data, GetGameStateCommand):
+                    msg = Message(
+                        "Ivo kan beter smashen dan sommigen maar niet beter dan anderen."
+                    )
+                    connection.send(msg.to_packet())
+
+                elif isinstance(data, GetPlayerIDCommand):
+                    connection.send(PlayerInfo(player_id).to_packet())
+
+                elif isinstance(data, SendPlayerPositionCommand):
+                    print(f"SERVER: received player position: {data.player_position}")
+                    # TODO: Update gamestate of server for player positions
+
+                # TODO: make command
+                elif isinstance(data, GetPlayerPositionsCommand):
+                    # TODO: Get player positions from gamestate
+                    player_positions = {1: [1, 2, 3, 4, 5]}
+                    connection.send(
+                        UpdatePlayerPositionsData(player_positions).to_packet()
+                    )
+
+                elif isinstance(data, DisconnectPlayerCommand):
+                    self.disconnect_player(data.player_id)
+
+                elif isinstance(data, SendPlayerInputCommand):
+                    self.send_to_all(data.to_packet())
+
             except ConnectionResetError:
                 log.warning(f"Remote host lost connection")
                 break
@@ -143,63 +210,6 @@ class Server:
                 log.error(
                     f"Client thread encountered exception: {e}\nTrying to keep alive..."
                 )
-            # If nothing got sent, wait
-            if not data:
-                continue
-
-            print(f"-- Network Data Command: {data.command}")
-
-            # print(f"{data.command} {data.player_input}")
-
-            if isinstance(data, CreateRoomCommand):
-                self.create_room(connection, data)
-
-            elif isinstance(data, PlayerReadyCommand):
-                self.room_manager.set_player_ready_in_room(
-                    data.room_code, data.player_name
-                )
-
-            elif isinstance(data, PlayerUnreadyCommand):
-                self.room_manager.set_player_unready_in_room(
-                    data.room_code, data.player_name
-                )
-
-            elif isinstance(data, JoinRoomCommand):
-                print("Joining Game Command logic")
-                self.join_room(connection, data)
-
-            elif isinstance(data, StartGameCommand):
-                print("Trying to start game")
-                print("Checking if players in room are ready...")
-                if self.room_manager.all_ready_in_room(data.room_code):
-                    print("All players in room are ready")
-                    # TODO: Replace with send_to_room
-                    self.send_to_all(GameStartNotification().to_packet())
-
-            elif isinstance(data, GetGameStateCommand):
-                msg = Message(
-                    "Ivo kan beter smashen dan sommigen maar niet beter dan anderen."
-                )
-                connection.send(msg.to_packet())
-
-            elif isinstance(data, GetPlayerIDCommand):
-                connection.send(PlayerInfo(player_id).to_packet())
-
-            elif isinstance(data, SendPlayerPositionCommand):
-                print(f"SERVER: received player position: {data.player_position}")
-                # TODO: Update gamestate of server for player positions
-
-            # TODO: make command
-            elif isinstance(data, GetPlayerPositionsCommand):
-                # TODO: Get player positions from gamestate
-                player_positions = {1: [1, 2, 3, 4, 5]}
-                connection.send(UpdatePlayerPositionsData(player_positions).to_packet())
-
-            elif isinstance(data, DisconnectPlayerCommand):
-                self.disconnect_player(data.player_id)
-
-            elif isinstance(data, SendPlayerInputCommand):
-                self.send_to_all(data.to_packet())
 
     def ping_connections(self):
         for connection in self.connections:

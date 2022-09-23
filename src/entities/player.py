@@ -20,12 +20,13 @@ class Player:
         self.snake = snake
         self.snake_colormap = snake_colormap
         self.player_statistics: PlayerStatistics = PlayerStatistics()
+        self.is_ready = False
 
     def set_snake(self, snake):
         self.snake = snake
 
     def to_json(self):
-        return {"name": self.name}
+        return {"name": self.name, "is_ready": self.is_ready}
 
     def report(self):
         print(f"Player report: {self.name}")

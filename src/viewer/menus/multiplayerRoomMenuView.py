@@ -14,10 +14,13 @@ class MultiplayerRoomMenuView(BaseMenuView):
         }
 
         self.menu.set_connected_players()  # TODO Dirty, please check if there is another way
-        # print(menu.connected_players)
+
         for idx, player in enumerate(menu.connected_players):
             self.text[player["name"]] = TextView(
                 player["name"], Color.WHITE.value, 0.5, 0.6 + (0.05 * (idx + 1))
+            )
+            self.text[player["name"] + "_is_ready"] = TextView(
+                player["is_ready"], Color.WHITE.value, 0.6, 0.6 + (0.05 * (idx + 1))
             )
 
         self.options = {
