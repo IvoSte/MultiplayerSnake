@@ -17,6 +17,8 @@ from networking.network_commands import (
     GetPlayerPositionsCommand,
     SendPlayerPositionCommand,
     SendPlayerInputCommand,
+    PlayerReadyCommand,
+    PlayerUnreadyCommand,
     StartGameCommand,
     JoinRoomCommand,
 )
@@ -152,13 +154,25 @@ class Server:
             if isinstance(data, CreateRoomCommand):
                 self.create_room(connection, data)
 
-            if isinstance(data, JoinRoomCommand):
+            elif isinstance(data, PlayerReadyCommand):
+                self.room_manager.set_player_ready_in_room(
+                    data.room_code, data.player_name
+                )
+
+            elif isinstance(data, PlayerUnreadyCommand):
+                self.room_manager.set_player_unready_in_room(
+                    data.room_code, data.player_name
+                )
+
+            elif isinstance(data, JoinRoomCommand):
                 print("Joining Game Command logic")
                 self.join_room(connection, data)
 
-            if isinstance(data, StartGameCommand):
-                print("Start game, but first check if players in room are all ready")
+            elif isinstance(data, StartGameCommand):
+                print("Trying to start game")
+                print("Checking if players in room are ready...")
                 if self.room_manager.all_ready_in_room(data.room_code):
+                    print("All players in room are ready")
                     # TODO: Replace with send_to_room
                     connection.send_to_all(GameStartNotification().to_packet())
 

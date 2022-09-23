@@ -48,6 +48,8 @@ class SendPlayerInputCommand(NetworkData):
 class PlayerReadyCommand(NetworkData):
     """Player is connected and ready for the game to start"""
 
+    room_code: str
+    player_name: str
     command: str = "player_ready"
 
 
@@ -55,6 +57,8 @@ class PlayerReadyCommand(NetworkData):
 class PlayerUnreadyCommand(NetworkData):
     """Player is connected and unredies for the game to start"""
 
+    room_code: str
+    player_name: str
     command: str = "player_unready"
 
 

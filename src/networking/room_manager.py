@@ -18,6 +18,12 @@ class RoomManager:
 
         return (room_code, self.rooms[room_code])
 
+    def set_player_ready_in_room(self, room_code, player_name):
+        self.rooms[room_code].set_player_ready(player_name)
+
+    def set_player_unready_in_room(self, room_code, player_name):
+        self.rooms[room_code].set_player_unready(player_name)
+
     def get_room(self, room_code):
         if room_code not in self.rooms:
             log.error(f"Room with room code {room_code} does not exist")
@@ -40,4 +46,5 @@ class RoomManager:
         if room_code not in self.rooms:
             log.error(f"Room with room code {room_code} does not exist")
             return False
-        return self.rooms[room_code].all_players_ready
+        print(self.rooms[room_code].all_players_ready)
+        return self.rooms[room_code].all_players_ready()

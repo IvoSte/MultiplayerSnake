@@ -18,15 +18,15 @@ class Room:
         if player in self.players_ready_check:
             del self.players_ready_check[player["name"]]
 
-    def set_player_ready(self, player):
-        self.players_ready_check[player["name"]] = True
+    def set_player_ready(self, player_name):
+        self.players_ready_check[player_name] = True
 
-    def set_player_unready(self, player):
-        self.players_ready_check[player["name"]] = False
+    def set_player_unready(self, player_name):
+        self.players_ready_check[player_name] = False
 
-    @property
     def all_players_ready(self):
         for player_ready in self.players_ready_check.values():
+            print(f"{player_ready=}")
             if not player_ready:
                 return False
         return True

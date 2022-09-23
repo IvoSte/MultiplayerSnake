@@ -34,11 +34,23 @@ class MultiplayerRoomMenu(BaseMenu):
     def set_player_ready(self):
         if self.options["ready check"].optionValue.value:
             # TODO The player name needs to be sent, more than one player needs to be able to ready and it should be player dependent
-            self.evManager.Post(PlayerMultiplayerEvent(command=PlayerReadyCommand()))
+            self.evManager.Post(
+                PlayerMultiplayerEvent(
+                    command=PlayerReadyCommand(
+                        self.room_code, self.game.model.players[0].name
+                    )
+                )
+            )
             ## Contact the client or send something to the client here
         else:
             print("Sending player unready command to server")
-            self.evManager.Post(PlayerMultiplayerEvent(command=PlayerUnreadyCommand()))
+            self.evManager.Post(
+                PlayerMultiplayerEvent(
+                    command=PlayerUnreadyCommand(
+                        self.room_code, self.game.model.players[0].name
+                    )
+                )
+            )
             ## Send the command to the client here.
 
     def start_game(self):
