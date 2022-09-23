@@ -91,9 +91,10 @@ class Client:
 
             if isinstance(data, ReadyCheckUpdatedNotification):
                 print(f"Ready check was updated")
-                for player in self.game.model.connected_player_ids:
+                # TODO: Hier gebeuren vieze dingen, dit moet ergens anders
+                for idx, player in enumerate(self.game.model.connected_player_ids):
                     if player["name"] == data.player_name:
-                        self.game.model.connected_player_ids[player["name"]][
+                        self.game.model.connected_player_ids[idx][
                             "is_ready"
                         ] = data.ready_status
 

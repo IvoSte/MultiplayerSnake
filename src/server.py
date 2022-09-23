@@ -153,7 +153,9 @@ class Server:
                         data.room_code, data.player_name
                     )
                     self.send_to_all(
-                        ReadyCheckUpdatedNotification(data.player_name, True)
+                        ReadyCheckUpdatedNotification(
+                            data.player_name, True
+                        ).to_packet()
                     )
 
                 elif isinstance(data, PlayerUnreadyCommand):
@@ -161,7 +163,9 @@ class Server:
                         data.room_code, data.player_name
                     )
                     self.send_to_all(
-                        ReadyCheckUpdatedNotification(data.player_name, False)
+                        ReadyCheckUpdatedNotification(
+                            data.player_name, False
+                        ).to_packet()
                     )
 
                 elif isinstance(data, JoinRoomCommand):
