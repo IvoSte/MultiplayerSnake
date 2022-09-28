@@ -30,24 +30,7 @@ from controls.input_controls import (
     player_3_controls,
     player_4_controls,
 )
-from game.env_variables import (
-    BACKGROUND_VISUALS,
-    DISABLE_MUSIC,
-    FREEZE_FRAMES_ON_EAT,
-    GAME_TIMER,
-    GAME_TIMER_SWITCH,
-    INITIAL_FOOD,
-    NUMBER_OF_PLAYERS,
-    INITIAL_LIVES,
-    GRID_SIZE_X,
-    GRID_SIZE_Y,
-    SNAKE_SIZE,
-    INITIAL_SNAKE_LENGTH,
-    SNAKE_SPEED,
-    START_COUNTDOWN,
-    TICKS_PER_SECOND,
-    WAVE_RATE,
-)
+from game.config import config
 
 import pygame
 import time
@@ -55,7 +38,7 @@ import random
 
 
 class GameEngine:
-    def __init__(self, evManager: EventManager, grid_size=(GRID_SIZE_X, GRID_SIZE_Y)):
+    def __init__(self, evManager: EventManager, grid_size=(config['GAME']['GRID_SIZE_X'], config['GAME']['GRID_SIZE_Y'])):
         self.evManager = evManager
         self.evManager.RegisterListener(self)
 
@@ -64,7 +47,7 @@ class GameEngine:
         self.model = GameModel()
 
         # Global variables
-        self.snake_size = (SNAKE_SIZE, SNAKE_SIZE)
+        self.snake_size = (config['GAME']['SNAKE_SIZE'], config['GAME']['SNAKE_SIZE'])
 
         # Call relevant init functions
         pygame.init()
@@ -122,7 +105,7 @@ class GameEngine:
             in_menu=False,
             food=[],
         )
-        self.model.set_game_timer((GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
+        self.model.set_game_timer((config['GAMEPLAY']['GAME_TIMER'] + config['GAMEPLAY']['START_COUNTDOWN']) * config['GAME']['TICKS_PER_SECOND'])
 
         # Set the main menu as the first view
         self.menuHandler.main_menu()
@@ -152,11 +135,11 @@ class GameEngine:
             in_menu=False,
             food=[],
         )
-        self.model.set_game_timer((GAME_TIMER + START_COUNTDOWN) * TICKS_PER_SECOND)
+        self.model.set_game_timer((config['GAMEPLAY']['GAME_TIMER'] + config['GAMEPLAY']['START_COUNTDOWN']) * config['GAME']['TICKS_PER_SECOND'])
 
     def init_sounds(self):
         self.sounds.init()
-        if not DISABLE_MUSIC:
+        if not config['MUSIC']['DISABLE_MUSIC']:
             self.sounds.play_music()
             self.sounds.set_music_volume(self.sounds.music_volume)
 
@@ -173,14 +156,14 @@ class GameEngine:
         self.model.clear_players()
         self.model.clear_snakes()
 
-        for i in range(NUMBER_OF_PLAYERS):
+        for i in range(config['PLAYER']['NUMBER_OF_PLAYERS']):
             snake = Snake(
                 self.model.grid_size[0] / 2,
                 self.model.grid_size[1] / 2,
-                width=SNAKE_SIZE,
-                length=INITIAL_SNAKE_LENGTH,
-                speed=SNAKE_SPEED,
-                lives=INITIAL_LIVES,
+                width=config['GAME']['SNAKE_SIZE'],
+                length=config['PLAYER']['INITIAL_SNAKE_LENGTH'],
+                speed=config['PLAYER']['SNAKE_SPEED'],
+                lives=config['PLAYER']['INITIAL_LIVES'],
                 colormap=colormaps[[*colormaps][i]],
                 name=f"{[*colormaps][i]}",
                 controls=self.control_sets[i],
@@ -212,7 +195,7 @@ class GameEngine:
 
     def init_food(self):
         self.model.clear_food()
-        for _ in range(INITIAL_FOOD):
+        for _ in range(config['PLAYER']['INITIAL_FOOD']):
             self.spawn_food()
 
     def reset_snakes(self):
@@ -221,10 +204,10 @@ class GameEngine:
             snake = Snake(
                 self.model.grid_size[0] / 2,
                 self.model.grid_size[1] / 2,
-                width=SNAKE_SIZE,
-                length=INITIAL_SNAKE_LENGTH,
-                speed=SNAKE_SPEED,
-                lives=INITIAL_LIVES,
+                width=config['GAME']['SNAKE_SIZE'],
+                length=config['PLAYER']['INITIAL_SNAKE_LENGTH'],
+                speed=config['PLAYER']['SNAKE_SPEED'],
+                lives=config['PLAYER']['INITIAL_LIVES'],
                 colormap=player.snake_colormap,
                 name=f"{player.name}",
                 controls=player.controls,
@@ -302,9 +285,9 @@ class GameEngine:
             eaten_food = []
             for food in self.model.food:
                 if snake.eat_food(food=food):
-                    snake.move_freeze_timer = FREEZE_FRAMES_ON_EAT
+                    snake.move_freeze_timer = config['COSMETIC']['FREEZE_FRAMES_ON_EAT']
                     eaten_food.append(food)
-                    if random.random() < WAVE_RATE:
+                    if random.random() < config['COSMETIC']['WAVE_RATE']:
                         self.environment.activate_agent_on_position(food.pos)
                     self.sounds.play_player_effect(idx)
             for food in eaten_food:
@@ -344,9 +327,9 @@ class GameEngine:
                 self.update()
 
                 # Move time forward
-                self.time_elapsed = self.clock.tick(TICKS_PER_SECOND)
+                self.time_elapsed = self.clock.tick(config['GAME']['TICKS_PER_SECOND'])
 
-                if GAME_TIMER_SWITCH:
+                if config['GAMEPLAY']['GAME_TIMER_SWITCH']:
                     self.model.game_timer -= 1
 
             # Update viewer and all other objects

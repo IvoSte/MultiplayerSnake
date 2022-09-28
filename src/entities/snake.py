@@ -2,21 +2,6 @@ from viewer.colors import Color, color_from_map, colormaps
 from controls.input_controls import Controls, default_player_controls
 import pygame
 import random
-from game.env_variables import (
-    BODY_DECAY_RATE,
-    DEATH_PUNISHMENT,
-    FREEZE_FRAMES_ON_BITTEN,
-    FREEZE_FRAMES_ON_EAT,
-    SNAKE_SIZE,
-    INITIAL_SNAKE_LENGTH,
-    SNAKE_SPEED,
-    MAX_COLOR_SCALE,
-    START_COUNTDOWN,
-    TAIL_BITING,
-    TAIL_STEALING,
-    TICKS_PER_SECOND,
-    VERZET,
-)
 from game.config import config
 
 class Snake:
@@ -24,12 +9,12 @@ class Snake:
         self,
         x_pos,
         y_pos,
-        speed=SNAKE_SPEED,
-        width=SNAKE_SIZE,
-        length=INITIAL_SNAKE_LENGTH,
+        speed=config['PLAYER']['SNAKE_SPEED'],
+        width=config['GAME']['SNAKE_SIZE'],
+        length=config['PLAYER']['INITIAL_SNAKE_LENGTH'],
         color=random.randint(0, 255),
         colormap=random.choice(list(colormaps.values())),
-        colorscale=random.randint(1, MAX_COLOR_SCALE),
+        colorscale=random.randint(1, config['COSMETIC']['MAX_COLOR_SCALE']),
         score=0,
         lives=0,
         name="Snake",
@@ -60,7 +45,7 @@ class Snake:
         self.command = None
         self.move_dir_buffer = None
         self.move_dist_buffer = 0
-        self.move_freeze_timer = START_COUNTDOWN * TICKS_PER_SECOND
+        self.move_freeze_timer = config['GAMEPLAY']['START_COUNTDOWN'] * config['GAME']['TICKS_PER_SECOND']
         self.body_buffer = 0
 
         self.ghost = False
@@ -92,7 +77,7 @@ class Snake:
             for idx in range(len(self.decaying_body)):
                 c = self.decay_body_color[idx]
                 self.decay_body_color[idx] = pygame.Color(
-                    c.r - BODY_DECAY_RATE, c.g - BODY_DECAY_RATE, c.b - BODY_DECAY_RATE
+                    c.r - config['COSMETIC']['BODY_DECAY_RATE'], c.g - config['COSMETIC']['BODY_DECAY_RATE'], c.b - config['COSMETIC']['BODY_DECAY_RATE']
                 )
 
     def is_dead(self, grid_size, snakes=None):
@@ -140,13 +125,13 @@ class Snake:
         if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
             return
         if self.body[len(self.body) - 1] in other.body[0 : len(other.body) - 1]:
-            self.move_freeze_timer = FREEZE_FRAMES_ON_EAT
+            self.move_freeze_timer = config['COSMETIC']['FREEZE_FRAMES_ON_EAT']
             # I bite you where my head is at
             tails_bitten = other.get_bitten(self.body[len(self.body) - 1])
 
             if other.name != self.name:
                 self.tails_eaten += tails_bitten
-                if TAIL_STEALING:
+                if config['MODE']['TAIL_STEALING']:
                     self.length += tails_bitten
 
     def get_bitten(self, pos):
@@ -159,8 +144,8 @@ class Snake:
         tails_lost = (
             1 + (self.body_length() - ((len(self.body) - bite_position))) // self.speed
         )
-        if VERZET:
-            self.move_freeze_timer = FREEZE_FRAMES_ON_BITTEN
+        if config['GAMEPLAY']['VERZET']:
+            self.move_freeze_timer = config['GAMEPLAY']['FREEZE_FRAMES_ON_BITTEN']
         self.init_decaying_body(self.body[0:bite_position])
         self.body = self.body[bite_position : len(self.body)]
         self.length = self.length - tails_lost
@@ -232,7 +217,7 @@ class Snake:
             return False
         return True
 
-    def respawn(self, x_pos=None, y_pos=None, punishment=DEATH_PUNISHMENT):
+    def respawn(self, x_pos=None, y_pos=None, punishment=config['PLAYER']['DEATH_PUNISHMENT']):
         # Default spawn or given arguments
         x_pos = self.spawn_pos_x if x_pos == None else x_pos
         y_pos = self.spawn_pos_y if y_pos == None else y_pos
