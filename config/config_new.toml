@@ -1,0 +1,54 @@
+[GAME]
+resolution_scale = 2
+screen_size_x = 600
+screen_size_y = 400
+grid_size_x = 60
+grid_size_y = 40
+snake_size = 10
+ticks_per_second = 60
+fullscreen = false
+
+[PLAYER]
+number_of_players = 2
+initial_food = 1
+initial_snake_length = 10
+initial_lives = 2
+snake_speed = 4
+death_punishment = 5
+
+[MODE]
+tail_biting = false
+tail_stealing = true
+
+[GAMEPLAY]
+verzet = false
+freeze_frames_on_bitten = 300
+start_countdown = 0
+game_timer_switch = false
+game_timer = 45
+
+[COSMETIC]
+background_visuals = true
+wave_rate = 1.0
+max_color_scale = 3
+neighbourhood_shape = 0
+agent_effect_step_size = 5
+freeze_frames_on_eat = 2
+player_score_boxes = true
+body_decay_rate = 15
+
+[CONTROLLER]
+enable_contollers = true
+controller_deadzone = 0.45
+
+[MUSIC]
+disable_music = true
+music_volume = 1.0
+
+[SOUND]
+disable_effect_sounds = false
+effect_volume = 0.5
+master_volume = 1.0
+
+[DEV]
+draw_coordinates = false

@@ -226,6 +226,7 @@ if __name__ == "__main__":
     ivos_ip = "87.214.136.100"
     ivo_local = "192.168.1.124"
     local_ip = "localhost"
+    ip_uni = "145.97.151.17"
 
-    server = Server(server_ip=ivo_local)
+    server = Server(server_ip=ip_uni)
     server.listen_for_connections()

@@ -17,7 +17,7 @@ from game.env_variables import (
     TICKS_PER_SECOND,
     VERZET,
 )
-
+from config.config import config
 
 class Snake:
     def __init__(
@@ -111,7 +111,7 @@ class Snake:
 
         # Snake dies because it hits itself
         for other in snakes:
-            if TAIL_BITING:
+            if config['mode']['tail_biting']:
                 self.bite_collision(other)
             else:
                 if self.collision(other):

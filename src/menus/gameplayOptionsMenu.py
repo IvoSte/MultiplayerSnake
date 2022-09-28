@@ -3,7 +3,7 @@ from game.env_variables import TAIL_BITING, TAIL_STEALING, set_config
 from viewer.colors import Color
 from controls.input_controls import Controls, menu_controls, general_controls
 from menus.baseMenu import BaseMenu
-
+from config.config import config
 
 class GameplayOptionsMenu(BaseMenu):
     def __init__(self, game):
@@ -53,11 +53,14 @@ class GameplayOptionsMenu(BaseMenu):
         pass
 
     def set_tail_biting_function(self):
-        print(f"tail biting before set: {TAIL_BITING}")
+        print(f"tail biting before set: {config['mode']['tail_biting']}")
         new_value = self.options["tail biting"].optionValue.value
+
         print(f"setting tail biting to {new_value}")
-        set_config("mode", "TAIL_BITING", new_value)
-        print(f"tail biting after set: {TAIL_BITING}")
+        
+        config['mode']['TAIL_BITING'] = new_value
+        
+        print(f"tail biting after set: {config['mode']['tail_biting']}")
 
     def set_tail_stealing_function(self):
         pass
