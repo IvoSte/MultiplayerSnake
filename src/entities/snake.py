@@ -10,7 +10,7 @@ class Snake:
         x_pos,
         y_pos,
         speed=config['PLAYER']['SNAKE_SPEED'],
-        width=config['GAME']['SNAKE_SIZE'],
+        width=config['GAME']['SNAKE_SIZE'] * config['game']['RESOLUTION_SCALE'],
         length=config['PLAYER']['INITIAL_SNAKE_LENGTH'],
         color=random.randint(0, 255),
         colormap=random.choice(list(colormaps.values())),

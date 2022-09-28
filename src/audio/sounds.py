@@ -53,7 +53,7 @@ class Sounds:
     def init(self):
         self.init_effects()
         self.init_player_effects()
-        self.load_music(config[""]["MUSIC_PATH\"])
+        self.load_music(MUSIC_PATH)
 
     def load_music(self, path):
         self.mixer.music.load(path)

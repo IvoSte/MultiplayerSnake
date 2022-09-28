@@ -3,7 +3,7 @@ from entities.agent import Agent
 from viewer.colormaps import generate_colormap
 from viewer.colors import color, fade_colors, interpolate 
 from pygame import Color
-from game.confg import config
+from game.config import config
 
 class AgentMode(Enum):
     BIG_WAVE = 0

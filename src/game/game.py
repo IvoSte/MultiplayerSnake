@@ -47,7 +47,7 @@ class GameEngine:
         self.model = GameModel()
 
         # Global variables
-        self.snake_size = (config['GAME']['SNAKE_SIZE'], config['GAME']['SNAKE_SIZE'])
+        self.snake_size = (config['GAME']['SNAKE_SIZE'] * config['game']['RESOLUTION_SCALE'], config['GAME']['SNAKE_SIZE'] * config['game']['RESOLUTION_SCALE'])
 
         # Call relevant init functions
         pygame.init()
@@ -160,7 +160,7 @@ class GameEngine:
             snake = Snake(
                 self.model.grid_size[0] / 2,
                 self.model.grid_size[1] / 2,
-                width=config['GAME']['SNAKE_SIZE'],
+                width=config['GAME']['SNAKE_SIZE'] * config['game']['RESOLUTION_SCALE'],
                 length=config['PLAYER']['INITIAL_SNAKE_LENGTH'],
                 speed=config['PLAYER']['SNAKE_SPEED'],
                 lives=config['PLAYER']['INITIAL_LIVES'],
@@ -204,7 +204,7 @@ class GameEngine:
             snake = Snake(
                 self.model.grid_size[0] / 2,
                 self.model.grid_size[1] / 2,
-                width=config['GAME']['SNAKE_SIZE'],
+                width=config['GAME']['SNAKE_SIZE'] * config['game']['RESOLUTION_SCALE'],
                 length=config['PLAYER']['INITIAL_SNAKE_LENGTH'],
                 speed=config['PLAYER']['SNAKE_SPEED'],
                 lives=config['PLAYER']['INITIAL_LIVES'],

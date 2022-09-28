@@ -26,8 +26,8 @@ class Viewer:
         self,
         evManager: EventManager,
         game: GameEngine,
-        snake_size=(config["GAME"]["SNAKE_SIZE"], config["GAME"]["SNAKE_SIZE"]),
-        display_size=(config["GAME"]["SCREEN_SIZE_X"], config["GAME"]["SCREEN_SIZE_Y"]),
+        snake_size=(config['GAME']['SNAKE_SIZE'] * config['GAME']['RESOLUTION_SCALE'], config['GAME']['SNAKE_SIZE'] * config['GAME']['RESOLUTION_SCALE']),
+        display_size=(config["GAME"]["SCREEN_SIZE_X"] * config["GAME"]["RESOLUTION_SCALE"], config["GAME"]["SCREEN_SIZE_Y"] * config["GAME"]["RESOLUTION_SCALE"]),
         game_title="Multiplayer Snake Game - Extraordinaire",
     ):
 
