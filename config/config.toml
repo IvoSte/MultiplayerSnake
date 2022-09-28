@@ -1,55 +1,55 @@
-[game]
-resolution_scale = 2
-screen_size_x = 600
-screen_size_y = 400
-grid_size_x = 60
-grid_size_y = 40
-snake_size = 10
-ticks_per_second = 60
-fullscreen = false
+[GAME]
+RESOLUTION_SCALE = 2
+SCREEN_SIZE_X = 600
+SCREEN_SIZE_Y = 400
+GRID_SIZE_X = 60
+GRID_SIZE_Y = 40
+SNAKE_SIZE = 10
+TICKS_PER_SECOND = 60
+FULLSCREEN = false
 
-[player]
-number_of_players = 2
-initial_food = 1
-initial_snake_length = 10
-initial_lives = 2
-snake_speed = 4
-death_punishment = 5
+[PLAYER]
+NUMBER_OF_PLAYERS = 2
+INITIAL_FOOD = 1
+INITIAL_SNAKE_LENGTH = 10
+INITIAL_LIVES = 2
+SNAKE_SPEED = 4
+DEATH_PUNISHMENT = 5
 
-[mode]
-tail_biting = false
-tail_stealing = true
+[MODE]
+TAIL_BITING = false
+TAIL_STEALING = true
 
-[gameplay]
-verzet = false
-freeze_frames_on_bitten = 300
-start_countdown = 0
-game_timer_switch = false
-game_timer = 45
+[GAMEPLAY]
+VERZET = false
+FREEZE_FRAMES_ON_BITTEN = 300
+START_COUNTDOWN = 0
+GAME_TIMER_SWITCH = false
+GAME_TIMER = 45
 
-[cosmetic]
-background_visuals = true
-wave_rate = 1.0
-max_color_scale = 3
-neighbourhood_shape = 0
-agent_effect_step_size = 5
-freeze_frames_on_eat = 2
-player_score_boxes = true
-body_decay_rate = 15
+[COSMETIC]
+BACKGROUND_VISUALS = true
+WAVE_RATE = 1.0
+MAX_COLOR_SCALE = 3
+NEIGHBOURHOOD_SHAPE = 0
+AGENT_EFFECT_STEP_SIZE = 5
+FREEZE_FRAMES_ON_EAT = 2
+PLAYER_SCORE_BOXES = true
+BODY_DECAY_RATE = 15
 
-[controller]
-enable_contollers = true
-controller_deadzone = 0.45
+[CONTROLLER]
+ENABLE_CONTOLLERS = true
+CONTROLLER_DEADZONE = 0.45
 
-[music]
-disable_music = true
-music_volume = 1.0
+[MUSIC]
+DISABLE_MUSIC = true
+MUSIC_VOLUME = 1.0
 
-[sound]
-disable_effect_sounds = false
-effect_volume = 0.5
-master_volume = 1.0
+[SOUND]
+DISABLE_EFFECT_SOUNDS = false
+EFFECT_VOLUME = 0.5
+MASTER_VOLUME = 1.0
 
-[dev]
-draw_coordinates = false
+[DEV]
+DRAW_COORDINATES = false
 
