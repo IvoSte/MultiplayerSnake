@@ -17,7 +17,7 @@ from game.env_variables import (
     TICKS_PER_SECOND,
     VERZET,
 )
-from config.config import config
+from game.config import config
 
 class Snake:
     def __init__(
