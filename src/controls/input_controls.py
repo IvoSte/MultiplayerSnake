@@ -1,5 +1,5 @@
 from enum import IntEnum
-from game.env_variables import CONTROLLER_DEADZONE
+from game.config import config
 import pygame
 
 
@@ -42,7 +42,7 @@ def inputHandler(command):
 
 
 def controllerInputHandler(event):
-    deadzone = CONTROLLER_DEADZONE
+    deadzone = config[""]["CONTROLLER_DEADZONE"]
     if event.type == pygame.JOYAXISMOTION:
         value = event.value
         if event.axis == 0:

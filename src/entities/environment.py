@@ -1,7 +1,7 @@
 import random
 from viewer.colors import Color
 from entities.environment_agent import Env_agent
-from game.env_variables import NEIGHBOURHOOD_SHAPE
+from game.config import config
 
 
 class Environment:
@@ -18,7 +18,7 @@ class Environment:
         self.agents = []
         self.active_agents = set()
 
-        self.neighbourhood_shape = NEIGHBOURHOOD_SHAPE
+        self.neighbourhood_shape = config["COSMETIC"]["NEIGHBOURHOOD_SHAPE"]
 
         # self.report_agents()
 

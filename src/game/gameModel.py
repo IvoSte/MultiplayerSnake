@@ -2,19 +2,14 @@ from operator import attrgetter
 from entities.player import Player
 from entities.snake import Snake
 from entities.food import Food
-from game.env_variables import (
-    NUMBER_OF_PLAYERS,
-    GAME_TIMER_SWITCH,
-    GRID_SIZE_X,
-    GRID_SIZE_Y,
-)
+from game.config import config
 
 
 class GameModel:
     def __init__(self):
         # Game variables
         self.game_timer: int
-        self.grid_size: tuple[int, int] = (GRID_SIZE_X, GRID_SIZE_Y)
+        self.grid_size: tuple[int, int] = (config["GAME"]["GRID_SIZE_X"], config["GAME"]["GRID_SIZE_Y"])
 
         # Entities
         self.players: list[Player] = []
@@ -85,16 +80,16 @@ class GameModel:
         # In multiplayer all players but on should be dead and without lives left.
         return (
             # Single player mode where the player is dead
-            NUMBER_OF_PLAYERS == 1
+            config["PLAYER"]["NUMBER_OF_PLAYERS"] == 1
             and self.snakes_lives_left() == 0
             # Multi player mode and only one player is alive and none respawning.
             or (
-                NUMBER_OF_PLAYERS > 1
+                config["PLAYER"]["NUMBER_OF_PLAYERS"] > 1
                 and self.snakes_alive() == 1
                 and self.dead_snakes_lives_left() == 0
             )
             # Timer for timed games
-            or (GAME_TIMER_SWITCH and self.game_timer <= 0)
+            or (config["GAMEPLAY"]["GAME_TIMER_SWITCH"] and self.game_timer <= 0)
         )
 
     def get_player_from_name(self, player_name):

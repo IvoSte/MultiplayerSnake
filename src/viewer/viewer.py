@@ -17,21 +17,8 @@ from viewer.menus.soundOptionsMenuView import SoundOptionsMenuView
 from viewer.menus.postGameMenuView import PostGameMenuView
 from viewer.menus.pauseMenuView import PauseMenuView
 from viewer.colors import Color, turbo_color, color_from_map, extend_colormaps
-from game.env_variables import (
-    FULLSCREEN,
-    GAME_TIMER,
-    GAME_TIMER_SWITCH,
-    PLAYER_SCORE_BOXES,
-    RESOLUTION_SCALE,
-    SCREEN_SIZE_X,
-    SCREEN_SIZE_Y,
-    SNAKE_SIZE,
-    TICKS_PER_SECOND,
-    VERZET,
-    BACKGROUND_VISUALS,
-    DRAW_COORDINATES,
-)
 from viewer.ui_elements.player_information import UI_player_information
+from game.config import config
 
 
 class Viewer:
@@ -39,8 +26,8 @@ class Viewer:
         self,
         evManager: EventManager,
         game: GameEngine,
-        snake_size=(SNAKE_SIZE, SNAKE_SIZE),
-        display_size=(SCREEN_SIZE_X, SCREEN_SIZE_Y),
+        snake_size=(config["GAME"]["SNAKE_SIZE"], config["GAME"]["SNAKE_SIZE"]),
+        display_size=(config["GAME"]["SCREEN_SIZE_X"], config["GAME"]["SCREEN_SIZE_Y"]),
         game_title="Multiplayer Snake Game - Extraordinaire",
     ):
 
@@ -50,9 +37,9 @@ class Viewer:
 
         # Set display
         self.display_size = display_size
-        if FULLSCREEN:
+        if config['GAME']['FULLSCREEN']:
             self.display = pygame.playplay.set_mode(
-                (display_size[0], display_size[1]), pygame.FULLSCREEN
+                (display_size[0], display_size[1]), pygame.config['GAME']['FULLSCREEN']
             )
         else:
             self.display = pygame.display.set_mode((display_size[0], display_size[1]))
@@ -192,9 +179,9 @@ class Viewer:
 
     def draw_game_timer(self, timer):
         # Start the countdown only after the game countdown
-        if timer <= GAME_TIMER * TICKS_PER_SECOND:
+        if timer <= config["GAMEPLAY"]["GAME_TIMER"] * config["GAME"]["TICKS_PER_SECOND"]:
             self.draw_text(
-                msg=(timer // TICKS_PER_SECOND) + 1,
+                msg=(timer // config["GAME"]["TICKS_PER_SECOND"]) + 1,
                 color=Color.WHITE.value,
                 relative_x=0.48,
                 relative_y=0.02,
@@ -210,7 +197,7 @@ class Viewer:
                     (player.x_pos, player.y_pos)
                 )
                 self.draw_text(
-                    msg=(player.move_freeze_timer // TICKS_PER_SECOND) + 1,
+                    msg=(player.move_freeze_timer // config["GAME"]["TICKS_PER_SECOND"]) + 1,
                     color=color_from_map(player.colormap, player.color),
                     relative_x=relative_x,
                     relative_y=relative_y,
@@ -308,7 +295,7 @@ class Viewer:
         self.clear_screen()
 
         # Draw background / environment
-        if BACKGROUND_VISUALS:
+        if config["COSMETIC"]["BACKGROUND_VISUALS"]:
             self.draw_environment(self.game.environment)
 
         # Draw food TODO draw items / draw entities
@@ -323,12 +310,12 @@ class Viewer:
         self.ui_player_information.display_players_information(self.game.model.snakes)
 
         # Draw timers
-        if GAME_TIMER_SWITCH:
+        if config["GAMEPLAY"]["GAME_TIMER_SWITCH"]:
             self.draw_game_timer(self.game.model.game_timer)
         self.draw_player_counters(self.game.model.snakes)
 
         # Draw coordinates -- useful for development.
-        if DRAW_COORDINATES:
+        if config["DEV"]["DRAW_COORDINATES"]:
             self.draw_coordinates()
 
         # Update screen

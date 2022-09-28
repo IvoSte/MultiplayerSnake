@@ -1,9 +1,4 @@
-from game.env_variables import (
-    PLAYER_SCORE_BOXES,
-    RESOLUTION_SCALE,
-    SCREEN_SIZE_X,
-    SCREEN_SIZE_Y,
-)
+from game.config import config
 from viewer.colors import color_from_map
 import pygame
 

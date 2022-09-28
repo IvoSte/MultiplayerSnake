@@ -1,6 +1,20 @@
 import random
-from game.env_variables import BITE_PLAYER_COLLISION_SOUND, BITE_SELF_COLLISION_SOUND, DEFEAT_SOUND, EFFECT_VOLUME, MUSIC_PATH, MUSIC_VOLUME, PLAYER_1_EAT_FRUIT_SOUNDS, PLAYER_2_EAT_FRUIT_SOUNDS, PLAYER_COLLISION_SOUND, SELF_COLLISION_SOUND, TEST_SOUND, VICTORY_SOUND, WALL_COLLISION_SOUND
+from game.env_variables import (
+    BITE_PLAYER_COLLISION_SOUND,
+    BITE_SELF_COLLISION_SOUND,
+    DEFEAT_SOUND,
+    MUSIC_PATH,
+    PLAYER_1_EAT_FRUIT_SOUNDS,
+    PLAYER_2_EAT_FRUIT_SOUNDS,
+    PLAYER_COLLISION_SOUND,
+    SELF_COLLISION_SOUND,
+    TEST_SOUND,
+    VICTORY_SOUND,
+    WALL_COLLISION_SOUND
+)
 import pygame
+
+from game.config import config
 
 class Sounds:
 
@@ -13,11 +27,11 @@ class Sounds:
             #"eat_fruit" : ,
             # "player_collision" : PLAYER_COLLISION_SOUND,
             # "self_collision" : SELF_COLLISION_SOUND,
-            # "bite_player_collision" : BITE_PLAYER_COLLISION_SOUND,
-            # "bite_self_collision" : BITE_SELF_COLLISION_SOUND,
+            # "bite_player_collision" : config[""]["BITE_PLAYER_COLLISION_SOUND"],
+            # "bite_self_collision" : config[""]["BITE_SELF_COLLISION_SOUND"],
             # "wall_collision" : WALL_COLLISION_SOUND,
             # "victory" : VICTORY_SOUND,
-            # "defeat" : DEFEAT_SOUND,
+            # "defeat" : config[""]["DEFEAT_SOUND"],
         }
         self.player_effects = {
             0 : PLAYER_1_EAT_FRUIT_SOUNDS,
@@ -30,8 +44,8 @@ class Sounds:
             7 : PLAYER_2_EAT_FRUIT_SOUNDS,
         }
 
-        self.music_volume = MUSIC_VOLUME
-        self.effect_volume = EFFECT_VOLUME
+        self.music_volume = config["MUSIC"]["MUSIC_VOLUME"]
+        self.effect_volume = config["SOUND"]["EFFECT_VOLUME"]
 
         self.music_paused = False
         self.effects_muted = False
@@ -39,7 +53,7 @@ class Sounds:
     def init(self):
         self.init_effects()
         self.init_player_effects()
-        self.load_music(MUSIC_PATH)
+        self.load_music(config[""]["MUSIC_PATH\"])
 
     def load_music(self, path):
         self.mixer.music.load(path)
