@@ -3,7 +3,7 @@ from entities.agent import Agent
 from viewer.colormaps import generate_colormap
 from viewer.colors import color, fade_colors, interpolate 
 from pygame import Color
-from game.env_variables import AGENT_EFFECT_STEP_SIZE
+from game.confg import config
 
 class AgentMode(Enum):
     BIG_WAVE = 0
@@ -47,13 +47,13 @@ class Env_agent(Agent):
 
     def update_big_wave(self):
         self.decrease_intensity()
-        self.color = fade_colors(self.top_color, self.base_color, 255/AGENT_EFFECT_STEP_SIZE, (255 - self.intensity)/AGENT_EFFECT_STEP_SIZE) 
+        self.color = fade_colors(self.top_color, self.base_color, 255/config['COSMETIC']['AGENT_EFFECT_STEP_SIZE'], (255 - self.intensity)/config['COSMETIC']['AGENT_EFFECT_STEP_SIZE']) 
         #self.color = color_from_map(self.colormap, 255 - self.intensity)
         self.infectious = self.intensity == 250
 
     def update_small_wave(self):
         self.decrease_intensity(100)
-        self.color = fade_colors(self.top_color, self.base_color, 255/AGENT_EFFECT_STEP_SIZE, (255 - self.intensity)/AGENT_EFFECT_STEP_SIZE) 
+        self.color = fade_colors(self.top_color, self.base_color, 255/config['COSMETIC']['AGENT_EFFECT_STEP_SIZE'], (255 - self.intensity)/config['COSMETIC']['AGENT_EFFECT_STEP_SIZE']) 
         #self.color = color_from_map(self.colormap, 255 - self.intensity)
         self.infectious = self.intensity == 155
 
@@ -64,7 +64,7 @@ class Env_agent(Agent):
     def set_base_color(self, color):
         self.base_color = color
 
-    def decrease_intensity(self, decrease = AGENT_EFFECT_STEP_SIZE):
+    def decrease_intensity(self, decrease = config['COSMETIC']['AGENT_EFFECT_STEP_SIZE']):
         self.intensity -= decrease
         if self.intensity < 0:
             self.reset()

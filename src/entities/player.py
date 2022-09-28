@@ -2,9 +2,6 @@ from dataclasses import dataclass
 from entities.snake import Snake
 from viewer.colors import Color, color_from_map, colormaps
 from controls.input_controls import Controls, default_player_controls
-from game.env_variables import (
-    VERZET,
-)
 
 
 class Player:
