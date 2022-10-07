@@ -135,6 +135,7 @@ class GameEngine:
         self.reset_snakes()
 
         # Grow food
+        self.reset_food()
         self.init_food()
 
         # Set game state
@@ -207,8 +208,11 @@ class GameEngine:
         )
         self.environment.init_environment()
 
-    def init_food(self):
+    def reset_food(self):
         self.model.clear_food()
+        self.init_food()
+
+    def init_food(self):
         for _ in range(config["PLAYER"]["INITIAL_FOOD"] - len(self.model.food)):
             self.spawn_food()
 
@@ -280,7 +284,7 @@ class GameEngine:
         # Color should be in the viewer? Maybe? NOTE
         food_color = pygame.Color(0, random.randint(200, 255), 0)
 
-        food = Food(self, (foodx, foody), food_color)
+        food = Food(self, [foodx, foody], food_color)
         self.model.food.append(food)
         return foodx, foody
 

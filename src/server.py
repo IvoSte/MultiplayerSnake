@@ -190,7 +190,7 @@ class Server:
                         self.send_to_all(
                             GameStartNotification(
                                 GameStartState(
-                                    data.room_code, RoomConfig((60, 40)), (20, 20), None
+                                    data.room_code, RoomConfig((60, 40)), (20, 20), []
                                 )
                             ).to_packet()
                         )
