@@ -250,5 +250,5 @@ if __name__ == "__main__":
     local_ip = "localhost"
     ip_uni = "145.97.151.17"
 
-    server = Server(server_ip=ivos_ip)
+    server = Server(server_ip=ivo_local)
     server.listen_for_connections()

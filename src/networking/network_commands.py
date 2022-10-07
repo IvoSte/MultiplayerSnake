@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from networking.network_data_base import NetworkData
 from controls.input_controls import Controls
-from typing import Tuple
 
 ## Naming convention:
 ## DATA is something to be pulled from the server by the client, or from the client to the server
@@ -93,5 +92,5 @@ class SpawnNewFoodCommand(NetworkData):
     """A socket connection has joined the game"""
 
     room_code: str
-    food_position: Tuple[int, int]
+    food_position: list
     command: str = "spawn_new_food"

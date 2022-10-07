@@ -6,7 +6,7 @@ from networking.client import Client
 
 
 def main():
-    local = True
+    local = False
     abes_ip = "217.105.109.132"
     laptop_abe_local_ip = "192.168.1.104"
     home_port = 25565

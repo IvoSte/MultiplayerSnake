@@ -4,8 +4,6 @@ from controls.input_controls import Controls
 from entities.snake import Snake
 from networking.network_data_base import NetworkData
 
-from typing import Tuple
-
 
 @dataclass
 class Event:
@@ -52,13 +50,13 @@ class PlayerInputFromServerEvent(Event):
 
 @dataclass
 class SpawnFoodFromServerEvent(Event):
-    food_position: Tuple[int, int] = (0, 0)
+    food_position: list = []
     name: str = "Spawn food from server event"
 
 
 @dataclass
 class SpawnFoodEvent(Event):
-    food_position: Tuple[int, int] = (0, 0)
+    food_position: list = []
     name: str = "Spawn food event"
 
 
