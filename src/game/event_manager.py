@@ -50,13 +50,13 @@ class PlayerInputFromServerEvent(Event):
 
 @dataclass
 class SpawnFoodFromServerEvent(Event):
-    food_position: list = []
+    food_position = []
     name: str = "Spawn food from server event"
 
 
 @dataclass
 class SpawnFoodEvent(Event):
-    food_position: list = []
+    food_position = []
     name: str = "Spawn food event"
 
 

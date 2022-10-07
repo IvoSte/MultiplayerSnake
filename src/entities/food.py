@@ -13,7 +13,7 @@ class Food(Item):
 
     def notify(self):
         foodx, foody = self.game.spawn_food()
-        gem_mod().instance.Post(gem_mod().SpawnFoodEvent((foodx, foody)))
+        gem_mod().instance.Post(gem_mod().SpawnFoodEvent([foodx, foody]))
 
     def eat(self):
         self.notify()
