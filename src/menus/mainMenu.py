@@ -21,7 +21,6 @@ class MainMenu(BaseMenu):
         self.quit_menu()
 
     def options_function(self):
-        self.quit_menu()
         self.game.menuHandler.options_menu()
 
     def credits_function(self):
@@ -34,5 +33,4 @@ class MainMenu(BaseMenu):
         self.game.quit_game()
 
     def multiplayer_function(self):
-        self.quit_menu()
         self.game.menuHandler.multiplayer_menu()

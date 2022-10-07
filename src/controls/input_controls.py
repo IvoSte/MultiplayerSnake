@@ -15,6 +15,7 @@ class Controls(IntEnum):
     OPTIONS = 8
     MUSIC = 9
     EFFECTS = 10
+    BACK = 11
 
 
 def inputHandler(command):
@@ -87,7 +88,7 @@ menu_controls = {
     pygame.K_RIGHT: Controls.RIGHT,
     pygame.K_UP: Controls.UP,
     pygame.K_DOWN: Controls.DOWN,
-    pygame.K_q: Controls.QUIT,
+    pygame.K_q: Controls.BACK,
     pygame.K_BACKSPACE: Controls.QUIT,
     pygame.K_ESCAPE: Controls.QUIT,
     pygame.K_RETURN: Controls.CONFIRM,

@@ -21,6 +21,7 @@ from networking.network_commands import (
     PlayerUnreadyCommand,
     StartGameCommand,
     JoinRoomCommand,
+    SpawnNewFoodCommand,
 )
 
 from networking.room_manager import RoomManager
@@ -36,6 +37,8 @@ from networking.network_data import (
     ReadyCheckUpdatedNotification,
     RoomJoinedData,
     RoomCreatedData,
+    GameStartState,
+    RoomConfig,
 )
 
 
@@ -94,6 +97,12 @@ class Server:
 
     def send_to_room(self, room_code: str, packet: bytes):
         raise NotImplementedError()
+
+    def send_to_others_in_room(self, room_code: str, self_conn, packet: bytes):
+        for (conn, _, _) in self.connections:
+            if conn == self_conn:
+                continue
+            conn.send(packet)
 
     def send_to_all(self, packet: bytes):
         for (conn, _, _) in self.connections:
@@ -178,7 +187,13 @@ class Server:
                     if self.room_manager.all_ready_in_room(data.room_code):
                         print("All players in room are ready")
                         # TODO: Replace with send_to_room
-                        self.send_to_all(GameStartNotification().to_packet())
+                        self.send_to_all(
+                            GameStartNotification(
+                                GameStartState(
+                                    data.room_code, RoomConfig((60, 40)), (20, 20), None
+                                )
+                            ).to_packet()
+                        )
 
                 elif isinstance(data, GetGameStateCommand):
                     msg = Message(
@@ -207,6 +222,13 @@ class Server:
                 elif isinstance(data, SendPlayerInputCommand):
                     self.send_to_all(data.to_packet())
 
+                elif isinstance(data, SpawnNewFoodCommand):
+                    self.send_to_others_in_room(
+                        data.room_code,
+                        connection,
+                        SpawnNewFoodCommand.to_packet(),
+                    )
+
             except ConnectionResetError:
                 log.warning(f"Remote host lost connection")
                 break
@@ -228,5 +250,5 @@ if __name__ == "__main__":
     local_ip = "localhost"
     ip_uni = "145.97.151.17"
 
-    server = Server(server_ip=ip_uni)
+    server = Server(server_ip=ivos_ip)
     server.listen_for_connections()

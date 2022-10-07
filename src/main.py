@@ -16,8 +16,7 @@ def main():
     ip_uni = "145.97.151.17"
     ip_uni_abe = "145.97.137.202"
 
-
-    ip = ip_uni_abe
+    ip = ivos_ip
     port = home_port
 
     if local:

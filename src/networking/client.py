@@ -8,12 +8,16 @@ from distutils.log import info
 import time
 import keyboard
 
-from game.event_manager import PlayerInputEvent, PlayerInputFromServerEvent
+from game.event_manager import (
+    PlayerInputEvent,
+    PlayerInputFromServerEvent,
+    SpawnFoodEvent,
+)
 
 # Client depends on the Network
 # from src.game.game import GameEngine
 from networking.network import Network, NetworkData
-from networking.network_commands import SendPlayerInputCommand
+from networking.network_commands import SendPlayerInputCommand, SpawnNewFoodCommand
 from networking.network_data import (
     UpdatePlayerPositionsData,
     PlayerInfo,
@@ -29,6 +33,7 @@ from networking.network_data import (
 import threading
 
 from game.event_manager import PlayerMultiplayerEvent
+from game.event_manager import SpawnFoodFromServerEvent
 
 
 class Client:
@@ -62,6 +67,10 @@ class Client:
         if isinstance(event, PlayerMultiplayerEvent):
             print(f"received {event.command}")
             self.network.send_multiplayer_command(event.command)
+        if isinstance(event, SpawnFoodEvent):
+            self.network.send_command(
+                SpawnNewFoodCommand(self.game.model.room_code, event.food_position)
+            )
 
     def listen(self):
 
@@ -85,8 +94,15 @@ class Client:
 
             if isinstance(data, GameStartNotification):
                 print(f"Game has started...")
-                # TODO: Start game
+                self.game.model.grid_size = data.gameStartState.roomConfig.grid_size
+
+                self.game.spawn_food(
+                    foodx=data.gameStartState.food_position[0],
+                    foody=data.gameStartState.food_position[1],
+                )
+
                 self.game.start_game()
+
                 # NOTE: Feels a bit iffy, but maybe this is how it should be
 
             if isinstance(data, ReadyCheckUpdatedNotification):
@@ -123,6 +139,10 @@ class Client:
                 self.evManager.Post(
                     PlayerInputFromServerEvent(player=player, command=data.player_input)
                 )
+            elif isinstance(data, SpawnNewFoodCommand):
+                # receive food spawn
+                print(f"Received food spawn event from server: {data =}")
+                self.evManager.Post(SpawnFoodFromServerEvent(data.food_position))
 
     def keep_alive(self):
         while True:

@@ -4,6 +4,8 @@ from controls.input_controls import Controls
 from entities.snake import Snake
 from networking.network_data_base import NetworkData
 
+from typing import Tuple
+
 
 @dataclass
 class Event:
@@ -46,6 +48,18 @@ class PlayerInputFromServerEvent(Event):
     name: str = "Player input from server event"
     player: Snake = None
     command: Controls = None
+
+
+@dataclass
+class SpawnFoodFromServerEvent(Event):
+    food_position: Tuple[int, int] = (0, 0)
+    name: str = "Spawn food from server event"
+
+
+@dataclass
+class SpawnFoodEvent(Event):
+    food_position: Tuple[int, int] = (0, 0)
+    name: str = "Spawn food event"
 
 
 # TODO The player name needs to be sent, more than one player needs to be able to ready and it should be player dependent
@@ -97,6 +111,11 @@ class EventManager:
     """
     Coordinates communication between the Model, View and Controller
     """
+
+    def __new__(cls):
+        if not hasattr(cls, "instance"):
+            cls.instance: EventManager = super(EventManager, cls).__new__(cls)
+        return cls.instance
 
     def __init__(self):
         from weakref import WeakKeyDictionary, WeakSet

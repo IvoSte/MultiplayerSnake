@@ -8,6 +8,7 @@ from menus.postGameMenu import PostGameMenu
 from menus.multiplayerLoadMenu import MultiplayerLoadMenu
 from menus.mainMenu import MainMenu
 from menus.multiplayerRoomMenu import MultiplayerRoomMenu
+from menus.multiplayerOptionsMenu import MultiplayerOptionsMenu
 
 
 class MenuHandler:
@@ -19,35 +20,52 @@ class MenuHandler:
 
     def quit_menu(self):
         self.current_menu = None
+        self.menu_stack = []
         self.game.state.in_menu = False
         self.game.state.in_game = True
 
+    def back_menu(self):
+        if len(self.menu_stack) <= 1:
+            self.quit_menu()
+            return
+        self.menu_stack.pop()
+        self.current_menu = self.menu_stack[-1]
+
+    def set_menu(self, menu):
+        self.menu_stack.append(menu)
+        print(f"{len(self.menu_stack)}")
+        print([menu.name for menu in self.menu_stack])
+        self.current_menu = self.menu_stack[-1]
+
     def main_menu(self):
-        self.current_menu = MainMenu(self.game)
+        self.set_menu(MainMenu(self.game))
 
     def postgame_menu(self):
-        self.current_menu = PostGameMenu(self.game)
+        self.set_menu(PostGameMenu(self.game))
 
     def pause_menu(self):
-        self.current_menu = PauseMenu(self.game)
+        self.set_menu(PauseMenu(self.game))
 
     def options_menu(self):
-        self.current_menu = OptionsMenu(self.game)
+        self.set_menu(OptionsMenu(self.game))
 
     def gameplay_options_menu(self):
-        self.current_menu = GameplayOptionsMenu(self.game)
+        self.set_menu(GameplayOptionsMenu(self.game))
 
     def graphics_options_menu(self):
-        self.current_menu = GraphicsOptionsMenu(self.game)
+        self.set_menu(GraphicsOptionsMenu(self.game))
 
     def sound_options_menu(self):
-        self.current_menu = SoundOptionsMenu(self.game)
+        self.set_menu(SoundOptionsMenu(self.game))
 
     def controls_options_menu(self):
-        self.current_menu = ControlsOptionsMenu(self.game)
+        self.set_menu(ControlsOptionsMenu(self.game))
 
     def multiplayer_menu(self):
-        self.current_menu = MultiplayerLoadMenu(self.game, self.evManager)
+        self.set_menu(MultiplayerLoadMenu(self.game, self.evManager))
 
     def multiplayer_room_menu(self):
-        self.current_menu = MultiplayerRoomMenu(self.game, self.evManager)
+        self.set_menu(MultiplayerRoomMenu(self.game, self.evManager))
+
+    def multiplayer_options_menu(self):
+        self.set_menu(MultiplayerOptionsMenu(self.game))

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from networking.network_data_base import NetworkData
+from typing import Tuple
 
 ## Naming convention:
 ## DATA is something to be pulled from the server by the client, or from the client to the server -- Ik wil dit weten
@@ -12,8 +13,23 @@ class PlayerInfo(NetworkData):
 
 
 @dataclass
+class RoomConfig:
+    grid_size: Tuple[int, int]
+
+
+@dataclass
+class GameStartState:
+    room_code: str
+    roomConfig: RoomConfig
+    food_position: Tuple[int, int]
+    player_position: list[Tuple[int, int]]
+
+
+@dataclass
 class GameState(NetworkData):
-    game_id: str
+    room_code: str
+    food_position: Tuple[int, int]
+    player_position: list[Tuple[int, int]]
 
 
 @dataclass
@@ -54,6 +70,7 @@ class PlayerJoinedNotification(NetworkData):
 class GameStartNotification(NetworkData):
     """Notification to notify everyone of game start"""
 
+    gameStartState: GameStartState
     start_game: bool = True
 
 

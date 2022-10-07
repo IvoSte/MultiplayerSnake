@@ -3,14 +3,14 @@ import configparser
 
 # TODO: Set to dynaconf: https://dynaconf.readthedocs.io/en/docs_223/guides/usage.html#usage
 config = configparser.RawConfigParser()
-configFilePath = os.path.join("config", "config.cfg")
+configFilePath = os.path.join("config", "config_legacy_for_sounds.cfg")
 result = config.read(configFilePath)
 # TODO Reload config after write
 
 
 def reload_config():
     config = configparser.RawConfigParser()
-    configFilePath = os.path.join("config", "config.cfg")
+    configFilePath = os.path.join("config", "config_legacy_for_sounds.cfg")
     result = config.read(configFilePath)
 
 

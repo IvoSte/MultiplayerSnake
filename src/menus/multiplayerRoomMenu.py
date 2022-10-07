@@ -34,6 +34,10 @@ class MultiplayerRoomMenu(BaseMenu):
                 "start game",
                 function=self.start_game,
             ),
+            "multiplayer options": MenuOption(
+                "multiplayer options",
+                function=self.multiplayer_options,
+            ),
         }
         self.selected_option = self.options["ready check"]
         self.evManager = evManager
@@ -68,6 +72,10 @@ class MultiplayerRoomMenu(BaseMenu):
         # receive reply yes or no
         # if yes, send start game command
         # if no, do nothing or send error
+
+    def multiplayer_options(self):
+        self.quit_menu()
+        self.game.menuHandler.multiplayer_options_menu()
 
     def set_connected_players(self):
         self.connected_players = self.game.model.connected_player_ids

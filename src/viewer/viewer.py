@@ -6,6 +6,7 @@ from game.event_manager import TickEvent
 from game.event_manager import EventManager
 from game.game import GameEngine
 from game.event_manager import GamePausedEvent
+from viewer.menus.MultiplayerOptionsMenuView import MultiplayerOptionsMenuView
 from viewer.menus.mainMenuView import MainMenuView
 from viewer.menus.multiplayerLoadMenuView import MultiplayerLoadMenuView
 from viewer.menus.multiplayerRoomMenuView import MultiplayerRoomMenuView
@@ -26,8 +27,14 @@ class Viewer:
         self,
         evManager: EventManager,
         game: GameEngine,
-        snake_size=(config['GAME']['SNAKE_SIZE'] * config['GAME']['RESOLUTION_SCALE'], config['GAME']['SNAKE_SIZE'] * config['GAME']['RESOLUTION_SCALE']),
-        display_size=(config["GAME"]["SCREEN_SIZE_X"] * config["GAME"]["RESOLUTION_SCALE"], config["GAME"]["SCREEN_SIZE_Y"] * config["GAME"]["RESOLUTION_SCALE"]),
+        snake_size=(
+            config["GAME"]["SNAKE_SIZE"] * config["GAME"]["RESOLUTION_SCALE"],
+            config["GAME"]["SNAKE_SIZE"] * config["GAME"]["RESOLUTION_SCALE"],
+        ),
+        display_size=(
+            config["GAME"]["SCREEN_SIZE_X"] * config["GAME"]["RESOLUTION_SCALE"],
+            config["GAME"]["SCREEN_SIZE_Y"] * config["GAME"]["RESOLUTION_SCALE"],
+        ),
         game_title="Multiplayer Snake Game - Extraordinaire",
     ):
 
@@ -37,9 +44,9 @@ class Viewer:
 
         # Set display
         self.display_size = display_size
-        if config['GAME']['FULLSCREEN']:
+        if config["GAME"]["FULLSCREEN"]:
             self.display = pygame.playplay.set_mode(
-                (display_size[0], display_size[1]), pygame.config['GAME']['FULLSCREEN']
+                (display_size[0], display_size[1]), pygame.config["GAME"]["FULLSCREEN"]
             )
         else:
             self.display = pygame.display.set_mode((display_size[0], display_size[1]))
@@ -105,6 +112,7 @@ class Viewer:
             "PostGameMenu": PostGameMenuView,
             "MultiplayerLoadMenu": MultiplayerLoadMenuView,
             "MultiplayerRoomMenu": MultiplayerRoomMenuView,
+            "MultiplayerOptionsMenu": MultiplayerOptionsMenuView,
         }
 
         self.ui_player_information = UI_player_information(self)
@@ -179,7 +187,10 @@ class Viewer:
 
     def draw_game_timer(self, timer):
         # Start the countdown only after the game countdown
-        if timer <= config["GAMEPLAY"]["GAME_TIMER"] * config["GAME"]["TICKS_PER_SECOND"]:
+        if (
+            timer
+            <= config["GAMEPLAY"]["GAME_TIMER"] * config["GAME"]["TICKS_PER_SECOND"]
+        ):
             self.draw_text(
                 msg=(timer // config["GAME"]["TICKS_PER_SECOND"]) + 1,
                 color=Color.WHITE.value,
@@ -197,7 +208,8 @@ class Viewer:
                     (player.x_pos, player.y_pos)
                 )
                 self.draw_text(
-                    msg=(player.move_freeze_timer // config["GAME"]["TICKS_PER_SECOND"]) + 1,
+                    msg=(player.move_freeze_timer // config["GAME"]["TICKS_PER_SECOND"])
+                    + 1,
                     color=color_from_map(player.colormap, player.color),
                     relative_x=relative_x,
                     relative_y=relative_y,

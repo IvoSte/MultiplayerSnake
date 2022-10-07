@@ -27,15 +27,12 @@ class PauseMenu(BaseMenu):
         self.game.restart_game()
 
     def options_function(self):
-        self.quit_menu()
         self.game.menuHandler.options_menu()
 
     def quit_function(self):
-        self.quit_menu()
         self.game.menuHandler.quit_game()
 
     def multiplayer_function(self):
-        self.quit_menu()
         self.game.menuHandler.multiplayer_menu()
 
 

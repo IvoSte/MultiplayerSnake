@@ -18,9 +18,10 @@ class BaseMenu:
     def menu_control(self, command):
         if command == Controls.QUIT:
             self.quit_menu()
+        elif command == Controls.BACK:
+            self.back_menu()
         elif command == Controls.CONFIRM:
             self.confirm_option()
-
         elif command == Controls.UP:
             self.move_cursor(command)
         elif command == Controls.DOWN:
@@ -35,9 +36,12 @@ class BaseMenu:
         self.game.state.in_game = False
 
     def quit_menu(self):
-        self.game.menuHandler.current_menu = None
-        self.game.state.in_menu = False
-        self.game.state.in_game = True
+        print("quit menu")
+        self.game.menuHandler.quit_menu()
+
+    def back_menu(self):
+        print("back menu")
+        self.game.menuHandler.back_menu()
 
     # function to override
     def confirm_option(self):

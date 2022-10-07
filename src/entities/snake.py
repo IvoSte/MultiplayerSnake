@@ -3,18 +3,20 @@ from controls.input_controls import Controls, default_player_controls
 import pygame
 import random
 from game.config import config
+from entities.food import Food
+
 
 class Snake:
     def __init__(
         self,
         x_pos,
         y_pos,
-        speed=config['PLAYER']['SNAKE_SPEED'],
-        width=config['GAME']['SNAKE_SIZE'] * config['game']['RESOLUTION_SCALE'],
-        length=config['PLAYER']['INITIAL_SNAKE_LENGTH'],
+        speed=config["PLAYER"]["SNAKE_SPEED"],
+        width=config["GAME"]["SNAKE_SIZE"] * config["game"]["RESOLUTION_SCALE"],
+        length=config["PLAYER"]["INITIAL_SNAKE_LENGTH"],
         color=random.randint(0, 255),
         colormap=random.choice(list(colormaps.values())),
-        colorscale=random.randint(1, config['COSMETIC']['MAX_COLOR_SCALE']),
+        colorscale=random.randint(1, config["COSMETIC"]["MAX_COLOR_SCALE"]),
         score=0,
         lives=0,
         name="Snake",
@@ -45,8 +47,11 @@ class Snake:
         self.command = None
         self.move_dir_buffer = None
         self.move_dist_buffer = 0
-        self.move_freeze_timer = config['GAMEPLAY']['START_COUNTDOWN'] * config['GAME']['TICKS_PER_SECOND']
+        self.move_freeze_timer = (
+            config["GAMEPLAY"]["START_COUNTDOWN"] * config["GAME"]["TICKS_PER_SECOND"]
+        )
         self.body_buffer = 0
+        self.body_decay_rate = config["COSMETIC"]["BODY_DECAY_RATE"]
 
         self.ghost = False
         self.tails_lost = 0
@@ -77,7 +82,9 @@ class Snake:
             for idx in range(len(self.decaying_body)):
                 c = self.decay_body_color[idx]
                 self.decay_body_color[idx] = pygame.Color(
-                    c.r - config['COSMETIC']['BODY_DECAY_RATE'], c.g - config['COSMETIC']['BODY_DECAY_RATE'], c.b - config['COSMETIC']['BODY_DECAY_RATE']
+                    c.r - self.body_decay_rate,
+                    c.g - self.body_decay_rate,
+                    c.b - self.body_decay_rate,
                 )
 
     def is_dead(self, grid_size, snakes=None):
@@ -96,7 +103,7 @@ class Snake:
 
         # Snake dies because it hits itself
         for other in snakes:
-            if config['mode']['tail_biting']:
+            if config["MODE"]["TAIL_BITING"]:
                 self.bite_collision(other)
             else:
                 if self.collision(other):
@@ -125,13 +132,13 @@ class Snake:
         if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
             return
         if self.body[len(self.body) - 1] in other.body[0 : len(other.body) - 1]:
-            self.move_freeze_timer = config['COSMETIC']['FREEZE_FRAMES_ON_EAT']
+            self.move_freeze_timer = config["COSMETIC"]["FREEZE_FRAMES_ON_EAT"]
             # I bite you where my head is at
             tails_bitten = other.get_bitten(self.body[len(self.body) - 1])
 
             if other.name != self.name:
                 self.tails_eaten += tails_bitten
-                if config['MODE']['TAIL_STEALING']:
+                if config["MODE"]["TAIL_STEALING"]:
                     self.length += tails_bitten
 
     def get_bitten(self, pos):
@@ -144,8 +151,8 @@ class Snake:
         tails_lost = (
             1 + (self.body_length() - ((len(self.body) - bite_position))) // self.speed
         )
-        if config['GAMEPLAY']['VERZET']:
-            self.move_freeze_timer = config['GAMEPLAY']['FREEZE_FRAMES_ON_BITTEN']
+        if config["GAMEPLAY"]["VERZET"]:
+            self.move_freeze_timer = config["GAMEPLAY"]["FREEZE_FRAMES_ON_BITTEN"]
         self.init_decaying_body(self.body[0:bite_position])
         self.body = self.body[bite_position : len(self.body)]
         self.length = self.length - tails_lost
@@ -196,7 +203,7 @@ class Snake:
         self.y_pos += y_pos_change
         # print(f"Snake moved to {self.x_pos} {self.y_pos}")
 
-    def eat_food(self, food) -> bool:
+    def eat_food(self, food: Food) -> bool:
         # TODO possibly should not be checked here but one place higher. This also works
         if self.body[len(self.body) - 1] == food.pos:
             self.length += 1
@@ -217,7 +224,9 @@ class Snake:
             return False
         return True
 
-    def respawn(self, x_pos=None, y_pos=None, punishment=config['PLAYER']['DEATH_PUNISHMENT']):
+    def respawn(
+        self, x_pos=None, y_pos=None, punishment=config["PLAYER"]["DEATH_PUNISHMENT"]
+    ):
         # Default spawn or given arguments
         x_pos = self.spawn_pos_x if x_pos == None else x_pos
         y_pos = self.spawn_pos_y if y_pos == None else y_pos
