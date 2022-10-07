@@ -19,6 +19,7 @@ class MultiplayerOptionsMenu(BaseMenu):
                 function=self.set_grid_size_y,
             ),
         }
+        self.selected_option = self.options["grid size x"]
 
     def set_grid_size_x(self):
         new_value = self.options["grid size x"].optionValue.value

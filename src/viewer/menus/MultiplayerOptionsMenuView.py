@@ -19,11 +19,11 @@ class MultiplayerOptionsMenuView(BaseMenuView):
                 Color.WHITE.value,
             ),
             "grid size y": MenuOptionView(
-                "Grid size Y",
                 menu.options["grid size y"],
+                "Grid size Y",
                 Color.WHITE.value,
                 0.5,
-                0.4,
+                0.45,
                 Color.WHITE.value,
             ),
         }

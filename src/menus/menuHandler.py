@@ -33,8 +33,6 @@ class MenuHandler:
 
     def set_menu(self, menu):
         self.menu_stack.append(menu)
-        print(f"{len(self.menu_stack)}")
-        print([menu.name for menu in self.menu_stack])
         self.current_menu = self.menu_stack[-1]
 
     def main_menu(self):

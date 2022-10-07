@@ -36,11 +36,9 @@ class BaseMenu:
         self.game.state.in_game = False
 
     def quit_menu(self):
-        print("quit menu")
         self.game.menuHandler.quit_menu()
 
     def back_menu(self):
-        print("back menu")
         self.game.menuHandler.back_menu()
 
     # function to override
@@ -71,8 +69,8 @@ class BaseMenu:
         if self.selected_option.optionValue == None:
             return
 
-        print(self.selected_option.optionValue)
-        print(self.selected_option.optionValue.value)
+        # print(self.selected_option.optionValue)
+        # print(self.selected_option.optionValue.value)
 
         # Change the value of an option up or down (e.g. sound volume in the range [0-10])
         if isinstance(self.selected_option.optionValue, OptionValueBool):
