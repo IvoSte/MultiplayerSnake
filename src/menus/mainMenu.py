@@ -18,7 +18,7 @@ class MainMenu(BaseMenu):
         self.selected_option = self.options["start"]
 
     def start_function(self):
-        self.quit_menu()
+        self.game.start_game()
 
     def options_function(self):
         self.game.menuHandler.options_menu()

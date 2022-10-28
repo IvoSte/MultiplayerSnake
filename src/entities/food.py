@@ -1,7 +1,7 @@
 from entities.item import Item
 import game
 
-gem_mod = lambda: game.event_manager
+gem_module = lambda: game.event_manager
 
 
 class Food(Item):
@@ -13,7 +13,9 @@ class Food(Item):
 
     def notify(self):
         foodx, foody = self.game.spawn_food()
-        gem_mod().EventManager.instance.Post(gem_mod().SpawnFoodEvent((foodx, foody)))
+        gem_module().EventManager.instance.Post(
+            gem_module().SpawnFoodEvent((foodx, foody))
+        )
 
     def eat(self):
         self.notify()

@@ -25,7 +25,7 @@ def main():
         game = GameEngine(evManager)
         controller = Controller(evManager, game)
         viewer = Viewer(evManager, game)
-        game.init_game()
+        game.on_startup_game()
         game.run()
     else:
         print(" -- Running in SERVER SYSTEM mode.")
@@ -34,7 +34,7 @@ def main():
         client = Client(evManager, game, ip, port)
         controller = Controller(evManager, game)
         viewer = Viewer(evManager, game)
-        game.init_game()
+        game.on_startup_game()
         game.run()
 
 

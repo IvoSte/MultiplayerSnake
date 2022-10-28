@@ -56,7 +56,7 @@ class SpawnFoodFromServerEvent(Event):
 
 @dataclass
 class SpawnFoodEvent(Event):
-    food_position = []
+    food_position = tuple()
     name: str = "Spawn food event"
 
 

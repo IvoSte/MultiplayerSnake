@@ -85,8 +85,7 @@ class GameEngine:
             food=[],
         )
 
-    #### Game init -- Could be split to own file
-    def init_game(self):
+    def on_startup_game(self):
         # Pre game setup
 
         # initialize sound module
@@ -94,6 +93,33 @@ class GameEngine:
 
         # initialize controllers
         self.init_controllers()
+
+        # Set game state
+        self.state = State(
+            running=True,
+            game_over=False,
+            game_paused=False,
+            in_game=False,
+            in_menu=True,
+            food=[],
+        )
+        self.model.set_game_timer(
+            (config["GAMEPLAY"]["GAME_TIMER"] + config["GAMEPLAY"]["START_COUNTDOWN"])
+            * config["GAME"]["TICKS_PER_SECOND"]
+        )
+
+        # Set the main menu as the first view
+        self.menuHandler.main_menu()
+
+    #### Game init -- Could be split to own file
+    def init_game(self):
+        # Pre game setup
+
+        # # initialize sound module
+        # self.init_sounds()
+
+        # # initialize controllers
+        # self.init_controllers()
 
         # Setup environment
         self.init_environment()
@@ -118,8 +144,8 @@ class GameEngine:
             * config["GAME"]["TICKS_PER_SECOND"]
         )
 
-        # Set the main menu as the first view
-        self.menuHandler.main_menu()
+        # # Set the main menu as the first view
+        # self.menuHandler.main_menu()
 
     def start_game(self):
         # TODO: Rename to be more explicit (start_game leads to in-game, rather than menu)
@@ -213,7 +239,9 @@ class GameEngine:
         self.init_food()
 
     def init_food(self):
+        print(f"{len(self.model.food)=} {config['PLAYER']['INITIAL_FOOD']=}")
         for _ in range(config["PLAYER"]["INITIAL_FOOD"] - len(self.model.food)):
+            print("Spawning food in init food")
             self.spawn_food()
 
     def reset_snakes(self):
