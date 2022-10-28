@@ -244,9 +244,7 @@ class GameEngine:
         self.init_food()
 
     def init_food(self):
-        print(f"{len(self.model.food)=} {config['PLAYER']['INITIAL_FOOD']=}")
         for _ in range(config["PLAYER"]["INITIAL_FOOD"] - len(self.model.food)):
-            print("Spawning food in init food")
             self.spawn_food()
 
     def reset_snakes(self):

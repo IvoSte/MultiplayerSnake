@@ -65,7 +65,6 @@ class Client:
         if isinstance(event, PlayerInputEvent):
             self.network.send_player_input(event.player.name, event.command)
         if isinstance(event, PlayerMultiplayerEvent):
-            print(f"received {event.command}")
             self.network.send_multiplayer_command(event.command)
         if isinstance(event, SpawnFoodEvent):
             self.network.send_command(

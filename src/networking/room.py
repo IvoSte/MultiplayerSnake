@@ -30,7 +30,6 @@ class Room:
 
     def all_players_ready(self):
         for player_ready in self.players_ready_check.values():
-            print(f"{player_ready=}")
             if not player_ready:
                 return False
         return True

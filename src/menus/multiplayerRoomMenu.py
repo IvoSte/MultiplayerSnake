@@ -24,7 +24,6 @@ class MultiplayerRoomMenu(BaseMenu):
         # }
         self.connected_players = {}
         self.room_code = self.game.model.room_code
-        print(f"{self.room_code = }")
         self.options = {
             "ready check": MenuOption(
                 "ready check",
@@ -55,7 +54,6 @@ class MultiplayerRoomMenu(BaseMenu):
             )
             ## Contact the client or send something to the client here
         else:
-            print("Sending player unready command to server")
             self.evManager.Post(
                 PlayerMultiplayerEvent(
                     command=PlayerUnreadyCommand(
@@ -82,7 +80,6 @@ class MultiplayerRoomMenu(BaseMenu):
         self.connected_players = self.game.model.connected_player_ids
 
     def leave_room(self):
-        print("Leaving room -- from menu")
         self.evManager.Post(
             PlayerMultiplayerEvent(command=LeaveRoomCommand(self.room_code))
         )

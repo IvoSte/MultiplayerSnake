@@ -76,7 +76,7 @@ class Bot(Player):
         return (dist_x, dist_y)
 
     def decide_policy(self):
-        print(self.objective_distance)
+        # print(self.objective_distance)
         if self.objective_distance.x != 0.0:
             # Move horizontally
             if self.objective_distance.x > 0.0:
@@ -89,11 +89,11 @@ class Bot(Player):
                 self.next_move = Controls.DOWN
             else:
                 self.next_move = Controls.UP
-        #self.unstuck_impossible_move()
+        # self.unstuck_impossible_move()
 
     def unstuck_impossible_move(self):
         if self.opposite_direction(self.next_move, self.snake.move_dir_buffer):
-            print("UNSTUCKING MOVE")
+            # print("UNSTUCKING MOVE")
             self.next_move = Controls(random.randint(0, 3))
 
     def opposite_direction(self, control_1, control_2):

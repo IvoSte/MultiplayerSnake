@@ -127,13 +127,13 @@ class Server:
             conn.send(packet)
 
     def create_room(self, conn, data):
-        print("Creating room...")
+        log.debug("Creating room... -- in server")
         room_code, _ = self.room_manager.create_room()
         self.room_manager.join_room(room_code, conn, data.player_info)
         conn.send(RoomCreatedData(room_code).to_packet())
 
     def join_room(self, conn, data):
-        print("Joining room... -- in server")
+        log.debug("Joining room... -- in server")
         # TODO: Make different games instead of one hardcoded one
         self.room_manager.join_room(data.room_code, conn, data.player_info)
 
@@ -147,15 +147,17 @@ class Server:
             )
             return
 
-        print("player should be joining the room")
+        # TODO: player_room.player_list is a dictionary, send it as such instead of transforming it to an array
         self.send_to_all(
             PlayerJoinedNotification(
-                data.player_info, player_room.player_list
+                data.player_info,
+                [
+                    player_room.player_list[playerkey]
+                    for playerkey in player_room.player_list
+                ],
             ).to_packet()
         )
-        log.info("Just send the player joined notification to everyone")
         conn.send(RoomJoinedData(data.room_code).to_packet())
-        log.info("Just send the room joined data to the caller")
 
     def client_thread(self, connection, player_id):
         """For each connected player, spawn a client thread. This now listens to
@@ -199,14 +201,10 @@ class Server:
                     )
 
                 elif isinstance(data, JoinRoomCommand):
-                    print("Joining Game Command logic")
                     self.join_room(connection, data)
 
                 elif isinstance(data, StartGameCommand):
-                    print("Trying to start game")
-                    print("Checking if players in room are ready...")
                     if self.room_manager.all_ready_in_room(data.room_code):
-                        print("All players in room are ready")
                         # TODO: Replace with send_to_room
                         self.send_to_all(
                             GameStartNotification(
@@ -256,7 +254,7 @@ class Server:
 
             except ConnectionResetError as e:
                 log.warning(f"Remote host lost connection")
-                log.debug(e)
+                # log.debug(e)
                 self.disconnect_player(connection)
                 break
             except Exception as e:

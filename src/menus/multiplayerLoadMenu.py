@@ -29,7 +29,6 @@ class MultiplayerLoadMenu(BaseMenu):
         self.evManager = evManager
 
     def create_room(self):
-        print("creating room")
         self.evManager.Post(
             PlayerMultiplayerEvent(
                 command=CreateRoomCommand(self.game.model.players[0].to_json())
@@ -39,7 +38,6 @@ class MultiplayerLoadMenu(BaseMenu):
     def join_room(self):
         # TODO read player input for room code
         room_code = "AAAA"
-        print("Joining room -- from menu")
         self.evManager.Post(
             PlayerMultiplayerEvent(
                 command=JoinRoomCommand(room_code, self.game.model.players[0].to_json())
