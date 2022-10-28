@@ -30,17 +30,30 @@ class RoomManager:
             return None
         return self.rooms[room_code]
 
-    def join_room(self, room_code, player):
+    def join_room(self, room_code, conn, player):
         if room_code not in self.rooms:
             log.error(f"Room with room code {room_code} does not exist")
             return
-        self.rooms[room_code].connect(player)
+        self.rooms[room_code].connect(conn, player)
 
-    def leave_room(self, room_code, player):
+    def leave_all_rooms_for_player(self, conn):
+        to_delete = [
+            room_code
+            for room_code in self.rooms
+            if conn in self.rooms[room_code].player_list
+        ]
+
+        for room_code in to_delete:
+            self.leave_room(room_code, conn)
+
+    def leave_room(self, room_code, conn):
         if room_code not in self.rooms:
             log.error(f"Room with room code {room_code} does not exist")
             return
-        self.rooms[room_code].disconnect(player)
+        self.rooms[room_code].disconnect(conn)
+
+        if self.rooms[room_code].is_empty():
+            del self.rooms[room_code]
 
     def all_ready_in_room(self, room_code):
         if room_code not in self.rooms:
@@ -48,3 +61,8 @@ class RoomManager:
             return False
         print(self.rooms[room_code].all_players_ready)
         return self.rooms[room_code].all_players_ready()
+
+    def print_all_rooms(self):
+        log.debug("Showing room manager state:")
+        for room in self.rooms:
+            print(room)

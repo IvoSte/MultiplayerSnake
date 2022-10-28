@@ -7,6 +7,7 @@ from networking.network_commands import (
     PlayerUnreadyCommand,
     CreateRoomCommand,
     StartGameCommand,
+    LeaveRoomCommand,
 )
 
 
@@ -79,3 +80,17 @@ class MultiplayerRoomMenu(BaseMenu):
 
     def set_connected_players(self):
         self.connected_players = self.game.model.connected_player_ids
+
+    def leave_room(self):
+        print("Leaving room -- from menu")
+        self.evManager.Post(
+            PlayerMultiplayerEvent(command=LeaveRoomCommand(self.room_code))
+        )
+
+    def quit_menu(self):
+        self.leave_room()
+        self.game.menuHandler.quit_menu()
+
+    def back_menu(self):
+        self.leave_room()
+        self.game.menuHandler.back_menu()

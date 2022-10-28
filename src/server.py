@@ -4,6 +4,7 @@ if __name__ == "__main__":
     sys.path.append("..")
 
 
+from dataclasses import dataclass
 import threading
 from logger import log
 import socket
@@ -21,6 +22,7 @@ from networking.network_commands import (
     PlayerUnreadyCommand,
     StartGameCommand,
     JoinRoomCommand,
+    LeaveRoomCommand,
     SpawnNewFoodCommand,
 )
 
@@ -40,6 +42,13 @@ from networking.network_data import (
     GameStartState,
     RoomConfig,
 )
+
+# TODO refactor the connection tuple object to this dataclass.
+# @dataclass
+# class PlayerConnection:
+#     conn: socket
+#     addr: _RetAddress
+#     player_id: str
 
 
 class Server:
@@ -64,16 +73,25 @@ class Server:
         print("Server has been bounded")
         self.server.listen()
 
-    def disconnect_player(self, player_id):
-        # TODO delete any game if the game is empty
-        # TODO remove player from game if it is not empty
+    def remove_connection(self, connection):
+        # TODO: Vies
+        full_connection_to_delete = None
+        for full_conn in self.connections:
+            if full_conn[0] == connection:
+                full_connection_to_delete = full_conn
+                break
 
         # delete connection
-        to_delete = None
-        for conn in self.connections:
-            if conn[2] == player_id:
-                to_delete = conn
-        self.connections.remove(to_delete)
+        self.connections.remove(full_connection_to_delete)
+
+    def disconnect_player(self, connection):
+        # TODO delete any game if the game is empty
+        # TODO remove player from game if it is not empty
+        self.room_manager.leave_all_rooms_for_player(connection)
+
+        self.room_manager.print_all_rooms()
+
+        self.remove_connection(connection)
 
     def listen_for_connections(self):
 
@@ -111,13 +129,13 @@ class Server:
     def create_room(self, conn, data):
         print("Creating room...")
         room_code, _ = self.room_manager.create_room()
-        self.room_manager.join_room(room_code, data.player_info)
+        self.room_manager.join_room(room_code, conn, data.player_info)
         conn.send(RoomCreatedData(room_code).to_packet())
 
     def join_room(self, conn, data):
-        print("Joining room...")
+        print("Joining room... -- in server")
         # TODO: Make different games instead of one hardcoded one
-        self.room_manager.join_room(data.room_code, data.player_info)
+        self.room_manager.join_room(data.room_code, conn, data.player_info)
 
         player_room = self.room_manager.get_room(data.room_code)
         if player_room is None:
@@ -129,12 +147,15 @@ class Server:
             )
             return
 
+        print("player should be joining the room")
         self.send_to_all(
             PlayerJoinedNotification(
                 data.player_info, player_room.player_list
             ).to_packet()
         )
+        log.info("Just send the player joined notification to everyone")
         conn.send(RoomJoinedData(data.room_code).to_packet())
+        log.info("Just send the room joined data to the caller")
 
     def client_thread(self, connection, player_id):
         """For each connected player, spawn a client thread. This now listens to
@@ -216,6 +237,10 @@ class Server:
                         UpdatePlayerPositionsData(player_positions).to_packet()
                     )
 
+                elif isinstance(data, LeaveRoomCommand):
+                    self.room_manager.leave_room(data.room_code, connection)
+                    self.room_manager.print_all_rooms()
+
                 elif isinstance(data, DisconnectPlayerCommand):
                     self.disconnect_player(data.player_id)
 
@@ -229,8 +254,10 @@ class Server:
                         SpawnNewFoodCommand.to_packet(),
                     )
 
-            except ConnectionResetError:
+            except ConnectionResetError as e:
                 log.warning(f"Remote host lost connection")
+                log.debug(e)
+                self.disconnect_player(connection)
                 break
             except Exception as e:
                 log.error(

@@ -80,6 +80,14 @@ class JoinRoomCommand(NetworkData):
 
 
 @dataclass
+class LeaveRoomCommand(NetworkData):
+    """A socket connection has joined the game"""
+
+    room_code: str
+    command: str = "leave_room"
+
+
+@dataclass
 class StartGameCommand(NetworkData):
     """A socket connection has joined the game"""
 

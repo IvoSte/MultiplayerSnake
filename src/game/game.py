@@ -94,6 +94,11 @@ class GameEngine:
         # initialize controllers
         self.init_controllers()
 
+        # Create players
+        self.init_players()
+        # Setup environment TODO remove from here
+        self.init_environment()
+
         # Set game state
         self.state = State(
             running=True,
@@ -288,7 +293,6 @@ class GameEngine:
             self.restart_game()
         if isinstance(event, MenuControlInputEvent):
             self.menuHandler.current_menu.menu_control(event.command)
-            print(f"game notify {event} {event.command}")
         if isinstance(event, GameEndedEvent):
             self.menuHandler.postgame_menu()
 

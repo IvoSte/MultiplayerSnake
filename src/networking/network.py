@@ -7,6 +7,8 @@ import socket
 import pickle
 import json
 
+from logger import log
+
 from networking.network_data_base import NetworkData
 from networking.network_commands import (
     DisconnectPlayerCommand,

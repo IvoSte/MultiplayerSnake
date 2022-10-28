@@ -29,8 +29,8 @@ class MainMenu(BaseMenu):
         # TODO make credits screen.
 
     def quit_function(self):
-        self.quit_menu()
         self.game.quit_game()
+        #self.quit_menu()
 
     def multiplayer_function(self):
         self.game.menuHandler.multiplayer_menu()
