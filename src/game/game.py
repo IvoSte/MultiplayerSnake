@@ -284,7 +284,7 @@ class GameEngine:
         # Color should be in the viewer? Maybe? NOTE
         food_color = pygame.Color(0, random.randint(200, 255), 0)
 
-        food = Food(self, [foodx, foody], food_color)
+        food = Food(self, (foodx, foody), food_color)
         self.model.food.append(food)
         return foodx, foody
 
