@@ -4,12 +4,15 @@ from entities.snake import Snake
 from entities.food import Food
 from game.config import config
 
-
+# Model that holds all the game data. It does not perform game functions.
 class GameModel:
     def __init__(self):
         # Game variables
         self.game_timer: int
-        self.grid_size: tuple[int, int] = (config["GAME"]["GRID_SIZE_X"], config["GAME"]["GRID_SIZE_Y"])
+        self.grid_size: tuple[int, int] = (
+            config["GAME"]["GRID_SIZE_X"],
+            config["GAME"]["GRID_SIZE_Y"],
+        )
 
         # Entities
         self.players: list[Player] = []

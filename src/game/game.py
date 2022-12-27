@@ -48,6 +48,8 @@ class GameEngine:
         self.evManager.RegisterListener(self)
 
         self.menuHandler = MenuHandler(self, evManager)
+        self.itemHandler = ItemHandler(self, evManager)
+
 
         self.model = GameModel()
 
@@ -305,18 +307,6 @@ class GameEngine:
         pygame.quit()
         quit()
 
-    def spawn_food(self, foodx=None, foody=None):
-        if foodx is None:
-            foodx = round(random.randrange(0, self.model.grid_size[0]))
-        if foody is None:
-            foody = round(random.randrange(0, self.model.grid_size[1]))
-
-        # Color should be in the viewer? Maybe? NOTE
-        food_color = pygame.Color(0, random.randint(200, 255), 0)
-
-        food = Food(self, (foodx, foody), food_color)
-        self.model.food.append(food)
-        return foodx, foody
 
     def end_screen(self):
         pass
@@ -349,6 +339,14 @@ class GameEngine:
 
             snake.update_body()
 
+    # def update_items(self):
+    #     for item in self.model.items:
+    #         item.update()
+
+    # def spawn_items(self):
+    #     for item in self.model.items_to_spawn:
+    #         pass
+
     def tick_bots(self):
         for player in self.model.players:
             if isinstance(player, Bot):
@@ -358,6 +356,7 @@ class GameEngine:
         # self.parse_input()
         self.tick_bots()
         self.update_snakes()
+        self.itemHandler.update()
         self.environment.update_environment()
 
     def run(self):
