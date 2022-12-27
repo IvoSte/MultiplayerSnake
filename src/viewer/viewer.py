@@ -283,6 +283,15 @@ class Viewer:
             ),
         )
 
+    def draw_powerup(self, powerup):
+        pygame.draw.rect(
+            self.display,
+            powerup.color,
+            self.rect_pixels_from_coords(
+                powerup.pos[0], powerup.pos[1], self.unit_size[0], self.unit_size[1]
+            ),
+        )
+
     def draw_environment(self, environment):
         for idx, agent in enumerate(environment.active_agents):
             # print(f"drawing agent {idx + 1}/{len(environment.active_agents)} at {agent.x_pos} {agent.y_pos}") #, end = '\r'
@@ -313,6 +322,10 @@ class Viewer:
         # Draw food TODO draw items / draw entities
         for food in self.game.model.food:
             self.draw_food(food)
+
+        # Draw powerups
+        for powerup in self.game.model.powerups:
+            self.draw_powerup(powerup)
 
         # Draw players
         for snake in self.game.model.snakes:

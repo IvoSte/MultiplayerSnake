@@ -18,6 +18,7 @@ class GameModel:
         self.players: list[Player] = []
         self.snakes: list[Snake] = []
         self.food: list[Food] = []
+        self.powerups: list[Powerup] = []
 
         # Multiplayer Info
         self.room_code = None
@@ -55,6 +56,14 @@ class GameModel:
     def remove_food(self, food):
         if food in self.food:
             self.food.remove(food)
+
+    def add_powerup(self, powerup):
+        if powerup not in self.powerups:
+            self.powerups.append(powerup)
+    
+    def remove_powerup(self, powerup):
+        if powerup in self.powerups:
+            self.powerups.remove(powerup)   
 
     def clear_food(self):
         self.food = []

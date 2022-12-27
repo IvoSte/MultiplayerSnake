@@ -4,6 +4,7 @@ import pygame
 import random
 from game.config import config
 from entities.food import Food
+from entities.powerup import PowerUp, SpeedPowerUp
 
 
 class Snake:
@@ -57,9 +58,15 @@ class Snake:
         self.tails_lost = 0
         self.tails_eaten = 0
 
+        self.powerups = []
+
     def set_command(self, command):
         if self.check_legal_move(command):
             self.command = command
+
+    def update(self):
+        self.update_powerups()
+        self.update_body()
 
     def update_body(self):
         # Update total body positions
@@ -208,9 +215,34 @@ class Snake:
         if self.body[len(self.body) - 1] == food.pos:
             self.length += 1
             self.score += 1
-            food.notify()  # Spawn another random food
             return True
         return False
+
+    def eat_powerup(self, powerup: PowerUp) -> bool:
+        if self.body[len(self.body) - 1] == powerup.pos:
+            self.apply_powerup(powerup)
+            return True
+        return False
+
+    def apply_powerup(self, powerup):
+        print(f"Snake {self.name} ate powerup {powerup.name}")
+        self.powerups.append(powerup)
+        if isinstance(powerup, SpeedPowerUp):
+            self.speed += powerup.speedboost
+
+    def update_powerups(self):
+        expired_powerups = []
+        for powerup in self.powerups:
+            powerup.update()
+            if powerup.is_expired():
+                expired_powerups.append(powerup)
+        self.remove_powerups(expired_powerups)
+
+    def remove_powerups(self, expired_powerups):
+        for powerup in expired_powerups:
+            self.powerups.remove(powerup)
+            if isinstance(powerup, SpeedPowerUp):
+                self.speed -= powerup.speedboost
 
     def check_legal_move(self, command):
         # Can't reverse

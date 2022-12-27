@@ -15,6 +15,7 @@ from game.event_manager import GamePausedEvent, RestartGameEvent
 from game.event_manager import MenuControlInputEvent, GameEndedEvent
 from menus.menuHandler import MenuHandler
 from entities.bot import Bot
+from entities.itemHandler import ItemHandler
 from game.event_manager import SpawnFoodFromServerEvent
 from viewer.screens.screens import set_end_screen, set_final_score, set_options_screen
 from audio.sounds import Sounds
@@ -49,7 +50,6 @@ class GameEngine:
 
         self.menuHandler = MenuHandler(self, evManager)
         self.itemHandler = ItemHandler(self, evManager)
-
 
         self.model = GameModel()
 
@@ -136,6 +136,9 @@ class GameEngine:
 
         # Grow food
         self.init_food()
+
+        # Spawn powerups
+        self.init_powerups()
 
         # Set game state
         self.state = State(
@@ -247,7 +250,10 @@ class GameEngine:
 
     def init_food(self):
         for _ in range(config["PLAYER"]["INITIAL_FOOD"] - len(self.model.food)):
-            self.spawn_food()
+            self.itemHandler.create_food()
+
+    def init_powerups(self):
+        self.itemHandler.create_powerup()
 
     def reset_snakes(self):
         self.model.clear_snakes()
@@ -307,11 +313,12 @@ class GameEngine:
         pygame.quit()
         quit()
 
-
     def end_screen(self):
         pass
 
     def update_snakes(self):
+        # TODO function very ripe for refactoring
+
         # Move snakes snake
         # Update snakes in random order
         for snake in random.sample(self.model.snakes, len(self.model.snakes)):
@@ -334,10 +341,16 @@ class GameEngine:
                     if random.random() < config["COSMETIC"]["WAVE_RATE"]:
                         self.environment.activate_agent_on_position(food.pos)
                     self.sounds.play_player_effect(idx)
+                    self.itemHandler.create_food()
             for food in eaten_food:
                 self.model.remove_food(food)
 
-            snake.update_body()
+            for powerup in self.model.powerups:
+                if snake.eat_powerup(powerup=powerup):
+                    self.model.remove_powerup(powerup)
+                    self.sounds.play_player_effect(idx)
+                    self.itemHandler.create_powerup()
+            snake.update()
 
     # def update_items(self):
     #     for item in self.model.items:
