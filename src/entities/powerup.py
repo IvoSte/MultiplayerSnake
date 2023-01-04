@@ -20,5 +20,5 @@ class SpeedPowerUp(PowerUp):
         super().__init__(pos)
         self.color = pygame.Color(255, 255, 0)
         self.name = "speed"
-        self.duration = 60
-        self.speedboost = -0.0
+        self.duration = 30
+        self.speedboost = -2.0

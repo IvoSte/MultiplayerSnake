@@ -253,7 +253,7 @@ class GameEngine:
             self.itemHandler.create_food()
 
     def init_powerups(self):
-        self.itemHandler.create_powerup()
+        self.itemHandler.create_powerups({"speed": 10})
 
     def reset_snakes(self):
         self.model.clear_snakes()
@@ -329,7 +329,6 @@ class GameEngine:
                     snake.respawn()
                     snake.lives_left -= 1
                 continue
-            snake.move()
 
             snake.is_dead(self.model.grid_size, snakes=self.model.snakes)
 
@@ -350,6 +349,7 @@ class GameEngine:
                     self.model.remove_powerup(powerup)
                     self.sounds.play_player_effect(idx)
                     self.itemHandler.create_powerup()
+            snake.move()
             snake.update()
 
     # def update_items(self):

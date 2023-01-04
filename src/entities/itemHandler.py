@@ -25,10 +25,17 @@ class ItemHandler:
         color = Color(0, random.randint(200, 255), 0)
         self.add_item_to_spawn(Food(pos, color))
 
-    def create_powerup(self, pos=None):
+    def create_powerups(self, amount_per_types: dict):
+        for powerup_type_name in amount_per_types:
+            if powerup_type_name == "speed":
+                powerup_type = SpeedPowerUp
+            for i in range(amount_per_types[powerup_type_name]):
+                self.create_powerup(powerup_type=powerup_type)
+
+    def create_powerup(self, pos=None, powerup_type=SpeedPowerUp):
         if pos == None:
             pos = self.get_random_position()
-        self.add_item_to_spawn(SpeedPowerUp(pos))
+        self.add_item_to_spawn(powerup_type(pos))
 
     def add_item_to_spawn(self, item):
         self.to_spawn.append(item)

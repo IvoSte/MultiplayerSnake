@@ -5,6 +5,7 @@ import random
 from game.config import config
 from entities.food import Food
 from entities.powerup import PowerUp, SpeedPowerUp
+import math
 
 
 class Snake:
@@ -47,7 +48,6 @@ class Snake:
         self.lives_left = lives
         self.command = None
         self.move_dir_buffer = None
-        self.move_dist_buffer = 0
         self.move_freeze_timer = (
             config["GAMEPLAY"]["START_COUNTDOWN"] * config["GAME"]["TICKS_PER_SECOND"]
         )
@@ -125,6 +125,7 @@ class Snake:
         # If my head and neck are at the same position, don't check collisions
         # because it means I just spawned
         # TODO possibly index out of bounds issue here where it checks the neck if there is none.
+        print(f"{len(self.body)}")
         if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
             return False
 
@@ -178,6 +179,7 @@ class Snake:
         # When x or y crosses to the next grid position, we can change direction.
         # NOTE: This gives problems at higher speeds, when floating point errors.
         if self.x_pos % 1.0 == 0.0 and self.y_pos % 1.0 == 0.0:
+            # Update direction
             self.move_dir_buffer = self.command
         if self.move_freeze_timer > 0:
             self.move_freeze_timer -= 1
@@ -206,8 +208,9 @@ class Snake:
             y_pos_change = 0
 
         # current position of player head
-        self.x_pos += x_pos_change
-        self.y_pos += y_pos_change
+        # math.isclose to remove floating point imprecision
+        self.x_pos += round(x_pos_change, 4)
+        self.y_pos += round(y_pos_change, 4)
         # print(f"Snake moved to {self.x_pos} {self.y_pos}")
 
     def eat_food(self, food: Food) -> bool:
@@ -220,12 +223,13 @@ class Snake:
 
     def eat_powerup(self, powerup: PowerUp) -> bool:
         if self.body[len(self.body) - 1] == powerup.pos:
+            print(f"Snake {self.name} ate powerup {powerup.name} at {powerup.pos}")
             self.apply_powerup(powerup)
             return True
         return False
 
     def apply_powerup(self, powerup):
-        print(f"Snake {self.name} ate powerup {powerup.name}")
+        print(f"Snake {self.name} activated powerup {powerup.name} at {powerup.pos}")
         self.powerups.append(powerup)
         if isinstance(powerup, SpeedPowerUp):
             self.speed += powerup.speedboost
