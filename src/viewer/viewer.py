@@ -264,6 +264,10 @@ class Viewer:
                     self.unit_size[1],
                 ),
             )
+        # Draw shields
+        for idx in range(snake.length, max(0, snake.length - snake.shield_length), -1):
+            self.draw_shield(snake.body[(idx * snake.body_segment_density) - 1])
+
         # Draw decaying body
         for idx, pos in enumerate(snake.decaying_body):
             pygame.draw.rect(
@@ -273,6 +277,24 @@ class Viewer:
                     pos[0], pos[1], self.unit_size[0], self.unit_size[1]
                 ),
             )
+
+    def draw_shield(self, pos):
+        x1, y1, x2, y2 = self.rect_pixels_from_coords(
+            pos[0], pos[1], self.unit_size[0], self.unit_size[1]
+        )
+        pygame.draw.rect(
+            self.display,
+            pygame.Color(14, 100, 180, 100),
+            [x1, y1, x2, y2],
+            border_radius=5,
+        )
+        pygame.draw.rect(
+            self.display,
+            pygame.Color(103, 212, 240, 100),
+            [x1 - 5, y1 - 5, x2 + 10, y2 + 10],
+            width=5,
+            border_radius=5,
+        )
 
     def draw_food(self, food):
         pygame.draw.rect(

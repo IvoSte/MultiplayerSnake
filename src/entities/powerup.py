@@ -53,10 +53,10 @@ class GhostPowerUp(PowerUp):
 class ShieldPowerUp(PowerUp):
     def __init__(self, pos):
         super().__init__(pos)
-        self.color = pygame.Color(0, 0, 255)
+        self.color = pygame.Color(14, 100, 180)
         self.name = "shield"
         self.duration = 600
-        self.shield_length = 30
+        self.shield_length = 5
 
     def apply(self, snake):
         snake.shield_length += self.shield_length

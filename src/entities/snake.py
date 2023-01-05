@@ -34,7 +34,7 @@ class Snake:
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.speed = speed
-        self.body = [(x_pos, y_pos)]
+        self.body = [(x_pos, y_pos)] * length * body_segment_density
         self.decaying_body = []
         self.width = width
         self.length = length
@@ -173,14 +173,17 @@ class Snake:
 
     def get_bitten_on_shield(self, pos):
         bite_position = self.body.index(pos)
-        print(f"{bite_position},  {self.shield_length * self.body_segment_density}")
-        return bite_position <= self.shield_length * self.body_segment_density
+        return bite_position <= self.body_length() - (
+            self.shield_length * self.body_segment_density
+        )
 
     def get_bitten(self, pos):
         bite_position = self.body.index(pos)
 
         # Can't bite off my protected body parts
-        if bite_position <= self.shield_length * self.body_segment_density:
+        if bite_position <= self.body_length() - (
+            self.shield_length * self.body_segment_density
+        ):
             return 0
 
         # Can't bite off my head
@@ -319,7 +322,7 @@ class Snake:
 
         # Remove body at spawn. It will grow to length when starting to move.
         # Having only a head avoids collision with body at respawn
-        self.body = [(x_pos, y_pos)]
+        self.body = [(x_pos, y_pos)] * self.body_length()
 
     def report(self):
         print(f"Snake report: {self.name}")
