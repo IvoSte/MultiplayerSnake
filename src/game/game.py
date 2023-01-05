@@ -253,7 +253,7 @@ class GameEngine:
             self.itemHandler.create_food()
 
     def init_powerups(self):
-        self.itemHandler.create_powerups({"speed": 10})
+        self.itemHandler.create_powerups({"speed": 10, "ghost": 5, "shield": 5})
 
     def reset_snakes(self):
         self.model.clear_snakes()

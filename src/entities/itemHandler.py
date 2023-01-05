@@ -1,7 +1,7 @@
 from pygame import Color
 import random
 from entities.food import Food
-from entities.powerup import PowerUp, SpeedPowerUp
+from entities.powerup import PowerUp, SpeedPowerUp, GhostPowerUp, ShieldPowerUp
 
 
 class ItemHandler:
@@ -29,6 +29,10 @@ class ItemHandler:
         for powerup_type_name in amount_per_types:
             if powerup_type_name == "speed":
                 powerup_type = SpeedPowerUp
+            if powerup_type_name == "ghost":
+                powerup_type = GhostPowerUp
+            if powerup_type_name == "shield":
+                powerup_type = ShieldPowerUp
             for i in range(amount_per_types[powerup_type_name]):
                 self.create_powerup(powerup_type=powerup_type)
 

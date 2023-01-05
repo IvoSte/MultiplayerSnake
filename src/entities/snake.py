@@ -16,6 +16,7 @@ class Snake:
         speed=config["PLAYER"]["SNAKE_SPEED"],
         width=config["GAME"]["SNAKE_SIZE"] * config["game"]["RESOLUTION_SCALE"],
         length=config["PLAYER"]["INITIAL_SNAKE_LENGTH"],
+        body_segment_density=config["GAME"]["SNAKE_BODY_SEGMENTS_PER_BLOCK"],
         color=random.randint(0, 255),
         colormap=random.choice(list(colormaps.values())),
         colorscale=random.randint(1, config["COSMETIC"]["MAX_COLOR_SCALE"]),
@@ -37,6 +38,9 @@ class Snake:
         self.decaying_body = []
         self.width = width
         self.length = length
+        self.body_segment_density = (
+            body_segment_density  # The number of segments per block
+        )
         self.color = color
         self.colormap = colormap
         self.colorscale = colorscale
@@ -54,11 +58,12 @@ class Snake:
         self.body_buffer = 0
         self.body_decay_rate = config["COSMETIC"]["BODY_DECAY_RATE"]
 
-        self.ghost = False
         self.tails_lost = 0
         self.tails_eaten = 0
 
         self.powerups = []
+        self.is_ghost = False
+        self.shield_length = 0
 
     def set_command(self, command):
         if self.check_legal_move(command):
@@ -66,7 +71,7 @@ class Snake:
 
     def update(self):
         self.update_powerups()
-        self.update_body()
+        self.update_decaying_body()
 
     def update_body(self):
         # Update total body positions
@@ -74,13 +79,13 @@ class Snake:
             self.body.append((self.x_pos, self.y_pos))
         while len(self.body) > self.body_length():
             self.body.pop(0)
-        if len(self.decaying_body) > 0:
-            self.update_decaying_body()
 
     def body_length(self):
-        return self.length * self.speed
+        return self.length * self.body_segment_density
 
     def update_decaying_body(self):
+        if len(self.decaying_body) == 0:
+            return
         ## TODO Here stuff can go wrong if the decay rate is set different. I dislike working with these colours.
         if self.decay_body_color[0] == pygame.Color(0, 0, 0):
             self.decaying_body = []
@@ -98,15 +103,9 @@ class Snake:
         if snakes == None:
             snakes = [self]
         # hit edges/boundaries
-        if (
-            self.x_pos >= grid_size[0]
-            or self.x_pos < 0
-            or self.y_pos >= grid_size[1]
-            or self.y_pos < 0
-        ):
+        if self.border_collision(grid_size):
             # print(f"{self.name} hit the edge and died")
-            self.init_decaying_body(self.body[0 : len(self.body)])
-            self.alive = False
+            self.die()
 
         # Snake dies because it hits itself
         for other in snakes:
@@ -115,17 +114,31 @@ class Snake:
             else:
                 if self.collision(other):
                     # print(f"{self.name} booped a snake with its snoot, perishing in the process.")
-                    self.init_decaying_body(self.body[0 : len(self.body)])
-                    self.alive = False
+                    self.die()
+
+    def die(self):
+        self.init_decaying_body(self.body[0 : len(self.body)])
+        self.alive = False
+
+    def border_collision(self, grid_size):
+        if (
+            self.x_pos >= grid_size[0]
+            or self.x_pos < 0
+            or self.y_pos >= grid_size[1]
+            or self.y_pos < 0
+        ):
+            return True
+        return False
 
     def collision(self, other) -> bool:
+        if self.is_ghost or other.is_ghost:
+            return False
         # Collision if my head is in your body, we collided. You can be me
         # TODO head collisions are acceptable
 
         # If my head and neck are at the same position, don't check collisions
         # because it means I just spawned
         # TODO possibly index out of bounds issue here where it checks the neck if there is none.
-        print(f"{len(self.body)}")
         if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
             return False
 
@@ -136,28 +149,48 @@ class Snake:
             return self.body[len(self.body) - 1] in other.body
 
     def bite_collision(self, other):
-        # Hatchling snek is friendly
+        if other.is_ghost:
+            return
+        # Hatchling snek is friendly (when head and neck are at the same place, we don't bite)
         if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
             return
+        # I bite you where my head is at
         if self.body[len(self.body) - 1] in other.body[0 : len(other.body) - 1]:
-            self.move_freeze_timer = config["COSMETIC"]["FREEZE_FRAMES_ON_EAT"]
-            # I bite you where my head is at
+            if other.get_bitten_on_shield(pos=self.body[len(self.body) - 1]):
+                print(
+                    f"{self.name} tried to bite {other.name} but got blocked by their shield"
+                )
+                self.die()
+                return
             tails_bitten = other.get_bitten(self.body[len(self.body) - 1])
+
+            self.move_freeze_timer = config["COSMETIC"]["FREEZE_FRAMES_ON_EAT"]
 
             if other.name != self.name:
                 self.tails_eaten += tails_bitten
                 if config["MODE"]["TAIL_STEALING"]:
                     self.length += tails_bitten
 
+    def get_bitten_on_shield(self, pos):
+        bite_position = self.body.index(pos)
+        print(f"{bite_position},  {self.shield_length * self.body_segment_density}")
+        return bite_position <= self.shield_length * self.body_segment_density
+
     def get_bitten(self, pos):
         bite_position = self.body.index(pos)
 
+        # Can't bite off my protected body parts
+        if bite_position <= self.shield_length * self.body_segment_density:
+            return 0
+
         # Can't bite off my head
-        if bite_position >= len(self.body) - (1 * self.speed):
+        if bite_position >= len(self.body) - (1 * self.body_segment_density):
             return 0
 
         tails_lost = (
-            1 + (self.body_length() - ((len(self.body) - bite_position))) // self.speed
+            1
+            + (self.body_length() - ((len(self.body) - bite_position)))
+            // self.body_segment_density
         )
         if config["GAMEPLAY"]["VERZET"]:
             self.move_freeze_timer = config["GAMEPLAY"]["FREEZE_FRAMES_ON_BITTEN"]
@@ -175,7 +208,8 @@ class Snake:
         # The move command is issued each tick. This function translates that check to the move speed
         # Updating the direction at required points
         # if self.x_pos % self.width == 0 and self.y_pos % self.width == 0:
-        step_size = 1.0 / self.speed
+        step_size = 1.0 / self.body_segment_density
+        steps = int(self.speed)
         # When x or y crosses to the next grid position, we can change direction.
         # NOTE: This gives problems at higher speeds, when floating point errors.
         if self.x_pos % 1.0 == 0.0 and self.y_pos % 1.0 == 0.0:
@@ -184,7 +218,9 @@ class Snake:
         if self.move_freeze_timer > 0:
             self.move_freeze_timer -= 1
         else:
-            self.move_step(step_size)
+            for _ in range(steps):
+                self.move_step(step_size)
+                self.update_body()
 
     def move_step(self, step_size):
         # Determine move direction
@@ -231,8 +267,7 @@ class Snake:
     def apply_powerup(self, powerup):
         print(f"Snake {self.name} activated powerup {powerup.name} at {powerup.pos}")
         self.powerups.append(powerup)
-        if isinstance(powerup, SpeedPowerUp):
-            self.speed += powerup.speedboost
+        powerup.apply(self)
 
     def update_powerups(self):
         expired_powerups = []
@@ -245,8 +280,7 @@ class Snake:
     def remove_powerups(self, expired_powerups):
         for powerup in expired_powerups:
             self.powerups.remove(powerup)
-            if isinstance(powerup, SpeedPowerUp):
-                self.speed -= powerup.speedboost
+            powerup.remove(self)
 
     def check_legal_move(self, command):
         # Can't reverse
