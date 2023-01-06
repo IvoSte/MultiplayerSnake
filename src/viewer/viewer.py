@@ -268,6 +268,10 @@ class Viewer:
         for idx in range(snake.length, max(0, snake.length - snake.shield_length), -1):
             self.draw_shield(snake.body[(idx * snake.body_segment_density) - 1])
 
+        # for pos in snake.body:
+        #     if snake.position_is_shielded(pos):
+        #         self.draw_shield(pos)
+
         # Draw decaying body
         for idx, pos in enumerate(snake.decaying_body):
             pygame.draw.rect(

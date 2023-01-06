@@ -77,11 +77,24 @@ class Snake:
         # Update total body positions
         if self.alive:
             self.body.append((self.x_pos, self.y_pos))
-        while len(self.body) > self.body_length():
+        while len(self.body) > self.body_length:
             self.body.pop(0)
 
+    @property
     def body_length(self):
         return self.length * self.body_segment_density
+
+    @property
+    def head(self):
+        return self.body[len(self.body) - 1]
+
+    @property
+    def neck(self):
+        return self.body[len(self.body) - 2]
+
+    @property
+    def tail(self):
+        return self.body[0]
 
     def update_decaying_body(self):
         if len(self.decaying_body) == 0:
@@ -139,30 +152,30 @@ class Snake:
         # If my head and neck are at the same position, don't check collisions
         # because it means I just spawned
         # TODO possibly index out of bounds issue here where it checks the neck if there is none.
-        if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
+        if self.head == self.neck:
             return False
 
         # Collision with myself
         if other.name == self.name:
-            return self.body[len(self.body) - 1] in other.body[0 : len(other.body) - 1]
+            return self.head in other.body[0 : len(other.body) - 1]
         else:
-            return self.body[len(self.body) - 1] in other.body
+            return self.head in other.body
 
     def bite_collision(self, other):
         if other.is_ghost:
             return
         # Hatchling snek is friendly (when head and neck are at the same place, we don't bite)
-        if self.body[len(self.body) - 1] == self.body[len(self.body) - 2]:
+        if self.head == self.neck:
             return
         # I bite you where my head is at
-        if self.body[len(self.body) - 1] in other.body[0 : len(other.body) - 1]:
-            if other.get_bitten_on_shield(pos=self.body[len(self.body) - 1]):
+        if self.head in other.body[0 : len(other.body) - 1]:
+            if other.position_is_shielded(pos=self.head):
                 print(
                     f"{self.name} tried to bite {other.name} but got blocked by their shield"
                 )
                 self.die()
                 return
-            tails_bitten = other.get_bitten(self.body[len(self.body) - 1])
+            tails_bitten = other.get_bitten(pos=self.head)
 
             self.move_freeze_timer = config["COSMETIC"]["FREEZE_FRAMES_ON_EAT"]
 
@@ -171,9 +184,9 @@ class Snake:
                 if config["MODE"]["TAIL_STEALING"]:
                     self.length += tails_bitten
 
-    def get_bitten_on_shield(self, pos):
+    def position_is_shielded(self, pos):
         bite_position = self.body.index(pos)
-        return bite_position <= self.body_length() - (
+        return bite_position >= self.body_length - (
             self.shield_length * self.body_segment_density
         )
 
@@ -181,9 +194,7 @@ class Snake:
         bite_position = self.body.index(pos)
 
         # Can't bite off my protected body parts
-        if bite_position <= self.body_length() - (
-            self.shield_length * self.body_segment_density
-        ):
+        if self.position_is_shielded(pos):
             return 0
 
         # Can't bite off my head
@@ -192,7 +203,7 @@ class Snake:
 
         tails_lost = (
             1
-            + (self.body_length() - ((len(self.body) - bite_position)))
+            + (self.body_length - (len(self.body) - bite_position))
             // self.body_segment_density
         )
         if config["GAMEPLAY"]["VERZET"]:
@@ -254,14 +265,14 @@ class Snake:
 
     def eat_food(self, food: Food) -> bool:
         # TODO possibly should not be checked here but one place higher. This also works
-        if self.body[len(self.body) - 1] == food.pos:
+        if self.head == food.pos:
             self.length += 1
             self.score += 1
             return True
         return False
 
     def eat_powerup(self, powerup: PowerUp) -> bool:
-        if self.body[len(self.body) - 1] == powerup.pos:
+        if self.head == powerup.pos:
             print(f"Snake {self.name} ate powerup {powerup.name} at {powerup.pos}")
             self.apply_powerup(powerup)
             return True
@@ -322,7 +333,7 @@ class Snake:
 
         # Remove body at spawn. It will grow to length when starting to move.
         # Having only a head avoids collision with body at respawn
-        self.body = [(x_pos, y_pos)] * self.body_length()
+        self.body = [(x_pos, y_pos)] * self.body_length
 
     def report(self):
         print(f"Snake report: {self.name}")
