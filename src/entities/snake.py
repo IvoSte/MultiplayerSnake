@@ -94,7 +94,8 @@ class Snake:
 
     @property
     def tail(self):
-        return self.body[0]
+        # The tail is not just the tip, it is everything that is not the head
+        return self.body[0 : self.body_length - self.body_segment_density]
 
     def update_decaying_body(self):
         if len(self.decaying_body) == 0:
@@ -130,7 +131,7 @@ class Snake:
                     self.die()
 
     def die(self):
-        self.init_decaying_body(self.body[0 : len(self.body)])
+        self.init_decaying_body(self.body)
         self.alive = False
 
     def border_collision(self, grid_size):
@@ -144,20 +145,21 @@ class Snake:
         return False
 
     def collision(self, other) -> bool:
+        # Collision if my head is in your body, we collided. You can be me
+
+        # If I am a ghost, I can't collide with anything
         if self.is_ghost or other.is_ghost:
             return False
-        # Collision if my head is in your body, we collided. You can be me
         # TODO head collisions are acceptable
 
         # If my head and neck are at the same position, don't check collisions
         # because it means I just spawned
-        # TODO possibly index out of bounds issue here where it checks the neck if there is none.
         if self.head == self.neck:
             return False
 
         # Collision with myself
         if other.name == self.name:
-            return self.head in other.body[0 : len(other.body) - 1]
+            return self.head in other.tail
         else:
             return self.head in other.body
 
@@ -168,16 +170,19 @@ class Snake:
         if self.head == self.neck:
             return
         # I bite you where my head is at
-        if self.head in other.body[0 : len(other.body) - 1]:
+        if self.head in other.tail:
             if other.position_is_shielded(pos=self.head):
                 print(
                     f"{self.name} tried to bite {other.name} but got blocked by their shield"
                 )
                 self.die()
                 return
+            # Currently, don't freeze the frames, as now it will bring the snake in a loop, where it checks
+            # keeps biting the same position, again adding the freeze frames. Biting one position more fixes the problem, but
+            # makes for something uglier. Perhaps some other solution is needed (a small bite cooldown variable.)
+            # The bug was introduced when changing the order or when the snake moves and when it checks for collisions.
+            # self.move_freeze_timer = config["COSMETIC"]["FREEZE_FRAMES_ON_EAT"]
             tails_bitten = other.get_bitten(pos=self.head)
-
-            self.move_freeze_timer = config["COSMETIC"]["FREEZE_FRAMES_ON_EAT"]
 
             if other.name != self.name:
                 self.tails_eaten += tails_bitten
@@ -198,14 +203,17 @@ class Snake:
             return 0
 
         # Can't bite off my head
-        if bite_position >= len(self.body) - (1 * self.body_segment_density):
+        if bite_position >= len(self.body) - self.body_segment_density:
             return 0
+
+        # tails_lost = bite_position // self.body_segment_density
 
         tails_lost = (
             1
             + (self.body_length - (len(self.body) - bite_position))
             // self.body_segment_density
         )
+
         if config["GAMEPLAY"]["VERZET"]:
             self.move_freeze_timer = config["GAMEPLAY"]["FREEZE_FRAMES_ON_BITTEN"]
         self.init_decaying_body(self.body[0:bite_position])

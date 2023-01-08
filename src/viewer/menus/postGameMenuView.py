@@ -35,3 +35,9 @@ class PostGameMenuView(BaseMenuView):
                 Color.WHITE.value,
             ),
         }
+
+    def draw(self):
+        BaseMenuView.draw(self)
+        self.viewer.ui_player_information.display_players_information(
+            self.viewer.game.model.snakes
+        )

@@ -45,13 +45,14 @@ class Viewer:
         # Set display
         self.display_size = display_size
         if config["GAME"]["FULLSCREEN"]:
-            self.display = pygame.playplay.set_mode(
+            self.display = pygame.display.set_mode(
                 (display_size[0], display_size[1]), pygame.config["GAME"]["FULLSCREEN"]
             )
         else:
             self.display = pygame.display.set_mode((display_size[0], display_size[1]))
         pygame.display.set_caption(game_title)
 
+        self.transparent_screen = pygame.Surface(self.display_size, pygame.SRCALPHA)
         # self.screen = pygame.Surface()
 
         # Set fonts
@@ -118,9 +119,11 @@ class Viewer:
         self.ui_player_information = UI_player_information(self)
 
     def update(self):
+        self.display.blit(self.transparent_screen, (0, 0))
         pygame.display.update()
 
     def clear_screen(self):
+        self.transparent_screen.fill(pygame.Color(0, 0, 0, 0))
         self.display.fill(self.background_color)
 
     def absolute_to_relative_position(
@@ -205,7 +208,7 @@ class Viewer:
         for player in players:
             if player.move_freeze_timer >= 10:
                 relative_x, relative_y = self.absolute_to_relative_position(
-                    (player.x_pos, player.y_pos)
+                    (player.x_pos * player.width, player.y_pos * player.width)
                 )
                 self.draw_text(
                     msg=(player.move_freeze_timer // config["GAME"]["TICKS_PER_SECOND"])
@@ -213,7 +216,7 @@ class Viewer:
                     color=color_from_map(player.colormap, player.color),
                     relative_x=relative_x,
                     relative_y=relative_y,
-                    font=self.score_font_big,
+                    font=self.score_font_huge,
                     border=True,
                     bordercolor=Color.WHITE.value,
                 )
@@ -249,14 +252,19 @@ class Viewer:
         ]
 
     def draw_snake(self, snake):
+        if snake.is_ghost:
+            display = self.transparent_screen
+        else:
+            display = self.display
         # Draw body
         for idx, pos in enumerate(snake.body):
             pygame.draw.rect(
-                self.display,
+                display,
                 color_from_map(
                     snake.colormap,
                     snake.color + ((len(snake.body) - idx) * snake.colorscale),
-                ),
+                )
+                + (100,),
                 self.rect_pixels_from_coords(
                     pos[0],
                     pos[1],
@@ -265,12 +273,17 @@ class Viewer:
                 ),
             )
         # Draw shields
-        for idx in range(snake.length, max(0, snake.length - snake.shield_length), -1):
-            self.draw_shield(snake.body[(idx * snake.body_segment_density) - 1])
+        # for idx in range(snake.length, max(0, snake.length - snake.shield_length), -1):
+        #     self.draw_shield(snake.body[(idx * snake.body_segment_density) - 1])
 
-        # for pos in snake.body:
-        #     if snake.position_is_shielded(pos):
-        #         self.draw_shield(pos)
+        for idx, pos in enumerate(snake.body):
+            if (
+                snake.position_is_shielded(pos)
+                # only draw one shield per block
+                # BUGGED - ended here
+                and idx - 1 % snake.body_segment_density == 0
+            ):
+                self.draw_shield(pos)
 
         # Draw decaying body
         for idx, pos in enumerate(snake.decaying_body):
@@ -287,14 +300,14 @@ class Viewer:
             pos[0], pos[1], self.unit_size[0], self.unit_size[1]
         )
         pygame.draw.rect(
-            self.display,
-            pygame.Color(14, 100, 180, 100),
+            self.transparent_screen,
+            pygame.Color(14, 100, 180, 50),
             [x1, y1, x2, y2],
             border_radius=5,
         )
         pygame.draw.rect(
-            self.display,
-            pygame.Color(103, 212, 240, 100),
+            self.transparent_screen,
+            pygame.Color(103, 212, 240, 150),
             [x1 - 5, y1 - 5, x2 + 10, y2 + 10],
             width=5,
             border_radius=5,
@@ -378,7 +391,8 @@ class Viewer:
         self.menus[self.game.menuHandler.current_menu.name](
             self, self.game.menuHandler.current_menu
         ).draw()
-
+        # TODO tempoeary
+        # self.ui_player_information.display_players_information(self.game.model.snakes)
         self.update()
         # self.game.menu.draw_menu()  # this is bad, there should not be a draw function in a gameengine object
         # so it should be something like
