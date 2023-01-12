@@ -232,17 +232,15 @@ class Snake:
         # if self.x_pos % self.width == 0 and self.y_pos % self.width == 0:
         step_size = 1.0 / self.body_segment_density
         steps = int(self.speed)
+
         # When x or y crosses to the next grid position, we can change direction.
         # NOTE: This gives problems at higher speeds, when floating point errors.
         if self.x_pos % 1.0 == 0.0 and self.y_pos % 1.0 == 0.0:
             # Update direction
             self.move_dir_buffer = self.command
-        if self.move_freeze_timer > 0:
-            self.move_freeze_timer -= 1
-        else:
-            for _ in range(steps):
-                self.move_step(step_size)
-                self.update_body()
+        for _ in range(steps):
+            self.move_step(step_size)
+            self.update_body()
 
     def move_step(self, step_size):
         # Determine move direction

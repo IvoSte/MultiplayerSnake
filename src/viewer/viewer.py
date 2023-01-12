@@ -280,8 +280,7 @@ class Viewer:
             if (
                 snake.position_is_shielded(pos)
                 # only draw one shield per block
-                # BUGGED - ended here
-                and idx - 1 % snake.body_segment_density == 0
+                # and idx % snake.body_segment_density == snake.body_segment_density - 1
             ):
                 self.draw_shield(pos)
 
@@ -299,12 +298,12 @@ class Viewer:
         x1, y1, x2, y2 = self.rect_pixels_from_coords(
             pos[0], pos[1], self.unit_size[0], self.unit_size[1]
         )
-        pygame.draw.rect(
-            self.transparent_screen,
-            pygame.Color(14, 100, 180, 50),
-            [x1, y1, x2, y2],
-            border_radius=5,
-        )
+        # pygame.draw.rect(
+        #     self.transparent_screen,
+        #     pygame.Color(14, 100, 180, 50),
+        #     [x1, y1, x2, y2],
+        #     border_radius=5,
+        # )
         pygame.draw.rect(
             self.transparent_screen,
             pygame.Color(103, 212, 240, 150),
@@ -323,13 +322,20 @@ class Viewer:
         )
 
     def draw_powerup(self, powerup):
-        pygame.draw.rect(
-            self.display,
-            powerup.color,
+
+        self.display.blit(
+            powerup.draw(),
             self.rect_pixels_from_coords(
                 powerup.pos[0], powerup.pos[1], self.unit_size[0], self.unit_size[1]
             ),
         )
+        # pygame.draw.rect(
+        #     self.display,
+        #     powerup.color,
+        #     self.rect_pixels_from_coords(
+        #         powerup.pos[0], powerup.pos[1], self.unit_size[0], self.unit_size[1]
+        #     ),
+        # )
 
     def draw_environment(self, environment):
         for idx, agent in enumerate(environment.active_agents):
