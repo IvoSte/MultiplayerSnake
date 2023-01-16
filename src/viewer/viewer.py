@@ -312,6 +312,25 @@ class Viewer:
             border_radius=5,
         )
 
+    def draw_snake_powerup_counters(self, snake):
+        y_offset = 1
+        for idx, powerup in enumerate(snake.powerups):
+            # if we have more powerups than body segments, add a new row
+            if idx * snake.body_segment_density + 1 >= len(snake.body):
+                y_offset += 1
+                idx = 0
+            x, y = snake.body[-1 * (idx * snake.body_segment_density + 1)]
+            coords = self.rect_pixels_from_coords(
+                x, y - y_offset, self.unit_size[0], self.unit_size[1]
+            )
+            self.draw_powerup_counter(powerup, coords)
+
+    def draw_powerup_counter(self, powerup, coords):
+        self.display.blit(
+            powerup.draw_counter_circle(),
+            [coords[0], coords[1], coords[2], coords[3]],
+        )
+
     def draw_food(self, food):
         pygame.draw.rect(
             self.display,
@@ -375,6 +394,10 @@ class Viewer:
         # Draw players
         for snake in self.game.model.snakes:
             self.draw_snake(snake)
+
+        # Draw player powerup counters
+        for snake in self.game.model.snakes:
+            self.draw_snake_powerup_counters(snake)
 
         # Update score
         self.ui_player_information.display_players_information(self.game.model.snakes)
