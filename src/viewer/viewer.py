@@ -20,6 +20,11 @@ from viewer.menus.pauseMenuView import PauseMenuView
 from viewer.colors import Color, turbo_color, color_from_map, extend_colormaps
 from viewer.ui_elements.player_information import UI_player_information
 from game.config import config
+from viewer.game_elements.particles.particle import (
+    Particle,
+    SquareParticle,
+    CircleParticle,
+)
 
 
 class Viewer:
@@ -117,6 +122,17 @@ class Viewer:
         }
 
         self.ui_player_information = UI_player_information(self)
+
+        # self.particles = [
+        #     CircleParticle(
+        #         pos=(250, 250),
+        #         color=pygame.Color(255, 255, 255),
+        #         size=random.randint(1, 3),
+        #         duration=random.randint(1, 60),
+        #         velocity=(2 * random.random() - 1, 2 * random.random() - 1),
+        #     )
+        #     for _ in range(100)
+        # ]
 
     def update(self):
         self.display.blit(self.transparent_screen, (0, 0))
@@ -238,8 +254,8 @@ class Viewer:
         # Retrieve the correct rectangle object parameters from grid coordinates.
         # Offset arguments can be used to shift when the game space is not
         # equal to the full display (e.g. with borders)
-        x_offset = 0.5 * size_x
-        y_offset = 0.5 * size_y
+        x_offset += 0.5 * size_x
+        y_offset += 0.5 * size_y
         return [
             (x * (self.display_size[0] / self.game.model.grid_size[0]))
             - (0.5 * size_x)
@@ -367,6 +383,13 @@ class Viewer:
                 ),
             )
 
+    def draw_particles(self, particles):
+        particle_surface = pygame.Surface(self.display_size, pygame.SRCALPHA)
+        for particle in particles:
+            particle.draw(particle_surface)
+            particle.update()
+        self.display.blit(particle_surface, (0, 0))
+
     def notify(self, event):
         if isinstance(event, TickEvent):
             if self.game.state.in_game:
@@ -382,6 +405,9 @@ class Viewer:
         # Draw background / environment
         if config["COSMETIC"]["BACKGROUND_VISUALS"]:
             self.draw_environment(self.game.environment)
+
+        # Draw particles
+        # self.draw_particles(self.particles)
 
         # Draw food TODO draw items / draw entities
         for food in self.game.model.food:

@@ -52,7 +52,7 @@ class PowerUp(Item):
         pygame.draw.rect(surface, pygame.Color(0, 0, 0, 100), [0, 0, *self.size])
         pygame.draw.rect(
             surface,
-            pygame.Color(255, 255, 255, 255),
+            self.color,
             [0, 0, self.fraction_left * self.size[0], self.size[1]],
         )
         return surface
